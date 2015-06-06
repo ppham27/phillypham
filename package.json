@@ -25,13 +25,15 @@
     "redis": "~0.12.1",
     "validator": "~3.4.0",
     "express-validator": "~2.11.0",
-    "bluebird": "~2.9.27"
+    "bluebird": "~2.9.27",
+    "sequelize-fixtures": "~0.4.4"
   },
   "devDependencies": {
     "mocha": "~2.2.5",
     "chai": "~3.0.0",
     "sinon": "~1.14.1",
     "zombie": "~3.1.1",
-    "fakeredis": "~0.3.1"
+    "fakeredis": "~0.3.1",
+    "sqlite3": "~3.0.8"
   }
 }
