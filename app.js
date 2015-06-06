@@ -1,12 +1,19 @@
+// default to development environment
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
+var config = require('config');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var RedisStore = require('connect-redis')(session);
+var redisClient = require('./lib/redisClient')
 
+var models = require('./models');
 var routes = require('./routes/index');
-var users = require('./routes/users');
 
 var app = express();
 
@@ -19,11 +26,14 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser(config.secret));
+app.use(session({resave: false,
+                 secret: config.secret,
+                 saveUninitialized: false,
+                 store: new RedisStore({client: redisClient})}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
