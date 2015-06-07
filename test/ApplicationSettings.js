@@ -6,9 +6,18 @@ var validator = require('validator');
 
 describe('ApplicationSettings on fresh database', function() {
   beforeEach(function(done) {
+    var self = this;
     this.redisClient = redis.createClient('redisDb');
-    this.ApplicationSettings = require('../models/ApplicationSettings.js')(this.redisClient);
-    this.ApplicationSettings.on('ready', done);
+    this.redisClient.flushdb(function(err, isSuccess) {
+      self.ApplicationSettings = require('../models/ApplicationSettings')(self.redisClient);
+      self.ApplicationSettings.on('ready', done);
+    });
+  });
+
+  after(function(done) {
+    this.redisClient.flushdb(function(err, isSuccess) {
+      done();
+    });
   });
 
   it('should have no data', function() {
@@ -59,6 +68,7 @@ describe('ApplicationSettings on fresh database', function() {
     var data = {'a': 3, 'b': 7, 'c': 4};
     this.ApplicationSettings.build(data);
     for (var key in this.ApplicationSettings) {
+      // console.log(key);
       expect(data).to.have.property(key);
     }
     this.ApplicationSettings.set('d', 9);
@@ -77,7 +87,8 @@ describe('ApplicationSettings on fresh database', function() {
   });
 
   it('should save', function(done) {
-    this.ApplicationSettings.set({sidebarPhotoUrl: 'test.jpg',
+    this.ApplicationSettings.set({defaultUserGroupId: 1,
+                                  sidebarPhotoUrl: 'test.jpg',
                                   sidebarInfo: 'Hello, World!'});
     var stub = sinon.stub(this.redisClient, 'hmset', 
                           function(key, obj, callback) {
@@ -112,7 +123,8 @@ describe('ApplicationSettings on existing database', function() {
     sinon.stub(this.redisClient, 'hgetall',
                function(key, callback) {
                  expect(key).to.equal('applicationSettings');
-                 setTimeout(callback, 300, undefined, {sidebarPhotoUrl: 'test.jpg',
+                 setTimeout(callback, 300, undefined, {defaultUserGroupId: 1,
+                                                       sidebarPhotoUrl: 'test.jpg',
                                                        sidebarInfo: 'Hello, World!'});
                });
   });

@@ -12,7 +12,10 @@ var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 var redisClient = require('./lib/redisClient')
 
-var models = require('./models');
+var db = require('./models');
+db.once('ready', function() {
+  db.loadFixtures(config.fixtures, process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test');
+});
 var routes = require('./routes/index');
 
 var app = express();

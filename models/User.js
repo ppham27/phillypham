@@ -1,3 +1,5 @@
+var Promise = require('bluebird');
+
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define("User", {
     displayName: {type: DataTypes.STRING, field: 'display_name', unique: true, notNull: true},
@@ -13,9 +15,15 @@ module.exports = function(sequelize, DataTypes) {
   },
                           { classMethods: {
                             associate: function(db) {
-                              db.User.belongsTo(db.UserGroup);
+                              db.User.belongsTo(db.UserGroup, {foreignKey: {allowNull: false}, onDelete: 'CASCADE'});
                               db.User.belongsToMany(db.Role, {through: db.UserRole});
                             }
-                          }, tableName: 'users'});
+                          }, tableName: 'users',
+                            hooks: {
+                              beforeValidate: function(user) {
+                                user.salt = 'abc';
+                                return Promise.resolve(user);
+                              }
+                            }});
 
 }

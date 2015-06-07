@@ -73,26 +73,30 @@ module.exports = function(redisClient) {
   ApplicationSettings.save = function() {
     return new Promise(function(resolve, reject) {
                          // verify that required properties exist here
-                         if (ApplicationSettings.sidebarPhotoUrl && ApplicationSettings.sidebarInfo) {
+                         if (ApplicationSettings.sidebarPhotoUrl && 
+                             ApplicationSettings.sidebarInfo &&
+                             ApplicationSettings.defaultUserGroupId) {
                            redisClient.hmset('applicationSettings', 
                                              ApplicationSettings,
                                              function(err) {
-                                               if (err) return reject(err);
-                                               return resolve();
+                                               if (err) reject(err);
+                                               resolve();
                                              });
                          } else if (!ApplicationSettings.sidebarPhotoUrl) {
                            reject(new TypeError('Sidebar photo url must be a nonempty string'));
                          } else if (!ApplicationSettings.sidebarInfo) {
                            reject(new TypeError('Sidebar info must be a nonempty string'));
+                         } else if (!ApplicationSettings.defaultUserGroupId) {
+                           reject(new TypeError('User Group must be set'));
                          }                         
                        });
   }
   Object.defineProperties(ApplicationSettings,
-                          {build: {enumerable: false},
+                          {on: {enumerable: false},
+                           build: {enumerable: false},
                            set: {enumerable: false},
                            reset: {enumerable: false},
-                           save: {enumerable: false},
-                           on: {enumerable: false}});
+                           save: {enumerable: false}});
   return ApplicationSettings;
 };
 
