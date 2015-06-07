@@ -1,3 +1,4 @@
+var Sequelize = require('sequelize');
 var Promise = require('bluebird');
 
 module.exports = function(sequelize, DataTypes) {
@@ -14,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
                                                   return userGroup.getUsers()
                                                          .then(function(users) {
                                                            if (users.length === 0) return Promise.resolve(userGroup);
-                                                           return Promise.reject(new Error('user group must have no users on destroy'));
+                                                           return Promise.reject(new Sequelize.ValidationError('user group must have no users on destroy'));
                                                          });                                                  
                                                 });
                               db.UserGroup.belongsToMany(db.Role, {through: db.UserGroupRole});
