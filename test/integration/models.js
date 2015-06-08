@@ -80,7 +80,26 @@ describe('associations', function() {
     });
 
     it('should get user roles through the group', function(done) {
-      done();
+      var db = this.db;
+      Promise.all([db.User.find({where: {displayName: 'phil'}})
+                   .then(function(user) {
+                     return Promise.map(['poster', 'commenter'], function(role) {
+                              return user.hasPermission(role);
+                            });
+                   })
+                   .each(function(hasPermission) {
+                     expect(hasPermission).to.be.true;
+                   }), 
+                   db.User.find({where: {displayName: 'jobin'}})
+                   .then(function(user) {
+                     return Promise.props({poster: user.hasPermission('poster'), 
+                                           commenter: user.hasPermission('commenter') });
+                   })
+                   .then(function(userPermissions) {
+                     expect(userPermissions.poster).to.be.true;
+                     expect(userPermissions.commenter).to.be.false;
+                   })])
+      .then(function() { done(); });
     });
   });
 });

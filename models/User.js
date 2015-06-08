@@ -1,5 +1,6 @@
 var Promise = require('bluebird');
 
+
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define("User", {
     displayName: {type: DataTypes.STRING, field: 'display_name', unique: true, notNull: true, len: [1,15]},
@@ -18,7 +19,25 @@ module.exports = function(sequelize, DataTypes) {
                               db.User.belongsTo(db.UserGroup, {foreignKey: {allowNull: false}, onDelete: 'CASCADE'});
                               db.User.belongsToMany(db.Role, {through: db.UserRole});
                             }
-                          }, tableName: 'users',
+                          }, 
+                            instanceMethods: {
+                              hasPermission: function(permission) {                                
+                                var db = require('./index');
+                                var user = this;
+                                return db.Role.find({where: {name: permission}})
+                                       .then(function(role) {
+                                         return Promise.all([user.hasRole(role), 
+                                                             user.getUserGroup()
+                                                             .then(function(userGroup) {
+                                                               return userGroup.hasRole(role);
+                                                             })]);
+                                       })
+                                       .then(function(isPermitted) {
+                                         return Promise.resolve(isPermitted.some(function(p) { return p; }));
+                                       });
+                              }
+                            },
+                            tableName: 'users',
                             hooks: {
                               beforeValidate: function(user) {
                                 user.salt = 'abc';
