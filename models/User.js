@@ -16,7 +16,8 @@ module.exports = function(sequelize, DataTypes) {
   },
                           { classMethods: {
                             associate: function(db) {
-                              db.User.belongsTo(db.UserGroup, {foreignKey: {allowNull: false}, onDelete: 'CASCADE'});
+                              db.User.belongsTo(db.UserGroup, {foreignKey: {fieldName: 'userGroupId', field: 'user_group_id', allowNull: false}, 
+                                                               constraints: true, onDelete: 'CASCADE'});
                               db.User.belongsToMany(db.Role, {through: db.UserRole});
                             }
                           }, 

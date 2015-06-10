@@ -8,7 +8,7 @@ module.exports = function(sequelize, DataTypes) {
   },
                           { classMethods: {
                             associate: function(db) {
-                              db.UserGroup.hasMany(db.User);
+                              db.UserGroup.hasMany(db.User, {foreignKey: {fieldName: 'userGroupId', field: 'user_group_id', allowNull: false}});
                               // don't delete user groups that still have users attached to them
                               db.UserGroup.hook('beforeDestroy',
                                                 function(userGroup) {

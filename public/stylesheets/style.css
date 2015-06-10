@@ -8,3 +8,83 @@ body {
 a {
   color: #145d8a;
 }
+
+textarea#wmd-input {
+  font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
+  font-size: 100%;
+}
+
+.wmd-panel {
+  width: 640px;
+}
+
+.wmd-input {
+  width: 640px;
+  max-width: 640px;
+  height: 300px;
+}
+
+.wmd-button-row 
+{
+  position: relative; 
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  margin-top: 10px;
+  padding: 0px;  
+  height: 20px;
+}
+
+.wmd-button-bar {
+  width: 100%;
+  background-color: Silver; 
+}
+
+.wmd-spacer {
+  width: 1px; 
+  height: 20px; 
+  margin-left: 14px;
+  
+  position: absolute;
+  background-color: Silver;
+  display: inline-block; 
+  list-style: none;
+}
+
+.wmd-spacer1 {
+  left: 50px;
+}
+
+.wmd-spacer2 {
+  left: 175px;
+}
+
+.wmd-spacer3 {
+  left: 300px;
+}
+
+.wmd-button {
+  width: 20px;
+  height: 20px;
+  padding-left: 2px;
+  padding-right: 3px;
+  position: absolute;
+  display: inline-block;
+  list-style: none;
+  cursor: pointer;
+}
+
+.wmd-button > span {
+  background-image: url(../images/wmd-buttons.svg);
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+}
+
+.centered {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}

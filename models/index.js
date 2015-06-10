@@ -2,7 +2,6 @@
 
 var fs        = require('fs');
 var EventEmitter = require('events').EventEmitter;
-// var eventEmitter = new EventEmitter();
 var path      = require('path');
 var Sequelize = require('sequelize');
 var redis     = require('redis');
