@@ -12,17 +12,23 @@ var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 var redisClient = require('./lib/redisClient')
 
-var db = require('./models');
-db.once('ready', function() {
-  db.loadFixtures(config.fixtures, process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test');
-});
 var routes = require('./routes/index');
 
 var app = express();
 
+var db = require('./models');
+db.once('ready', function() {
+  db.loadFixtures(config.fixtures, process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test');
+  app.set('applicationSettings', db.ApplicationSettings);
+});
+
+
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+app.locals.pretty = true;
 
 // uncomment after placing your favicon in /public
 app.use(favicon(__dirname + '/public/favicon.ico'));

@@ -1,0 +1,12 @@
+include ../mixins/headerLink.jade
+
+#header
+  a#header-title(href="/")= settings.applicationSettings.title
+  #header-menu
+    +headerLink('Blog', '/')
+    +headerLink('DataViz', 'http://bl.ocks.org/ppham27')
+    +headerLink('Projects', '/projects')
+    +headerLink('Résumé', '/resume.pdf')
+    +headerLink('Contact Me', '/contact')
+    
+  

@@ -2,6 +2,17 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    meta(charset="utf-8")
+    link(rel="stylesheet", href="/stylesheets/style.css")
   body
-    block content
+    include ./includes/topbar.jade
+    #container
+      include ./includes/header.jade
+      #content
+        #right-sidebar
+          include ./includes/rightSidebar.jade
+        #mainbar
+          block content
+
+    
+    

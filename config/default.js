@@ -17,7 +17,9 @@ module.exports = {
   },
   // behavior is undetermined without at least one user group that matches
   // the default user group id
-  applicationSettings: { defaultUserGroupId: 1,
+  applicationSettings: { title: 'PhillyPham',                         
+                         defaultUserGroupId: 1,
+                         sidebarTitle: 'About Me',
                          sidebarPhotoUrl: 'test.jpg',
                          sidebarInfo: 'Hello, World!'
                        },
