@@ -5,11 +5,11 @@ var bcrypt = require('bcrypt');
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define("User", {
-    displayName: {type: DataTypes.STRING, field: 'display_name', unique: true, notNull: true, 
+    displayName: {type: DataTypes.STRING, field: 'display_name', unique: true, allowNull: false, 
                   validate: { len: [1,15]}},
-    email: {type: DataTypes.STRING, unique: true, allowNull: true, 
+    email: {type: DataTypes.STRING, unique: true, allowNull: false,
             validate: {isEmail: true}},
-    emailVerified: {type: DataTypes.BOOLEAN, defaultValue: false},
+    emailVerified: {type: DataTypes.BOOLEAN, defaultValue: false, field: 'email_verified'},
     salt: {type: DataTypes.STRING, defaultValue: null},
     password: {type: DataTypes.STRING, allowNull: true, 
                validate: {len: 8}},
@@ -41,7 +41,7 @@ module.exports = function(sequelize, DataTypes) {
                                                              })]);
                                        })
                                        .then(function(isPermitted) {
-                                         return Promise.resolve(isPermitted.some(function(p) { return p; }));
+                                         return Promise.resolve(user.emailVerified && isPermitted.some(function(p) { return p; }));
                                        });
                               },
                               hashPassword: function() {

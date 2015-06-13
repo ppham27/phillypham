@@ -9,6 +9,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var flash = require('flash');
 var RedisStore = require('connect-redis')(session);
 var redisClient = require('./lib/redisClient')
 
@@ -19,7 +20,7 @@ var app = express();
 var db = require('./models');
 db.once('ready', function() {
   db.loadFixtures(config.fixtures, process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test');
-  app.set('applicationSettings', db.ApplicationSettings);
+  app.set('ApplicationSettings', db.ApplicationSettings);
 });
 
 
@@ -34,12 +35,13 @@ app.locals.pretty = true;
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser(config.secret));
 app.use(session({resave: false,
                  secret: config.secret,
                  saveUninitialized: false,
                  store: new RedisStore({client: redisClient})}));
+app.use(flash());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);

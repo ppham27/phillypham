@@ -39,6 +39,6 @@ module.exports = {
     {model: 'UserGroup', data: {id: 4, name: 'moderator', description: 'extra extra privileges',
                                 Roles: [{name: 'commenter'}, {name: 'poster'},
                                         {name: 'post_editor'}, {name: 'comment_editor'}]}},
-    {model: 'User', data: {id: 1, displayName: 'admin', password: 'password', UserGroup: {name: 'admin'}}}
+    {model: 'User', data: {id: 1, displayName: 'admin', password: 'password', email: 'admin@admin.com', emailVerified: true, UserGroup: {name: 'admin'}}}
   ]   
 }

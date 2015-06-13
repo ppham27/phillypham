@@ -8,6 +8,10 @@ body {
   margin-bottom: 32px;
 }
 
+a {
+  color: #145d8a;
+}
+
 #topbar {
   width: 100%;
   background: rgba(0, 0, 0, 0.85);  
@@ -60,6 +64,10 @@ a.topbar-link {
   text-align: center;
 }
 
+#header a {
+  color: #003b52;
+}
+
 #header-menu {
   align: bottom;
 }
@@ -104,15 +112,17 @@ a.header-link:hover {
 
 #content h1, h2, h3, h4, h5, h6, p {
   margin: 0px;
-}
-
-#content h1, h2, h3, h4, h5, h6, p {
   padding-top: 5px;
   padding-bottom: 5px;
 }
 
+#content h1, h2, h3, h4, h5, h6 {
+  color: #003b52;
+}
+
 #mainbar {
   width: 805px;
+  min-height: 800px;
   padding-left: 0px;
   padding-right: 20px;
   padding-top: 15px;
@@ -139,10 +149,6 @@ a.header-link:hover {
 #sidebar-photo { 
   width: 275px;
   border: 2px solid #222;
-}
-
-a {
-  color: #145d8a;
 }
 
 textarea#wmd-input {
