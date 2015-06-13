@@ -22,11 +22,33 @@ module.exports = function(sequelize, DataTypes) {
   },
                           { tableName: 'users',
                             classMethods: {
-                            associate: function(db) {
-                              db.User.belongsTo(db.UserGroup, {foreignKey: {fieldName: 'userGroupId', field: 'user_group_id', allowNull: false}, 
-                                                               constraints: true, onDelete: 'CASCADE'});
-                              db.User.belongsToMany(db.Role, {through: db.UserRole});
-                            }
+                              associate: function(db) {
+                                db.User.belongsTo(db.UserGroup, {foreignKey: {fieldName: 'userGroupId', field: 'user_group_id', allowNull: false}, 
+                                                                 constraints: true, onDelete: 'CASCADE'});
+                                db.User.belongsToMany(db.Role, {through: db.UserRole});
+                              },
+                              authenticate: function(email, password, req) {
+                                var User = this;
+                                return User.findOne({where: {email: email}})
+                                       .then(function(user) {
+                                         if (!user) {   
+                                           if (req) {}
+                                           return Promise.reject(new Sequelize.ValidationError('user does not exist'));
+                                         } else {                                           
+                                           return new Promise(function(resolve, reject) {
+                                                                bcrypt.compare(password, user.password, function(err, res) {
+                                                                  if (err) {
+                                                                    if (req) {}
+                                                                    reject(err);
+                                                                  }
+                                                                  if (res) return resolve(user);
+                                                                  if (req) {}
+                                                                  return reject(new Sequelize.ValidationError('invalid password'));
+                                                                });
+                                                              });
+                                         }
+                                       });
+                              }
                           }, 
                             instanceMethods: {
                               hasPermission: function(permission) {                                
@@ -72,6 +94,7 @@ module.exports = function(sequelize, DataTypes) {
                             },
                             hooks: {
                               afterValidate: function(user) {
+                                user.email = user.email.toLowerCase();
                                 return user.hashPassword();
                               }
                             }});

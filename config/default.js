@@ -20,7 +20,7 @@ module.exports = {
   applicationSettings: { title: 'PhillyPham',                         
                          defaultUserGroupId: 1,
                          sidebarTitle: 'About Me',
-                         sidebarPhotoUrl: 'test.jpg',
+                         sidebarPhotoUrl: 'https://dl.dropboxusercontent.com/u/29552058/1504453_10151953824578353_1084290774_o.jpg',
                          sidebarInfo: 'Hello, World!'
                        },
   fixtures: [

@@ -91,7 +91,7 @@ a.header-link  {
 
 a.header-link:hover {
   color: #d02027;
-  outline: 3px solid #d02027;
+  outline: 2px solid #d02027;
 }
 
 
@@ -103,10 +103,11 @@ a.header-link:hover {
 
 #content {
   background: rgba(254, 254, 254, 0.75);
-  border: 5px solid rgba(179,226, 205, 0.75);
-  padding-left: 25px;
-  padding-right: 25px;
-  border-radius: 25px;
+  /*   border: 5px solid rgba(179,226, 205, 0.75); */
+  border: 1px solid rgba(77, 175, 74, 0.75);
+  padding-left: 28px;
+  padding-right: 28px;
+  border-radius: 28px;
   margin: 0px;
 }
 
