@@ -43,7 +43,8 @@
     "pagedown": "~1.1.0",
     "browserify": "~10.2.4",
     "sanitize-html": ">=1.7.0",
-    "gulp": "~3.9.0"
+    "gulp": "~3.9.0",
+    "bcrypt": "~0.8.3"
   },
   "devDependencies": {
     "mocha": "~2.2.5",

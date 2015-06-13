@@ -1,12 +1,18 @@
+var Sequelize = require('sequelize');
 var Promise = require('bluebird');
+var bcrypt = require('bcrypt');
 
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define("User", {
-    displayName: {type: DataTypes.STRING, field: 'display_name', unique: true, notNull: true, len: [1,15]},
-    email: {type: DataTypes.STRING, unique: true, allowNull: true, isEmail: true},
+    displayName: {type: DataTypes.STRING, field: 'display_name', unique: true, notNull: true, 
+                  validate: { len: [1,15]}},
+    email: {type: DataTypes.STRING, unique: true, allowNull: true, 
+            validate: {isEmail: true}},
+    emailVerified: {type: DataTypes.BOOLEAN, defaultValue: false},
     salt: {type: DataTypes.STRING, defaultValue: null},
-    password: {type: DataTypes.STRING, defaultValue: null},
+    password: {type: DataTypes.STRING, allowNull: true, 
+               validate: {len: 8}},
     familyName: {type: DataTypes.STRING, defaultValue: null, field: 'family_name'},
     givenName: {type: DataTypes.STRING, defaultValue: null, field: 'given_name'},
     middleName: {type: DataTypes.STRING, defaultValue: null, field: 'middle_name'},
@@ -14,7 +20,8 @@ module.exports = function(sequelize, DataTypes) {
     facebookId: {type: DataTypes.STRING, defaultValue: null, field: 'facebook_id'},
     googleId: {type: DataTypes.STRING, defaultValue: null, field: 'google_id'}
   },
-                          { classMethods: {
+                          { tableName: 'users',
+                            classMethods: {
                             associate: function(db) {
                               db.User.belongsTo(db.UserGroup, {foreignKey: {fieldName: 'userGroupId', field: 'user_group_id', allowNull: false}, 
                                                                constraints: true, onDelete: 'CASCADE'});
@@ -36,13 +43,36 @@ module.exports = function(sequelize, DataTypes) {
                                        .then(function(isPermitted) {
                                          return Promise.resolve(isPermitted.some(function(p) { return p; }));
                                        });
+                              },
+                              hashPassword: function() {
+                                var user = this;
+                                // no password needs to be hashed
+                                if (!user.password || user.salt) return Promise.resolve(user);
+                                return (new Promise(function(resolve, reject) {
+                                                      bcrypt.genSalt(12, function(err, salt) {
+                                                        if (err) reject(err);
+                                                        resolve(salt);
+                                                      });
+                                                    }))
+                                       .then(function(salt) {
+                                         user.salt = salt;
+                                         return new Promise(function(resolve, reject) {
+                                                              bcrypt.hash(user.password, salt, function(err, hash) {
+                                                                if (err) reject(err);
+                                                                resolve(hash);
+                                                              });
+                                                            });
+                                       })
+                                       .then(function(password) {
+                                         user.password = password
+                                         return Promise.resolve(user);
+                                       }); 
+                                
                               }
                             },
-                            tableName: 'users',
                             hooks: {
-                              beforeValidate: function(user) {
-                                user.salt = 'abc';
-                                return Promise.resolve(user);
+                              afterValidate: function(user) {
+                                return user.hashPassword();
                               }
                             }});
 

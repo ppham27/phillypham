@@ -31,7 +31,7 @@ describe('associations', function() {
       var db = this.db;
       db.UserGroup.create({name: 'A'})
       .then(function(userGroup) {
-        return userGroup.createUser({name: 'phil', password: 'a'});
+        return userGroup.createUser({name: 'phil', password: 'aaaaaaaaaaa'});
       })
       .then(function(user) {
         return db.UserGroup.create({name: 'B'});
@@ -63,8 +63,8 @@ describe('associations', function() {
       db.UserGroup.create({name: 'standard'})
       .then(function(userGroup) {
         return Promise.all([userGroup.createRole({name: 'poster'}),
-                            userGroup.createUser({displayName: 'phil', password: 'a'}), 
-                            userGroup.createUser({displayName: 'jobin', password: 'b'})]);
+                            userGroup.createUser({displayName: 'phil', password: 'aaaaaaaaaaaa'}), 
+                            userGroup.createUser({displayName: 'jobin', password: 'bbbbbbbbbbbb'})]);
       })
       .then(function(instances) {
         user = instances[1];

@@ -1,4 +1,5 @@
 var expect = require('chai').expect;
+var Sequelize = require('sequelize');
 
 describe('User', function() {
   beforeEach(function(done) {
@@ -26,6 +27,27 @@ describe('User', function() {
       done();
     });    
   }); 
+
+  it('should not allow short passwords', function(done) {
+    var db = this.db;
+    var User = this.User;
+    User.create({displayName: 'phil', password: '1234567'})
+    .catch(function(err) {
+      expect(err).to.be.instanceOf(db.sequelize.ValidationError);
+      done();
+    });
+  });
+
+  it('should add salt and hash passwords', function(done) {
+    var db = this.db;
+    var User = this.User;
+    User.create({displayName: 'phil', password: '123456789'})
+    .then(function(user) {
+      expect(user.salt).to.be.not.null;
+      expect(user.password).to.not.equal('123456789');
+      done();
+    });
+  });
 
   
 });
