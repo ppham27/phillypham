@@ -12,6 +12,31 @@ a {
   color: #145d8a;
 }
 
+#flash {
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  color: #d02027;
+  border: 2px solid #d02027;
+  padding: 10px;  
+}
+
+ul, ol {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 0px;  
+  margin-bottom: 0px;  
+}
+
+li {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 0px;  
+  margin-bottom: 0px;  
+}
+
 #topbar {
   width: 100%;
   background: rgba(0, 0, 0, 0.85);  
@@ -34,8 +59,13 @@ a {
   float: right;
 }
 
-.topbar-link-div {  
+.topbar-link-div, .topbar-div {  
   display: inline-block;
+}
+
+.topbar-div {
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .topbar-link-div:hover {  
@@ -44,8 +74,8 @@ a {
 
 a.topbar-link {
   display: block;
-  padding-left: 5px;
-  padding-right: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
   color: rgb(224, 224, 224);
   text-decoration: none;  
 }

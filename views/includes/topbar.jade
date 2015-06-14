@@ -3,11 +3,14 @@ include ../mixins/topbarLink.jade
 #topbar
   #topbar-content
     #topbar-content-right
-      +topbarLink('Login', '/login')
-      +topbarLink('Logout', '/logout')
-      +topbarLink('sadfsa', '/asdf')
-    #topbar-content-left
-      +topbarLink('New', 'random')
-      +topbarLink('Old', 'asfs')
-      +topbarLink('sadfs', 'sadfsa')
+      if locals.user
+        .topbar-div Hello, #{user.displayName}!
+        +topbarLink('User Settings', '/user/' + '#{user.id}')
+        +topbarLink('Logout', '/logout')
+      else 
+        +topbarLink('Login', '/login')
+    #topbar-content-left      
+      +topbarLink('Post', '/post')
+      +topbarLink('User Management', '/user')
+      +topbarLink('Application Settings', '/application-settings')
 

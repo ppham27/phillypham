@@ -23,8 +23,7 @@ db.once('ready', function() {
   app.set('ApplicationSettings', db.ApplicationSettings);
 });
 
-
-
+var passport = require('./lib/passport');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -40,8 +39,12 @@ app.use(cookieParser(config.secret));
 app.use(session({resave: false,
                  secret: config.secret,
                  saveUninitialized: false,
+                 cookie: {maxAge: 604800000},
                  store: new RedisStore({client: redisClient})}));
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(require('./lib/middleware/user'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);

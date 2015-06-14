@@ -9,5 +9,6 @@ router.get('/', function(req, res, next) {
 });
 
 router.use('/login', require('./login'));
+router.use('/logout', require('./logout'));
 
 module.exports = router;
