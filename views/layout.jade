@@ -4,6 +4,7 @@ html
     title= locals.title ? title + ' - ' + settings.ApplicationSettings.title : settings.ApplicationSettings.title
     meta(charset="utf-8")
     link(rel="stylesheet", href="/stylesheets/style.css")
+    link(rel="stylesheet", href="/stylesheets/highlight.js.css")
   body
     include ./includes/topbar.jade
     #container
@@ -15,6 +16,7 @@ html
           h1= title
           include ./includes/flash.jade
           block content
+    script(src="/javascripts/markdownBundle.js")
 
     
     

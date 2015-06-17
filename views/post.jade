@@ -1,0 +1,15 @@
+extends layout
+  
+block content
+  form#post-form
+    .wmd-panel
+      fieldset
+        label(for="title") Title:
+        span.text-input-span
+          input.text-input(type="text", name="title", placeholder="Enter a title here")
+      #wmd-button-bar
+      textarea#wmd-input.wmd-input
+  h2 Post Preview
+  #wmd-preview.wmd-panel.wmd-preview
+    
+    

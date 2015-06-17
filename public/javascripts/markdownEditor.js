@@ -103,7 +103,7 @@ var markdownEditor = function (markdownConverter, idPostfix, options) {
   }
   var getString = function (identifier) { return options.strings[identifier] || defaultsStrings[identifier]; }
 
-  idPostfix = idPostfix || "";
+  this.idPostfix = idPostfix = idPostfix || "";
 
   var hooks = this.hooks = new Markdown.HookCollection();
   hooks.addNoop("onPreviewRefresh");       // called with no arguments after the preview has been refreshed
