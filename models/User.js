@@ -18,7 +18,8 @@ module.exports = function(sequelize, DataTypes) {
     middleName: {type: DataTypes.STRING, defaultValue: null, field: 'middle_name'},
     photoUrl: {type: DataTypes.STRING, defaultValue: null, field: 'photo_url', allowNull: true, isUrl: true},
     facebookId: {type: DataTypes.STRING, defaultValue: null, field: 'facebook_id'},
-    googleId: {type: DataTypes.STRING, defaultValue: null, field: 'google_id'}
+    googleId: {type: DataTypes.STRING, defaultValue: null, field: 'google_id'},
+    twitterId: {type: DataTypes.STRING, defaultValue: null, field: 'twitter_id'}
   },
                           { tableName: 'users',
                             classMethods: {

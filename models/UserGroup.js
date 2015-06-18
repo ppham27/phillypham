@@ -3,7 +3,7 @@ var Promise = require('bluebird');
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('UserGroup', {
-    name: {type: DataTypes.STRING, unique: true, notNull: true},
+    name: {type: DataTypes.STRING, unique: true, allowNull: false},
     description: {type: DataTypes.TEXT}
   },
                           { classMethods: {

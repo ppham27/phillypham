@@ -2,15 +2,21 @@ include ../mixins/topbarLink.jade
   
 #topbar
   #topbar-content
+    #topbar-content-left
+      if locals.user
+        if roles['poster']
+          +topbarLink('Post', '/post')
+        if roles['user_manager']
+          +topbarLink('User Management', '/user')
+        if roles['settings_manager']
+          +topbarLink('Application Settings', '/application-settings')      
     #topbar-content-right
       if locals.user
-        .topbar-div Hello, #{user.displayName}!
-        +topbarLink('User Settings', '/user/' + '#{user.id}')
+        .topbar-div Hello, #{user.displayName}!        
+        +topbarLink('User Settings', '/user/' + user.id.toString())
         +topbarLink('Logout', '/logout')
       else 
         +topbarLink('Login', '/login')
-    #topbar-content-left      
-      +topbarLink('Post', '/post')
-      +topbarLink('User Management', '/user')
-      +topbarLink('Application Settings', '/application-settings')
+        +topbarLink('Register', '/user/register')
+
 
