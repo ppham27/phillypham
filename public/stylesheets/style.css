@@ -260,6 +260,16 @@ textarea#wmd-input {
   display: inline-block;
 }
 
+.wmd-prompt-background {
+  background-color: black;
+}
+
+.wmd-prompt-dialog {
+  border: 1px solid #999;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
 /* tables */
 .wmd-preview table {
   border-collapse: collapse;
