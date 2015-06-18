@@ -19,8 +19,11 @@ var app = express();
 
 var db = require('./models');
 db.once('ready', function() {
-  db.loadFixtures(config.fixtures, process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test');
   app.set('ApplicationSettings', db.ApplicationSettings);
+  db.loadFixtures(config.fixtures, process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')
+  .then(function() {
+    app.emit('ready');
+  });
 });
 
 var passport = require('./lib/passport');

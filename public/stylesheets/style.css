@@ -146,7 +146,7 @@ a.header-link:hover {
   margin: 0px;
 }
 
-#content h1, #content h2, #content h3, #content h4, #content h5, #content h6, #content p {
+#content h1, #content h2, #content h3, #content h4, #content h5, #content h6, #content p, #content pre {
   margin: 0px;
   padding-top: 5px;
   padding-bottom: 5px;
@@ -296,6 +296,17 @@ textarea#wmd-input {
   line-height: 1.5em;
   font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
   font-size: 100%;
+}
+
+.submit-button {
+  cursor: pointer;
+  background: #0b2844;
+  color: #fff;
+  font-size: 100%;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .centered {

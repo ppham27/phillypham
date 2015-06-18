@@ -4,7 +4,11 @@ var Promise = require('bluebird');
 describe('associations', function() {
   before(function(done) {
     this.db = require('../../models');
-    this.db.once('ready', done);
+    if (this.db.isReady) {
+      done();
+    } else {
+      this.db.once('ready', done);
+    }
   });
 
   beforeEach(function(done) {

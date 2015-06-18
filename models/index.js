@@ -16,7 +16,7 @@ var sequelize = new Sequelize(config.sequelize.database,
                               config.sequelize);
 var redisClient = require('../lib/redisClient');
 var db        = new EventEmitter();
-var isReady = false;
+db.isReady = false;
 
 var sequelizeModels = ['User', 'UserGroup', 'Role', 'UserRole', 'UserGroupRole'];
 
@@ -44,7 +44,7 @@ sequelize.sync({force: env === 'development' || env === 'test'})
       db.ApplicationSettings = require('./ApplicationSettings')(redisClient);
       db.ApplicationSettings.on('ready', function() {
         db.ApplicationSettings.set(config.applicationSettings).save();
-        isReady = true;
+        db.isReady = true;
         db.emit('ready');
       });
     });
@@ -54,7 +54,7 @@ sequelize.sync({force: env === 'development' || env === 'test'})
       if (!doesExist) {
         db.ApplicationSettings.on('ready', function() {
           db.ApplicationSettings.set(config.applicationSettings).save();
-          isReady = true;
+          db.isReady = true;
           db.emit('ready');
         });
       }
@@ -62,9 +62,8 @@ sequelize.sync({force: env === 'development' || env === 'test'})
   }  
 });
 
-db.isReady = function() { return isReady; }
 db.loadFixtures = function(fixtures, force) {
-  if (!isReady) throw new Error('database is not yet ready');
+  if (!db.isReady) throw new Error('database is not yet ready');
   return require('../lib/loadFixtures')(db, fixtures, force);
 }
 
