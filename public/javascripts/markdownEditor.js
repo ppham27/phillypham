@@ -1463,17 +1463,32 @@ function UIManager(postfix, panels, undoManager, previewManager, commandManager,
       xPosition += 25;
     }
 
-    buttons.bold = makeButton("wmd-bold-button", getString("bold"), "0px", bindCommand("doBold"));
-    buttons.italic = makeButton("wmd-italic-button", getString("italic"), "-20px", bindCommand("doItalic"));
+    buttons.bold = makeButton("wmd-bold-button", 
+                              getString("bold"), "0px", 
+                              bindCommand("doBold"));
+    buttons.italic = makeButton("wmd-italic-button", 
+                                getString("italic"), "-20px", 
+                                bindCommand("doItalic"));
     makeSpacer(1);
-                buttons.link = makeButton("wmd-link-button", getString("link"), "-40px", bindCommand(function (chunk, postProcessing) {
-                                                                                  return this.doLinkOrImage(chunk, postProcessing, false);
-                                                                                }));
-    buttons.quote = makeButton("wmd-quote-button", getString("quote"), "-60px", bindCommand("doBlockquote"));
-    buttons.code = makeButton("wmd-code-button", getString("code"), "-80px", bindCommand("doCode"));
-    buttons.image = makeButton("wmd-image-button", getString("image"), "-100px", bindCommand(function (chunk, postProcessing) {
-                                                                                   return this.doLinkOrImage(chunk, postProcessing, true);
-                                                                                 }));
+    buttons.link = makeButton("wmd-link-button", 
+                              getString("link"), "-40px", 
+                              bindCommand(function (chunk, postProcessing) {
+                                return this.doLinkOrImage(chunk, 
+                                                          postProcessing, 
+                                                          false); 
+                              }));
+    buttons.quote = makeButton("wmd-quote-button", 
+                               getString("quote"), "-60px", 
+                               bindCommand("doBlockquote"));
+    buttons.code = makeButton("wmd-code-button", 
+                              getString("code"), 
+                              "-80px", bindCommand("doCode"));
+    buttons.image = makeButton("wmd-image-button", getString("image"), 
+                               "-100px", 
+                               bindCommand(function (chunk, postProcessing) {
+                                 return this.doLinkOrImage(chunk, postProcessing, 
+                                                           true);
+                               }));
     makeSpacer(2);
     buttons.olist = makeButton("wmd-olist-button", getString("olist"), "-120px", bindCommand(function (chunk, postProcessing) {
                                                                                    this.doList(chunk, postProcessing, true);
