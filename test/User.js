@@ -12,19 +12,23 @@ describe('User', function() {
   });  
 
   it('should build user', function() {
-    var u = this.User.build({displayName: 'phil', email: 'phil@phillypham.com', password: 'a'});
+    var u = this.User.build({displayName: 'phil', email: 'phil@phillypham.com', password: 'aaaaaaaaaaaa'});
     expect(u.displayName).to.equal('phil');
   }); 
 
-  it('should not allow duplicate names', function(done) {
+  it('should automatically rename duplicate names', function(done) {
     var db = this.db;
     var User = this.User;
-    User.create({displayName: 'phil', email: 'phil@phillypham.com', password: 'phil'})
+    User.create({displayName: 'phil', email: 'phil@phillypham.com', password: 'philphilphil'})
     .then(function(user) {
-      return User.create({displayName: 'phil', password: 'chris'})
+      return User.create({displayName: 'phil', password: 'chrischris'})
     })    
-    .catch(function(err) {
-      expect(err).to.be.instanceOf(db.Sequelize.ValidationError);
+    .then(function(user) {
+      expect(user.displayName).to.match(/^phil[0-9]+$/);
+      return User.count();
+    })
+    .then(function(cnt) {
+      expect(cnt).to.equal(2);
       done();
     });    
   }); 

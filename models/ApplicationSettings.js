@@ -1,3 +1,5 @@
+// TODO: publish changes and subscribe to changes
+
 var Promise = require('bluebird');
 var EventEmitter = require('events').EventEmitter;
 

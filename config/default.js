@@ -1,4 +1,4 @@
-module.exports = {
+var config = {
   secret: 'keyboard cat',
   redis: {
     port: 6379,
@@ -18,28 +18,30 @@ module.exports = {
   // behavior is undetermined without at least one user group that matches
   // the default user group id
   applicationSettings: { title: 'PhillyPham',                         
-                         defaultUserGroupId: 1,
+                         defaultUserGroupId: 2,
                          sidebarTitle: 'About Me',
                          sidebarPhotoUrl: 'https://dl.dropboxusercontent.com/u/29552058/1504453_10151953824578353_1084290774_o.jpg',
                          sidebarInfo: 'Hello, World!'
                        },
   fixtures: [
-    {model: 'Role', data: {id: 1, name: 'poster', description: 'can post'}},
-    {model: 'Role', data: {id: 2, name: 'commenter', description: 'can comment'}},
-    {model: 'Role', data: {id: 3, name: 'post_editor', description: 'can edit posts'}},
-    {model: 'Role', data: {id: 4, name: 'comment_editor', description: 'can edit comments'}},
-    {model: 'Role', data: {id: 5, name: 'user_manager', description: 'can manage users'}},
-    {model: 'Role', data: {id: 6, name: 'settings_manager', description: 'can edit application settings'}},
-    {model: 'UserGroup', data: {id: 1, name: 'admin', description: 'all-powerful users',
+    {model: 'Role', data: {name: 'poster', description: 'can post'}},
+    {model: 'Role', data: {name: 'commenter', description: 'can comment'}},
+    {model: 'Role', data: {name: 'post_editor', description: 'can edit posts'}},
+    {model: 'Role', data: {name: 'comment_editor', description: 'can edit comments'}},
+    {model: 'Role', data: {name: 'user_manager', description: 'can manage users'}},
+    {model: 'Role', data: {name: 'settings_manager', description: 'can edit application settings'}},
+    {model: 'UserGroup', data: {name: 'admin', description: 'all-powerful users',
                                 Roles: [{name: 'poster'}, {name: 'commenter'}, {name: 'post_editor'},
                                         {name: 'comment_editor'}, {name: 'user_manager'}, {name: 'settings_manager'}]}},
-    {model: 'UserGroup', data: {id: 2, name: 'standard', description: 'default',
+    {model: 'UserGroup', data: {name: 'standard', description: 'default',
                                 Roles: [{name: 'commenter'}]}},
-    {model: 'UserGroup', data: {id: 3, name: 'power', description: 'extra privileges',
+    {model: 'UserGroup', data: {name: 'power', description: 'extra privileges',
                                 Roles: [{name: 'commenter'}, {name: 'poster'}]}},
-    {model: 'UserGroup', data: {id: 4, name: 'moderator', description: 'extra extra privileges',
+    {model: 'UserGroup', data: {name: 'moderator', description: 'extra extra privileges',
                                 Roles: [{name: 'commenter'}, {name: 'poster'},
                                         {name: 'post_editor'}, {name: 'comment_editor'}]}},
-    {model: 'User', data: {id: 1, displayName: 'admin', password: 'password', email: 'admin@admin.com', emailVerified: true, UserGroup: {name: 'admin'}}}
+    {model: 'User', data: {displayName: 'admin', password: 'password', email: 'admin@admin.com', emailVerified: true, UserGroup: {name: 'admin'}}}
   ]   
 }
+
+module.exports = config;
