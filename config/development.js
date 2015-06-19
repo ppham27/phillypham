@@ -6,8 +6,15 @@ var defaultConfig = require('./default.js');
 var sequelizeConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json')))[process.env.NODE_ENV];
 
 var config = { 
+  siteUrl: 'http://localhost:3000',
   redis: helper.parseSqlUrl('redis://h:password@127.0.0.1:6379'),
-  sequelize: helper.parseSequelizeConfig(sequelizeConfig)
+  sequelize: helper.parseSequelizeConfig(sequelizeConfig),
+  appKeys: {
+    facebook: {
+      clientID: '392842890908888',
+      clientSecret: 'e77660d2bd22037cb091f97d9ef22fc8'
+    }
+  }
 }
 
 config.redis.database = 2;

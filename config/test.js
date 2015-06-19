@@ -13,6 +13,12 @@ var config = {
     database: 3,
     password: 'password'
   },
+  appKeys: {
+    facebook: {
+      clientID: '392392270953950',
+      clientSecret: 'f98afb1786d320ed3465211c66efa47d'
+    }
+  },
   sequelize: helper.parseSequelizeConfig(sequelizeConfig)
 }
 

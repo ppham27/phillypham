@@ -1,5 +1,4 @@
 var config = {
-  siteUrl: 'http://localhost:3000',
   secret: 'keyboard cat',
   redis: {
     port: 6379,
@@ -24,12 +23,6 @@ var config = {
                          sidebarPhotoUrl: 'https://dl.dropboxusercontent.com/u/29552058/1504453_10151953824578353_1084290774_o.jpg',
                          sidebarInfo: 'Hello, World!'
                        },
-  appKeys: {
-    facebook: {
-      clientID: '392392270953950',
-      clientSecret: 'f98afb1786d320ed3465211c66efa47d'
-    }
-  },
   fixtures: [
     {model: 'Role', data: {name: 'poster', description: 'can post'}},
     {model: 'Role', data: {name: 'commenter', description: 'can comment'}},

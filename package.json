@@ -48,7 +48,9 @@
     "gulp": "~3.9.0",
     "bcrypt": "~0.8.3",
     "flash": "~1.1.0",
-    "highlight.js": "~8.6.0"
+    "highlight.js": "~8.6.0",
+    "request": "^2.58.0",
+    "async": "~1.2.1"
   },
   "devDependencies": {
     "mocha": "~2.2.5",

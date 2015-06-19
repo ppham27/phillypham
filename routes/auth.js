@@ -8,7 +8,8 @@ router.get('/facebook',
            passport.authenticate('facebook', 
                                  { scope: ['public_profile', 'email']}));
 
-router.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login' }),
+router.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login', 
+                                                                     failureFlash: true}),
            require('../lib/middleware/postLogin'));
 
 module.exports = router;

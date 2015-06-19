@@ -13,7 +13,8 @@
     "database": "phillypham_test",
     "host": "127.0.0.1",
     "dialect": "postgres",
-    "port": 5432
+    "port": 5432,
+    "logging": false
   },
   "production": {
     "use_env_variable": "DATABASE_URL"

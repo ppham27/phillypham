@@ -92,6 +92,18 @@ module.exports = function(sequelize, DataTypes) {
                               }
                             },
                             hooks: {
+                              beforeValidate: function(user) {
+                                // user already exists, do nothing
+                                if (user.id) return Promise.resolve(user);
+                                return user.Model.findOne({where: {displayName: user.displayName}})
+                                       .then(function(oldUser) {
+                                         // the displayName is unique do nothing
+                                         if (oldUser === null) return Promise.resolve(user);
+                                         // I suspect 4 digits will cover me, my app is small
+                                         user.displayName += Math.round(Math.random()*9999).toString();
+                                         return Promise.resolve(user);                                         
+                                       });
+                              },
                               afterValidate: function(user) {
                                 if (user.email) user.email = user.email.toLowerCase();
                                 return user.hashPassword();
