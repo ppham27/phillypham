@@ -1,5 +1,9 @@
 var markdown = require('../../lib/markdown');
 var markdownEditor = require('./markdownEditor');
+var ace = require('brace');
+require('brace/mode/plain_text');
+require('brace/theme/xcode');
+require('./brace/keybinding/emacs');
 var hljs = require('highlight.js');
 var pagedownExtra = require('../../lib/pagedownExtra');
 var mathJax = require('../../lib/mathJax');
@@ -11,6 +15,24 @@ var editor;
   }
   var makeEditor = document.getElementById('wmd-input') !== null;
   if (makeEditor) {
+    var aceEditor = ace.edit('wmd-editor');
+    aceEditor.getSession().setMode('ace/mode/plain_text');
+    aceEditor.setTheme('ace/theme/xcode');
+    aceEditor.renderer.setShowGutter(false);
+    aceEditor.renderer.setHighlightGutterLine(false);
+    aceEditor.setHighlightActiveLine(false);
+    aceEditor.setKeyboardHandler('ace/keyboard/emacs');
+    var wmdInput = document.getElementById('wmd-input');
+    aceEditor.on('change', function() {
+      wmdInput.value = aceEditor.getValue();
+      wmdInput.dispatchEvent(new Event('input'));
+    });
+    aceEditor.on('focus', function() {
+      document.getElementById('wmd-editor').classList.add('focused');
+    });
+    aceEditor.on('blur', function() {
+      document.getElementById('wmd-editor').classList.remove('focused');
+    });
     editor = new markdownEditor(markdown.Converter, undefined,
                                 {helpButton: {handler: editorHelp}});
     pagedownExtra.hookEditor(editor);
@@ -38,4 +60,4 @@ var editor;
   }        
   hljs.initHighlightingOnLoad();
   mathJaxConfigRequest.send();  
-})()
+})();
