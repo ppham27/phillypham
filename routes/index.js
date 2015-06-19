@@ -10,6 +10,7 @@ router.get('/', function(req, res, next) {
 
 router.use('/login', require('./login'));
 router.use('/logout', require('./logout'));
+router.use('/auth', require('./auth'));
 router.use('/post', require('./post'));
 
 module.exports = router;

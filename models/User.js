@@ -7,7 +7,7 @@ module.exports = function(sequelize, DataTypes) {
   return sequelize.define("User", {
     displayName: {type: DataTypes.STRING, field: 'display_name', unique: true, allowNull: false, 
                   validate: { len: [1,15]}},
-    email: {type: DataTypes.STRING, unique: true, allowNull: false,
+    email: {type: DataTypes.STRING, unique: true, allowNull: true,
             validate: {isEmail: true}},
     emailVerified: {type: DataTypes.BOOLEAN, defaultValue: false, field: 'email_verified'},
     salt: {type: DataTypes.STRING, defaultValue: null},
@@ -16,10 +16,11 @@ module.exports = function(sequelize, DataTypes) {
     familyName: {type: DataTypes.STRING, defaultValue: null, field: 'family_name'},
     givenName: {type: DataTypes.STRING, defaultValue: null, field: 'given_name'},
     middleName: {type: DataTypes.STRING, defaultValue: null, field: 'middle_name'},
-    photoUrl: {type: DataTypes.STRING, defaultValue: null, field: 'photo_url', allowNull: true, isUrl: true},
-    facebookId: {type: DataTypes.STRING, defaultValue: null, field: 'facebook_id'},
-    googleId: {type: DataTypes.STRING, defaultValue: null, field: 'google_id'},
-    twitterId: {type: DataTypes.STRING, defaultValue: null, field: 'twitter_id'}
+    photoUrl: {type: DataTypes.STRING, field: 'photo_url', defaultValue: '/images/default-profile.jpg'},
+    biography: {type: DataTypes.TEXT, allowNull: true},
+    facebookId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'facebook_id'},
+    googleId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'google_id'},
+    twitterId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'twitter_id'}    
   },
                           { tableName: 'users',
                             classMethods: {
@@ -92,7 +93,7 @@ module.exports = function(sequelize, DataTypes) {
                             },
                             hooks: {
                               afterValidate: function(user) {
-                                user.email = user.email.toLowerCase();
+                                if (user.email) user.email = user.email.toLowerCase();
                                 return user.hashPassword();
                               }
                             }});

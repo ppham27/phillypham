@@ -1,11 +1,14 @@
 extends layout
 
 block content
-  form(action="/login", method="POST")
-    input(type="text", name="email", placeholder="Email")
+  form#login-form(action="/login", method="POST")
+    input.text(type="text", name="email", placeholder="Email")
     br
-    input(type="password", name="password", placeholder="Password")
+    input.text(type="password", name="password", placeholder="Password")
     br
     input(type="submit", value="Login")
-    
-   
+  #login-buttons
+    a(href="/auth/facebook")
+      img(src="/images/facebook-login-button.png")
+      .overlay
+  

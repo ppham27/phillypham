@@ -36,6 +36,7 @@ app.locals.pretty = true;
 // uncomment after placing your favicon in /public
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser(config.secret));
@@ -48,7 +49,6 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(require('./lib/middleware/user'));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 
