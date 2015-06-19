@@ -10,6 +10,7 @@ var editor;
   var editorHelp = function() {
     alert('Do you need help?');
   }
+  var makeTitle = document.getElementById('post-title') !== null;
   var makeEditor = document.getElementById('wmd-input') !== null;
   if (makeEditor) {
     editor = new MarkdownAceEditor(markdown.Converter, undefined,
@@ -30,6 +31,10 @@ var editor;
       if (makeEditor) {
         mathJax.hookEditor(editor);
         editor.run();
+      }
+      if (makeTitle) {
+        document.getElementById('post-title')
+        .addEventListener('input', mathJax.run);
       }
     }
     document.head.appendChild(mathJaxCDN);
