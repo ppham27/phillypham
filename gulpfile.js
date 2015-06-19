@@ -26,4 +26,13 @@ gulp.task('migrate', function() {
   .stdout.pipe(process.stdout);
 });
 
+gulp.task('selenium', function() {
+  // on my system selenium is an alias for:
+  // java -jar /Users/phil/selenium/selenium-server-standalone-2.46.0.jar -Dwebdriver.chrome.driver=/Users/phil/selenium/chromedriver
+  var selenium = child_process.spawn('java', ['-jar', '/Users/phil/selenium/selenium-server-standalone-2.46.0.jar',
+                                              '-Dwebdriver.chrome.driver=/Users/phil/selenium/chromedriver']);
+  selenium.stdout.pipe(process.stdout);
+  selenium.stderr.pipe(process.stderr);
+});
+
 gulp.task('default', ['browserify', 'migrate']);

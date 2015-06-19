@@ -6,7 +6,7 @@ var bcrypt = require('bcrypt');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define("User", {
     displayName: {type: DataTypes.STRING, field: 'display_name', unique: true, allowNull: false, 
-                  validate: { len: [1,15]}},
+                  validate: { len: [1, 255]}},
     email: {type: DataTypes.STRING, unique: true, allowNull: true,
             validate: {isEmail: true}},
     emailVerified: {type: DataTypes.BOOLEAN, defaultValue: false, field: 'email_verified'},

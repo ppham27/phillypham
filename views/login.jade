@@ -7,8 +7,5 @@ block content
     input.text(type="password", name="password", placeholder="Password")
     br
     input(type="submit", value="Login")
-  #login-buttons
-    a(href="/auth/facebook")
-      img(src="/images/facebook-login-button.png")
-      .overlay
+  include ./includes/loginButtons.jade
   

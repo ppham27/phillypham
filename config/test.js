@@ -6,6 +6,7 @@ var defaultConfig = require('./default.js');
 var sequelizeConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json')))[process.env.NODE_ENV];
 
 var config = { 
+  siteUrl: 'http://localhost:8888',
   redis: {
     port: 6379,
     host: '127.0.0.1',
