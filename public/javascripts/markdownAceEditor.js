@@ -22,7 +22,7 @@ var defaultStrings = {
   quote: 'Blockquote <blockquote>',
   quoteExample: 'Blockquote',
   code: 'Code Sample <pre><code>',
-  codeexample: 'enter code here',
+  codeExample: 'enter code here',
   image: 'Image <img>',
   imagedescription: 'enter image description here',
   imagedialog: '<p><b>Insert Image</b></p><p>http://example.com/images/diagram.jpg "optional title"<br><br>Need <a href="http://www.google.com/search?q=free+image+hosting" target="_blank">free image hosting?</a></p>',
@@ -34,7 +34,6 @@ var defaultStrings = {
   hr: 'Horizontal Rule <hr>',
   undo: 'Undo',
   redo: 'Redo',
-  redomac: 'Redo',
   help: 'Markdown Editing Help'
 };
 
@@ -85,6 +84,10 @@ function MarkdownAceEditor(converter, idPostfix, options) {
                       {editor: editor,
                        indent: '>', defaultString: defaultStrings['quoteExample']});
   buttons.makeButton('code', defaultStrings['code'], '-80px');
+  bindButtonToCommand(buttons.buttonElements.code,
+                      toggleIndentEditor,
+                      {editor: editor,
+                       indent: '    ', defaultString: defaultStrings['codeExample']});
   buttons.makeButton('image', defaultStrings['image'], '-100px');
   buttons.makeSpacer(2);
   buttons.makeButton('olist', defaultStrings['olist'], '-120px');
@@ -279,6 +282,7 @@ function toggleIndentEditor(options) {
     selection.addRange(new Range(cursor.row, cursor.column - defaultString.length,
                                  cursor.row, cursor.column));
   } else {
+    if (editor.setEmacsMark) editor.setEmacsMark(null)
     editor.navigateFileEnd();
   }
   editor.focus();
@@ -292,9 +296,33 @@ function toggleIndentString(string, indent) {
     indentedSplitString = blockQuoteIndent(splitString, indent);    
     break;
     case '    ':
+    indentedSplitString = codeIndent(splitString, indent);
+    break;
+    case '#': 
     break;
   }  
   return indentedSplitString.join('\n');
+}
+
+function codeIndent(splitString, indent) {
+  var indented = splitString.map(function(string) {
+                   return /^[ ]{4}/.test(string) || /^\t/.test(string); 
+                 });
+  var decrement = indented[0] && indented.every(function(i) { return i; });
+  var indentedSplitString = splitString.map(function(string) {
+                              if (decrement) {
+                                if (/^[ ]{4}/.test(string)) {
+                                  return string.slice(4);
+                                } else if (/^\t/.test(string)) {
+                                  return string.slice(1);
+                                } else {
+                                  return string;
+                                }
+                              } else {
+                                return indent + string;
+                              }
+                            });
+  return indentedSplitString;
 }
 
 function blockQuoteIndent(splitString, indent) {
@@ -303,7 +331,7 @@ function blockQuoteIndent(splitString, indent) {
                        var cursor = string.indexOf(indent);
                        // count indent symbol while avoiding code blocks
                        while (cursor !== -1 && cursor < 4 &&
-                              /^\s{0,3}$/.test(string.substring(0, cursor))) {
+                              /^[ ]{0,3}$/.test(string.substring(0, cursor))) {
                          indentLevel += 1;
                          string = string.slice(cursor + 1);
                          cursor = string.indexOf(indent);
@@ -324,9 +352,8 @@ function blockQuoteIndent(splitString, indent) {
                               } else {
                                 if (indentLevels[idx] !== 0) {
                                   string = string.slice(string.indexOf(indent) + 1);
-                                  // then remove any white space up to 3
-                                  var whiteSpace = string.match(/^\s*/)[0].length;
-                                  return whiteSpace < 4 ? string.slice(whiteSpace) : string;
+                                  var spaces = string.match(/^[ ]*/)[0].length % 4;
+                                  return spaces > 0 ? string.slice(1) : string;
                                 } else {
                                   return string;
                                 }
