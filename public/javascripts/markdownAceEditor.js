@@ -20,7 +20,7 @@ var defaultStrings = {
   linkdescription: 'enter link description here',
   linkdialog: '<p><b>Insert Hyperlink</b></p><p>http://example.com/ "optional title"</p>',
   quote: 'Blockquote <blockquote>',
-  quoteexample: 'Blockquote',
+  quoteExample: 'Blockquote',
   code: 'Code Sample <pre><code>',
   codeexample: 'enter code here',
   image: 'Image <img>',
@@ -47,15 +47,25 @@ function MarkdownAceEditor(converter, idPostfix, options) {
   this.editor = createEditor(this.panels);
   var panels = this.panels;
   var editor = this.editor;
+
   var hooks = this.hooks = new Markdown.HookCollection();
   hooks.addNoop("onPreviewRefresh");
   // hooks.addNoop("postBlockquoteCreation");
-  // hooks.addFalse("insertImageDialog");
+  /* called with one parameter: a callback to be called with the URL of the image. 
+   * If the application creates
+   * its own image insertion dialog, this hook should return true, 
+   * and the callback should be called with the chosen
+   * image url (or null if the user cancelled). 
+   * If this hook returns false, the default dialog will be used.
+   */
+  hooks.addFalse("insertImageDialog");
   editor.on('change', function() {
     panels.preview.innerHTML = converter.makeHtml(editor.getValue());
     hooks.onPreviewRefresh();
   });  
+
   window.aceEditor = editor; // DEBUG CODE
+  
   var buttons = this.buttons = new ButtonCollection(panels.buttonBar);
   buttons.makeButton('bold', defaultStrings['bold'], '0px');
   bindButtonToCommand(buttons.buttonElements.bold,
@@ -70,6 +80,10 @@ function MarkdownAceEditor(converter, idPostfix, options) {
   buttons.makeSpacer(1);  
   buttons.makeButton('link', defaultStrings['link'], '-40px');
   buttons.makeButton('quote', defaultStrings['quote'], '-60px');
+  bindButtonToCommand(buttons.buttonElements.quote,
+                      toggleIndentEditor,
+                      {editor: editor,
+                       indent: '>', defaultString: defaultStrings['quoteExample']});
   buttons.makeButton('code', defaultStrings['code'], '-80px');
   buttons.makeButton('image', defaultStrings['image'], '-100px');
   buttons.makeSpacer(2);
@@ -142,7 +156,6 @@ ButtonCollection.prototype.makeButton = function(id, title, XShift) {
   button.appendChild(buttonImage);
   button.title = title;
   button.XShift = XShift;
-  // if (textOp) button.textOp = textOp;
   setupButton(button, true);
   this.buttonRow.appendChild(button);
   this.buttonElements[id] = button;
@@ -191,9 +204,11 @@ function createEditor(panels) {
   editor.getSession().setMode('ace/mode/markdown');
   editor.getSession().setUseWrapMode(true);
   editor.getSession().setWrapLimitRange(80, 80);
+  editor.setPrintMarginColumn(80);
   // editor.renderer.setShowLineNumbers(false);
-  editor.renderer.setShowInvisibles(true);
   editor.renderer.setShowGutter(false);
+  editor.renderer.setShowInvisibles(true);
+  editor.renderer.setDisplayIndentGuides(true);
   editor.renderer.setHighlightGutterLine(false);
   editor.setHighlightActiveLine(false);
   editor.setKeyboardHandler('ace/keyboard/emacs');
@@ -208,37 +223,115 @@ function createEditor(panels) {
   });
   return editor;
 }
-  
-function fenceEditor(options) {
+
+
+  function fenceEditor(options) {
   var editor = options.editor;
   var session = editor.getSession();
   var fence = options.fence;
   var defaultString = options.defaultString;
   var selection = session.getSelection();
-  var lastRange;
-  selection.getAllRanges()
-  .forEach(function(range, idx, ranges) {    
-    var isEmpty = range.isEmpty();
+  var ranges = selection.getAllRanges();
+  ranges.forEach(function(range) {    
     session.replace(range,
-                    fenceString(isEmpty ? defaultString : session.getTextRange(range), 
-                                fence));	
-    if (idx === ranges.length - 1) lastRange = range;
+                    fenceString(range.isEmpty() ? defaultString : session.getTextRange(range), 
+                                fence));
   });  
-  if (lastRange.isEmpty()) {
-    editor.moveCursorTo(lastRange.end.row, 
-                        lastRange.end.column + fence.length + defaultString.length);
-    selection.addRange(new Range(lastRange.start.row, lastRange.start.column + fence.length,
-                                 lastRange.end.row, 
-                                 lastRange.end.column + defaultString.length + fence.length));
-  } else {
-    editor.moveCursorTo(lastRange.end.row, 
-                        lastRange.end.column + 2*fence.length);
+  if (ranges.length === 1 && ranges[0].isEmpty()) {
+    var range = ranges[0];
     editor.clearSelection();
+    editor.moveCursorTo(range.end.row, 
+                        range.end.column + fence.length + defaultString.length);
+    selection.addRange(new Range(range.start.row, range.start.column + fence.length,
+                                 range.end.row, 
+                                 range.end.column + defaultString.length + fence.length));
+  } else {
+    editor.navigateFileEnd();
   }
   editor.focus();
-
 }
 
 function fenceString(string, fence) {
   return fence + string + fence;
 }
+
+
+function toggleIndentEditor(options) {
+  var editor = options.editor;
+  var session = editor.getSession();
+  var indent = options.indent;
+  var defaultString = options.defaultString;
+  var selection = session.getSelection();
+  var ranges = selection.getAllRanges();
+  var pre = '';
+  var post = '';
+  ranges.forEach(function(range) {
+    if (range.start.column !== 0) pre += '\n\n';
+    if (range.end.column < session.getLine(range.end.row).length - 1) post += '\n\n';    
+    var newString = toggleIndentString(range.isEmpty() ? defaultString : session.getTextRange(range), 
+                                       indent);
+    session.replace(range,
+                    pre + newString + post);
+  });
+  if (ranges.length === 1 && ranges[0].isEmpty()) {    
+    if (post !== '') editor.navigateUp(2); editor.navigateLineEnd();
+    var cursor = editor.getCursorPosition();
+    selection.addRange(new Range(cursor.row, cursor.column - defaultString.length,
+                                 cursor.row, cursor.column));
+  } else {
+    editor.navigateFileEnd();
+  }
+  editor.focus();
+}
+
+function toggleIndentString(string, indent) {
+  var splitString = string.split('\n');
+  var indentedSplitString;
+  switch(indent) {
+    case '>':
+    indentedSplitString = blockQuoteIndent(splitString, indent);    
+    break;
+    case '    ':
+    break;
+  }  
+  return indentedSplitString.join('\n');
+}
+
+function blockQuoteIndent(splitString, indent) {
+  var indentLevels = splitString.map(function(string) {
+                       var indentLevel = 0;
+                       var cursor = string.indexOf(indent);
+                       // count indent symbol while avoiding code blocks
+                       while (cursor !== -1 && cursor < 4 &&
+                              /^\s{0,3}$/.test(string.substring(0, cursor))) {
+                         indentLevel += 1;
+                         string = string.slice(cursor + 1);
+                         cursor = string.indexOf(indent);
+                       }
+                       return indentLevel;
+                     });
+  var firstLineIndentLevel = indentLevels[0];
+  var allEqual = indentLevels.every(function(indentLevel) { 
+                   return indentLevel === firstLineIndentLevel; 
+                 });
+  // determine indent behavior
+  var increment = allEqual && firstLineIndentLevel === 0;
+  var indentedSplitString = splitString.map(function(string, idx) {
+                              if (increment) {                                
+                                return indentLevels[idx] === 0  ? 
+                                  indent + ' ' + string : 
+                                  indent + string;
+                              } else {
+                                if (indentLevels[idx] !== 0) {
+                                  string = string.slice(string.indexOf(indent) + 1);
+                                  // then remove any white space up to 3
+                                  var whiteSpace = string.match(/^\s*/)[0].length;
+                                  return whiteSpace < 4 ? string.slice(whiteSpace) : string;
+                                } else {
+                                  return string;
+                                }
+                              }
+                            });
+  return indentedSplitString;
+}
+
