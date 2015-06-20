@@ -14,6 +14,7 @@ var editor;
                                    {helpButton: editorHelp});
     pagedownExtra.hookEditor(editor);
   }
+  window.myEditor = editor;
   var mathJaxConfig = document.createElement('script');
   mathJaxConfig.type = 'text/x-mathjax-config';
   var mathJaxCDN = document.createElement('script');

@@ -29,8 +29,8 @@ var defaultStrings = {
   olist: 'Numbered List <ol>',
   ulist: 'Bulleted List <ul>',
   litem: 'List item',
-  heading: 'Heading <h1>/<h2>',
-  headingexample: 'Heading',
+  heading: 'Heading <h1> &ndash; <h6>',
+  headingExample: 'Heading',
   hr: 'Horizontal Rule <hr>',
   undo: 'Undo',
   redo: 'Redo',
@@ -58,10 +58,6 @@ function MarkdownAceEditor(converter, idPostfix, options) {
    * If this hook returns false, the default dialog will be used.
    */
   hooks.addFalse("insertImageDialog");
-  editor.on('change', function() {
-    panels.preview.innerHTML = converter.makeHtml(editor.getValue());
-    hooks.onPreviewRefresh();
-  });  
 
   window.aceEditor = editor; // DEBUG CODE
   
@@ -93,14 +89,16 @@ function MarkdownAceEditor(converter, idPostfix, options) {
   buttons.makeButton('olist', defaultStrings['olist'], '-120px');
   buttons.makeButton('ulist', defaultStrings['ulist'], '-140px');
   buttons.makeButton('heading', defaultStrings['heading'], '-160px');
+  bindButtonToCommand(buttons.buttonElements.heading,
+                      toggleIndentEditor,
+                      {editor: editor,
+                       indent: '#', defaultString: defaultStrings['headingExample']});
   buttons.makeButton('hr', defaultStrings['hr'], '-180px');
   buttons.makeSpacer(3);
+  // for these two buttons bind commands later
   buttons.makeButton('undo', defaultStrings['undo'], '-200px');
-  bindButtonToCommand(buttons.buttonElements.undo,
-                      function() { editor.getSession().getUndoManager().undo(); })
   buttons.makeButton('redo', defaultStrings['redo'], '-220px');
-  bindButtonToCommand(buttons.buttonElements.redo,
-                      function() { editor.getSession().getUndoManager().redo(); })
+
   if (options.helpButton) {
     buttons.makeButton('help', defaultStrings['help'], '-240px');
     // extra attributes
@@ -110,15 +108,53 @@ function MarkdownAceEditor(converter, idPostfix, options) {
     // undo to button collection
     buttons.buttonElements.help.style.left = null;
     buttons.xPosition -= 25;
-  }    
+  } 
+     
+  this.refreshState = function() {
+    panels.preview.innerHTML = converter.makeHtml(editor.getValue());
+    
+    if (editor.getSession().getUndoManager().hasUndo()) {
+      setupButton(buttons.buttonElements.undo, 
+                  true);
+      bindButtonToCommand(buttons.buttonElements.undo,
+                          function() { 
+                            editor.getSession().getUndoManager().undo(); 
+                            editor.focus();
+                          })
+    } else {
+      setupButton(buttons.buttonElements.undo, false);
+      buttons.buttonElements.undo.onmouseover = 
+        buttons.buttonElements.undo.onmouseout = 
+        buttons.buttonElements.undo.onclick = function () { };
+    }
+    // weird timing issue, i don't understand why i need to put this in a timeout block
+    setTimeout(function() {
+      if (editor.getSession().getUndoManager().hasRedo()) {
+        setupButton(buttons.buttonElements.redo, true);
+        bindButtonToCommand(buttons.buttonElements.redo,
+                            function() { 
+                              editor.getSession().getUndoManager().redo(); 
+                              editor.focus();
+                            })
+      } else {
+        setupButton(buttons.buttonElements.redo, 
+                    false);
+        buttons.buttonElements.redo.onmouseover = 
+          buttons.buttonElements.redo.onmouseout = 
+          buttons.buttonElements.redo.onclick = function () { };
+      }
+    }, 0);
+    hooks.onPreviewRefresh();
+  }
 }
 
 MarkdownAceEditor.prototype.getConverter = function() {
   return this.converter;
 }
 
-MarkdownAceEditor.prototype.run = function() {
-  return this.hooks.onPreviewRefresh();
+MarkdownAceEditor.prototype.run = function() {  
+  this.editor.on('change', this.refreshState);
+  return this.refreshState();
 }
 
 module.exports = MarkdownAceEditor;
@@ -188,7 +224,6 @@ function setupButton(button, isEnabled) {
     };
   } else {
     image.style.backgroundPosition = button.XShift + " " + disabledYShift;
-    button.onmouseover = button.onmouseout = button.onclick = function () { };
   }
 }
 
@@ -276,11 +311,14 @@ function toggleIndentEditor(options) {
     session.replace(range,
                     pre + newString + post);
   });
-  if (ranges.length === 1 && ranges[0].isEmpty()) {    
-    if (post !== '') editor.navigateUp(2); editor.navigateLineEnd();
+  if (post !== '') editor.navigateUp(2); editor.navigateLineEnd();
+  if (indent === '#' && ranges.length === 1 && ranges[0].start.row === ranges[0].end.row) {    
+    editor.navigateLineStart();        
+    selection.selectLineEnd();        
+  } else if (ranges.length === 1 && ranges[0].isEmpty()) {        
     var cursor = editor.getCursorPosition();
     selection.addRange(new Range(cursor.row, cursor.column - defaultString.length,
-                                 cursor.row, cursor.column));
+                                 cursor.row, cursor.column));  
   } else {
     if (editor.setEmacsMark) editor.setEmacsMark(null)
     editor.navigateFileEnd();
@@ -299,9 +337,25 @@ function toggleIndentString(string, indent) {
     indentedSplitString = codeIndent(splitString, indent);
     break;
     case '#': 
+    indentedSplitString = headingIndent(splitString, indent);
     break;
   }  
   return indentedSplitString.join('\n');
+}
+
+function headingIndent(splitString, indent) {
+  var indentLevels = splitString.map(function(string) {
+                      return string.match(/^#{0,6}/)[0].length;
+                     });
+  var indentedSplitString = splitString.map(function(string) {
+                              var match = string.match(/^(#{0,6}) ?(.*)/);
+                              if (match[1].length === 6) {
+                                return match[2];
+                              } else {
+                                return match[1] + '# ' + match[2];
+                              }
+                            });
+  return indentedSplitString;
 }
 
 function codeIndent(splitString, indent) {
