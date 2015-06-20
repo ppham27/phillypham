@@ -57,7 +57,7 @@ function MarkdownAceEditor(converter, idPostfix, options) {
    * image url (or null if the user cancelled). 
    * If this hook returns false, the default dialog will be used.
    */
-  hooks.addFalse("insertImageDialog");
+  // hooks.addFalse("insertImageDialog"); TODO: currently doesn't do anything
 
   window.aceEditor = editor; // DEBUG CODE
   
@@ -87,13 +87,24 @@ function MarkdownAceEditor(converter, idPostfix, options) {
   buttons.makeButton('image', defaultStrings['image'], '-100px');
   buttons.makeSpacer(2);
   buttons.makeButton('olist', defaultStrings['olist'], '-120px');
+  bindButtonToCommand(buttons.buttonElements.olist,
+                      toggleIndentEditor,
+                      {editor: editor,
+                       indent: ':olist', defaultString: defaultStrings['litem']});
   buttons.makeButton('ulist', defaultStrings['ulist'], '-140px');
+  bindButtonToCommand(buttons.buttonElements.ulist,
+                      toggleIndentEditor,
+                      {editor: editor,
+                       indent: ':ulist', defaultString: defaultStrings['litem']});
   buttons.makeButton('heading', defaultStrings['heading'], '-160px');
   bindButtonToCommand(buttons.buttonElements.heading,
                       toggleIndentEditor,
                       {editor: editor,
                        indent: '#', defaultString: defaultStrings['headingExample']});
   buttons.makeButton('hr', defaultStrings['hr'], '-180px');
+  bindButtonToCommand(buttons.buttonElements.hr,
+                      ruleInsertEditor,
+                      {editor: editor, rule: '----------'});
   buttons.makeSpacer(3);
   // for these two buttons bind commands later
   buttons.makeButton('undo', defaultStrings['undo'], '-200px');
@@ -339,14 +350,39 @@ function toggleIndentString(string, indent) {
     case '#': 
     indentedSplitString = headingIndent(splitString, indent);
     break;
+    case ':olist': 
+    indentedSplitString = oListIndent(splitString, indent);
+    break;
+    case ':ulist': 
+    indentedSplitString = uListIndent(splitString, indent);
+    break;
   }  
   return indentedSplitString.join('\n');
 }
 
+function uListIndent(splitString, indent) {
+  var alreadyIndented = splitString.every(function(string, idx) {
+                          return string.indexOf('- ') === 0;
+                        });
+  var indentedSplitString = splitString.map(function(string, idx) {
+                              var prefix = '- ';
+                              return alreadyIndented ? string.slice(prefix.length) : prefix + string;
+                            });
+  return indentedSplitString;  
+}
+
+function oListIndent(splitString, indent) {
+  var alreadyIndented = splitString.every(function(string, idx) {
+                          return string.indexOf((idx + 1).toString() + '. ') === 0;
+                        });
+  var indentedSplitString = splitString.map(function(string, idx) {
+                              var prefix = (idx + 1).toString() + '. ';
+                              return alreadyIndented ? string.slice(prefix.length) : prefix + string;
+                            });
+  return indentedSplitString;  
+}
+
 function headingIndent(splitString, indent) {
-  var indentLevels = splitString.map(function(string) {
-                      return string.match(/^#{0,6}/)[0].length;
-                     });
   var indentedSplitString = splitString.map(function(string) {
                               var match = string.match(/^(#{0,6}) ?(.*)/);
                               if (match[1].length === 6) {
@@ -416,3 +452,22 @@ function blockQuoteIndent(splitString, indent) {
   return indentedSplitString;
 }
 
+function ruleInsertEditor(options) {
+  var editor = options.editor;
+  var rule = options.rule;
+  var session = editor.getSession();
+  var selection = session.getSelection();
+  var ranges = selection.getAllRanges();  
+  var pre = '\n';
+  var post = '\n\n';
+  ranges.forEach(function(range) {
+    if (range.start.column !== 0) pre += '\n';    
+    if (/^\s*$/.test(session.getLine(range.end.row).slice(range.end.column))
+      && range.end.row !== session.getLength() - 1) {
+      post = '\n';
+    }
+    session.replace(range, pre + rule + post);
+  });
+  editor.navigateFileEnd();
+  editor.focus();  
+}
