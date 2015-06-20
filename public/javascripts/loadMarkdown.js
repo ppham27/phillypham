@@ -7,14 +7,11 @@ var mathJax = require('../../lib/mathJax');
 var editor;
 
 (function() {
-  var editorHelp = function() {
-    alert('Do you need help?');
-  }
   var makeTitle = document.getElementById('post-title') !== null;
   var makeEditor = document.getElementById('wmd-input') !== null;
   if (makeEditor) {
     editor = new MarkdownAceEditor(markdown.Converter, undefined,
-                                   {helpButton: {handler: editorHelp}});
+                                   {helpButton: editorHelp});
     pagedownExtra.hookEditor(editor);
   }
   var mathJaxConfig = document.createElement('script');
@@ -49,3 +46,37 @@ var editor;
   hljs.initHighlightingOnLoad();
   mathJaxConfigRequest.send();  
 })();
+
+function editorHelp() {
+  var self = this;
+  var helpTip = document.createElement('div');
+  helpTip.className = 'help-tip';
+  helpTip.innerHTML = 'Get help here';
+  alert('TODO');
+}
+
+// (function() {
+//   self = document.getElementById('wmd-help-button');
+//   var width = 200;  
+//   var helpTip = document.createElement('div');
+//   helpTip.className = 'help-tip';
+//   helpTip.innerHTML = '### H3 ### H3### H3 ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3 ';
+//   document.body.appendChild(helpTip);  
+//   var buttonBoundingClientRect = self.getBoundingClientRect();
+//   helpTip.style.position = 'absolute';  
+//   helpTip.style.left = (buttonBoundingClientRect.left-width + document.body.scrollLeft).toString() + 'px';
+//   helpTip.style.bottom = (buttonBoundingClientRect.top + document.body.scrollTop).toString() + 'px';
+//   helpTip.style.width = width.toString() + 'px';
+//   helpTip.style.border = '1px solid #222';
+//   helpTip.style.backgroundColor = 'yellow';
+  
+//   self.addEventListener('click', function() {
+//     document.body.removeChild(helpTip);
+//   });
+//   console.log(buttonBoundingClientRect);  
+// })()
+
+
+
+
+

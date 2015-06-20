@@ -4,6 +4,10 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/style.css">
     <link rel="stylesheet" type="text/css" href="stylesheets/highlight.js.css">
     <style type="text/css" media="screen">
+     #wmd-button-bar {
+       width: 600px;
+       margin: 10px;
+     }
      #wmd-editor { 
        font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
        font-size: 100%;
@@ -16,6 +20,10 @@
      #wmd-editor.focused {
        outline: 3px solid rgb(112,154,192);
      }
+
+     #wmd-input {
+       display: none;
+     }
     </style>
   </head>  
   <body>
@@ -23,9 +31,9 @@
     <form>
       <div class="wmd-panel">
         <div><input id="post-title" type="text"></div>
-        <h2 id="preview-title"></h2>
-        <div id="wmd-button-bar"></div>
+        <h2 id="preview-title"></h2>        
         <textarea id="wmd-input" class="wmd-input"></textarea>
+        <div id="wmd-button-bar"></div>
         <div id="wmd-editor"></div>
       </div>
     </form>
@@ -70,7 +78,7 @@
      var previewTitle = document.getElementById('preview-title');
      postTitle.addEventListener('input', function() {
        previewTitle.textContent = postTitle.value;
-     }, false);
+     });
     </script>
 
 
