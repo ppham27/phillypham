@@ -138,7 +138,6 @@ a.header-link:hover {
 
 #content {
   background: rgba(254, 254, 254, 0.75);
-  /*   border: 5px solid rgba(179,226, 205, 0.75); */
   border: 1px solid rgba(77, 175, 74, 0.75);
   padding-left: 28px;
   padding-right: 28px;
@@ -152,17 +151,21 @@ a.header-link:hover {
   padding-bottom: 10px;
 }
 
-#content blockquote {
-  margin-top: 0px;
-  margin-bottom: 0px;
-  padding-top: 5px;
-  padding-bottom: 5px;  
+#content blockquote {  
+  margin: 0px;
+  padding: 5px;
+  padding-left: 28px;
 }
 
 #content pre, #content p {
   margin: 0px;
   padding-top: 5px;
   padding-bottom: 5px;  
+}
+
+.wmd-panel img {
+  max-width: 400px;
+  max-height: 600px;
 }
 
 #content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
@@ -326,7 +329,7 @@ textarea#wmd-input {
 #post-form .text-input-span {
   display: block;
   overflow: hidden;
-  padding-right: 6px;
+  padding-right: 8px;
   padding-left: 10px;
 }
 
