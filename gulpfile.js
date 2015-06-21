@@ -1,7 +1,9 @@
 var gulp = require('gulp');
 var fs = require('fs');
 var browserify = require('browserify');
+var ClosureCompiler = require('closurecompiler');
 var child_process = require('child_process');
+
 
 gulp.task('db:start', function() {
   var pg = child_process.spawn('postgres', ['-D', '/usr/local/var/postgres/']);
@@ -12,19 +14,34 @@ gulp.task('db:start', function() {
   redis.stderr.pipe(process.stdout);
 });
 
-gulp.task('browserify', function() {
+gulp.task('browserify', function(done) {
   var b = browserify('./public/javascripts/loadMarkdown.js');
-  var bStream = b.bundle();
+  var bStream = b.transform('uglifyify').bundle();
   bStream.on('end', function() {
     console.log('markdown has been browserified!');
+    done();
   });
-  bStream.pipe(fs.createWriteStream('./public/javascripts/markdownBundle.js'));
+  bStream.pipe(fs.createWriteStream('./public/javascripts/markdownBundle.js')); 
+});
+
+gulp.task('closurecompiler', ['browserify'], function() {
+  ClosureCompiler.compile('./public/javascripts/markdownBundle.js',
+                          {language_in: 'ECMASCRIPT5'},
+                          function(err, res) {
+                            fs.writeFile('./public/javascripts/markdownBundle-min.js', res,
+                                         function(err) {
+                                           if (err) throw err;
+                                           console.log('markdown has been compiled!');
+                                         });
+                          });
 });
 
 gulp.task('migrate', function() {  
   child_process.spawn('sequelize', ['db:migrate'])
   .stdout.pipe(process.stdout);
 });
+
+
 
 gulp.task('selenium', function() {
   // on my system selenium is an alias for:
@@ -35,4 +52,4 @@ gulp.task('selenium', function() {
   selenium.stderr.pipe(process.stderr);
 });
 
-gulp.task('default', ['browserify', 'migrate']);
+gulp.task('default', ['closurecompiler', 'migrate']);

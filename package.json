@@ -51,7 +51,9 @@
     "highlight.js": "~8.6.0",
     "request": "^2.58.0",
     "async": "~1.2.1",
-    "brace": "~0.5.1"
+    "brace": "~0.5.1",
+    "uglifyify": "~3.0.1",
+    "closurecompiler": "~1.5.2"
   },
   "devDependencies": {
     "mocha": "~2.2.5",
