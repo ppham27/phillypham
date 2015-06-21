@@ -889,53 +889,53 @@ function PreviewManager(converter, panels, previewRefreshCallback) {
   // setTimeout is already used.  Used as an event listener.
   var applyTimeout = function () {
 
-   if (timeout) {
-     clearTimeout(timeout);
-     timeout = undefined;
-   }
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = undefined;
+    }
 
-   if (startType !== "manual") {
+    if (startType !== "manual") {
 
-     var delay = 0;
+      var delay = 0;
 
-     if (startType === "delayed") {
-       delay = elapsedTime;
-     }
+      if (startType === "delayed") {
+        delay = elapsedTime;
+      }
 
-     if (delay > maxDelay) {
-       delay = maxDelay;
-     }
-     timeout = setTimeout(makePreviewHtml, delay);
-   }
- };
+      if (delay > maxDelay) {
+        delay = maxDelay;
+      }
+      timeout = setTimeout(makePreviewHtml, delay);
+    }
+  };
 
   var getScaleFactor = function (panel) {
-                                 if (panel.scrollHeight <= panel.clientHeight) {
-                                   return 1;
-                                 }
-                                 return panel.scrollTop / (panel.scrollHeight - panel.clientHeight);
-                               };
+    if (panel.scrollHeight <= panel.clientHeight) {
+      return 1;
+    }
+    return panel.scrollTop / (panel.scrollHeight - panel.clientHeight);
+  };
 
   var setPanelScrollTops = function () {
-                            if (panels.preview) {
-                              panels.preview.scrollTop = (panels.preview.scrollHeight - panels.preview.clientHeight) * getScaleFactor(panels.preview);
-                            }
-                          };
+    if (panels.preview) {
+      panels.preview.scrollTop = (panels.preview.scrollHeight - panels.preview.clientHeight) * getScaleFactor(panels.preview);
+    }
+  };
 
   this.refresh = function (requiresRefresh) {
 
-           if (requiresRefresh) {
-             oldInputText = "";
-             makePreviewHtml();
-           }
-           else {
-             applyTimeout();
-           }
-         };
+    if (requiresRefresh) {
+      oldInputText = "";
+      makePreviewHtml();
+    }
+    else {
+      applyTimeout();
+    }
+  };
 
   this.processingTime = function () {
-                         return elapsedTime;
-                       };
+    return elapsedTime;
+  };
 
   var isFirstTimeFilled = true;
 
@@ -943,73 +943,73 @@ function PreviewManager(converter, panels, previewRefreshCallback) {
   // (which is the case for inline editing) -- in that case, detach the element, set the
   // value, and reattach. Yes, that *is* ridiculous.
   var ieSafePreviewSet = function (text) {
-                           var preview = panels.preview;
-                           var parent = preview.parentNode;
-                           var sibling = preview.nextSibling;
-                           parent.removeChild(preview);
-                           preview.innerHTML = text;
-                           if (!sibling)
-                             parent.appendChild(preview);
-                           else
-                             parent.insertBefore(preview, sibling);
-                         }
+    var preview = panels.preview;
+    var parent = preview.parentNode;
+    var sibling = preview.nextSibling;
+    parent.removeChild(preview);
+    preview.innerHTML = text;
+    if (!sibling)
+      parent.appendChild(preview);
+    else
+      parent.insertBefore(preview, sibling);
+  }
 
   var nonSuckyBrowserPreviewSet = function (text) {
-                       panels.preview.innerHTML = text;
-                     }
+    panels.preview.innerHTML = text;
+  }
 
   var previewSetter;
 
   var previewSet = function (text) {
-                   if (previewSetter)
-                     return previewSetter(text);
+    if (previewSetter)
+      return previewSetter(text);
 
-                   try {
-                     nonSuckyBrowserPreviewSet(text);
-                     previewSetter = nonSuckyBrowserPreviewSet;
-                   } catch (e) {
-                     previewSetter = ieSafePreviewSet;
-                     previewSetter(text);
-                   }
-                 };
+    try {
+      nonSuckyBrowserPreviewSet(text);
+      previewSetter = nonSuckyBrowserPreviewSet;
+    } catch (e) {
+      previewSetter = ieSafePreviewSet;
+      previewSetter(text);
+    }
+  };
 
   var pushPreviewHtml = function (text) {
 
-              var emptyTop = position.getTop(panels.input) - getDocScrollTop();
+    var emptyTop = position.getTop(panels.input) - getDocScrollTop();
 
-              if (panels.preview) {
-                previewSet(text);
-                previewRefreshCallback();
-              }
+    if (panels.preview) {
+      previewSet(text);
+      previewRefreshCallback();
+    }
 
-              setPanelScrollTops();
+    setPanelScrollTops();
 
-              if (isFirstTimeFilled) {
-                  isFirstTimeFilled = false;
-                return;
-              }
+    if (isFirstTimeFilled) {
+      isFirstTimeFilled = false;
+      return;
+    }
 
-              var fullTop = position.getTop(panels.input) - getDocScrollTop();
+    var fullTop = position.getTop(panels.input) - getDocScrollTop();
 
-              if (uaSniffed.isIE) {
-                setTimeout(function () {
-                          window.scrollBy(0, fullTop - emptyTop);
-                        }, 0);
-              }
-              else {
-                window.scrollBy(0, fullTop - emptyTop);
-              }
-            };
+    if (uaSniffed.isIE) {
+      setTimeout(function () {
+        window.scrollBy(0, fullTop - emptyTop);
+      }, 0);
+    }
+    else {
+      window.scrollBy(0, fullTop - emptyTop);
+    }
+  };
 
   var init = function () {
 
-                                          setupEvents(panels.input, applyTimeout);
-                                          makePreviewHtml();
+    setupEvents(panels.input, applyTimeout);
+    makePreviewHtml();
 
-                                          if (panels.preview) {
-                                            panels.preview.scrollTop = 0;
-                                          }
-                                        };
+    if (panels.preview) {
+      panels.preview.scrollTop = 0;
+    }
+  };
 
   init();
 };
@@ -1020,38 +1020,38 @@ function PreviewManager(converter, panels, previewRefreshCallback) {
 // browser-specific hacks remain here.
 ui.createBackground = function () {
 
-                            var background = doc.createElement("div"),
-                            style = background.style;
-                            
-                            background.className = "wmd-prompt-background";
-                            
-                            style.position = "absolute";
-                            style.top = "0";
+  var background = doc.createElement("div"),
+      style = background.style;
+  
+  background.className = "wmd-prompt-background";
+  
+  style.position = "absolute";
+  style.top = "0";
 
-                            style.zIndex = "1000";
+  style.zIndex = "1000";
 
-                                if (uaSniffed.isIE) {
-                                  style.filter = "alpha(opacity=50)";
-                                }
-                            else {
-                              style.opacity = "0.5";
-                            }
+  if (uaSniffed.isIE) {
+    style.filter = "alpha(opacity=50)";
+  }
+  else {
+    style.opacity = "0.5";
+  }
 
-                            var pageSize = position.getPageSize();
-                            style.height = pageSize[1] + "px";
+  var pageSize = position.getPageSize();
+  style.height = pageSize[1] + "px";
 
-                            if (uaSniffed.isIE) {
-                              style.left = doc.documentElement.scrollLeft;
-                                style.width = doc.documentElement.clientWidth;
-                            }
-                            else {
-                              style.left = "0";
-                              style.width = "100%";
-                            }
+  if (uaSniffed.isIE) {
+    style.left = doc.documentElement.scrollLeft;
+    style.width = doc.documentElement.clientWidth;
+  }
+  else {
+    style.left = "0";
+    style.width = "100%";
+  }
 
-                            doc.body.appendChild(background);
-                            return background;
-                          };
+  doc.body.appendChild(background);
+  return background;
+};
 
 // This simulates a modal dialog box and asks for the URL when you
 // click the hyperlink or image buttons.

@@ -11,31 +11,68 @@ require('brace/mode/markdown');
 require('brace/theme/xcode');
 require('./brace/keybinding/emacs');
 
+// default options
+
+var defaultImageFormOptions = {title: 'Insert Image',
+                               fields: [{name: 'image-url', label: 'Image URL', type: 'url'},
+                                        {name: 'image-text', label: 'Text', placeholder: 'text describing the image'}],
+                               description: 'If you need somewhere to host your images, I recommend the Dropbox Public folder or <a href="http://imgur.com" target="_blank">Imgur</a>.'}
+
+var defaultLinkFormOptions = {title: 'Insert Link',
+                               fields: [{name: 'url', label: 'URL', type: 'url'},
+                                        {name: 'text', label: 'Text', placeholder: 'text describing the link'}],
+                               description: 'The URL is the address of the website. The text is what others will see in your document.'}
+
 var defaultStrings = {
   bold: 'Strong <strong>',
   boldExample: "strong text",
   italic: 'Emphasis <em>',
   italicExample: 'emphasized text',
   link: 'Hyperlink <a>',
-  linkdescription: 'enter link description here',
-  linkdialog: '<p><b>Insert Hyperlink</b></p><p>http://example.com/ "optional title"</p>',
+  linkDescription: 'enter link description here',
   quote: 'Blockquote <blockquote>',
   quoteExample: 'Blockquote',
   code: 'Code Sample <pre><code>',
   codeExample: 'enter code here',
   image: 'Image <img>',
-  imagedescription: 'enter image description here',
-  imagedialog: '<p><b>Insert Image</b></p><p>http://example.com/images/diagram.jpg "optional title"<br><br>Need <a href="http://www.google.com/search?q=free+image+hosting" target="_blank">free image hosting?</a></p>',
+  imageDescription: 'enter image description here',
   olist: 'Numbered List <ol>',
   ulist: 'Bulleted List <ul>',
   litem: 'List item',
-  heading: 'Heading <h1> &ndash; <h6>',
+  heading: 'Heading <h1> to <h6>',
   headingExample: 'Heading',
   hr: 'Horizontal Rule <hr>',
   undo: 'Undo',
   redo: 'Redo',
   help: 'Markdown Editing Help'
 };
+
+function createEditor(panels) {
+  var editor = ace.edit(panels.editor.id);
+  // my preferred options, should change later for more customizability
+  editor.setTheme('ace/theme/xcode');
+  editor.getSession().setMode('ace/mode/markdown');
+  editor.getSession().setUseWrapMode(true);
+  editor.getSession().setWrapLimitRange(80, 80);
+  editor.setPrintMarginColumn(80);
+  // editor.renderer.$gutterLayer.setShowLineNumbers(false);
+  editor.renderer.setShowGutter(false);
+  editor.renderer.setShowInvisibles(true);
+  editor.renderer.setDisplayIndentGuides(true);
+  editor.renderer.setHighlightGutterLine(false);
+  editor.setHighlightActiveLine(false);
+  editor.setKeyboardHandler('ace/keyboard/emacs');
+  editor.on('change', function() {
+    panels.input.value = editor.getValue();
+  });
+  editor.on('focus', function(e) {
+    panels.editor.classList.add('focused');
+  });
+  editor.on('blur', function(e) {
+    panels.editor.classList.remove('focused');
+  });
+  return editor;
+}
 
 
 function MarkdownAceEditor(converter, idPostfix, options) {
@@ -58,8 +95,6 @@ function MarkdownAceEditor(converter, idPostfix, options) {
    * If this hook returns false, the default dialog will be used.
    */
   // hooks.addFalse("insertImageDialog"); TODO: currently doesn't do anything
-
-  window.aceEditor = editor; // DEBUG CODE
   
   var buttons = this.buttons = new ButtonCollection(panels.buttonBar);
   buttons.makeButton('bold', defaultStrings['bold'], '0px');
@@ -74,6 +109,11 @@ function MarkdownAceEditor(converter, idPostfix, options) {
                        fence: '*', defaultString: defaultStrings['italicExample']});
   buttons.makeSpacer(1);  
   buttons.makeButton('link', defaultStrings['link'], '-40px');
+  bindButtonToCommand(buttons.buttonElements.link,
+                      dialogFormCommand,
+                      {editor: editor, formOptions: defaultLinkFormOptions,
+                       postProcess: createMarkdownLink,
+                       inserter: replaceCurrentRangeEditor});
   buttons.makeButton('quote', defaultStrings['quote'], '-60px');
   bindButtonToCommand(buttons.buttonElements.quote,
                       toggleIndentEditor,
@@ -85,6 +125,11 @@ function MarkdownAceEditor(converter, idPostfix, options) {
                       {editor: editor,
                        indent: '    ', defaultString: defaultStrings['codeExample']});
   buttons.makeButton('image', defaultStrings['image'], '-100px');
+  bindButtonToCommand(buttons.buttonElements.image,
+                      dialogFormCommand,
+                      {editor: editor, formOptions: defaultImageFormOptions,
+                       postProcess: createMarkdownImageLink,
+                       inserter: replaceCurrentRangeEditor});
   buttons.makeSpacer(2);
   buttons.makeButton('olist', defaultStrings['olist'], '-120px');
   bindButtonToCommand(buttons.buttonElements.olist,
@@ -123,6 +168,11 @@ function MarkdownAceEditor(converter, idPostfix, options) {
      
   this.refreshState = function() {
     panels.preview.innerHTML = converter.makeHtml(editor.getValue());
+    // make links open in a new tab, perhabs better addressed with a plugin
+    Array.prototype.slice.call(panels.preview.getElementsByTagName('a'))
+    .forEach(function(a) {
+      if (!a.target) a.target = '_blank';
+    });
     
     if (editor.getSession().getUndoManager().hasUndo()) {
       setupButton(buttons.buttonElements.undo, 
@@ -169,17 +219,6 @@ MarkdownAceEditor.prototype.run = function() {
 }
 
 module.exports = MarkdownAceEditor;
-
-function bindButtonToCommand(button, command,
-                             options) {
-  button.onclick = function() {
-    if (this.onmouseout) {
-      this.onmouseout();
-    }
-    if (options) return command.call(button, options);
-    return command.call(button);
-  };
-}
 
 
 function ButtonCollection(buttonBar) {
@@ -238,6 +277,17 @@ function setupButton(button, isEnabled) {
   }
 }
 
+function bindButtonToCommand(button, command,
+                             options) {
+  button.onclick = function() {
+    if (this.onmouseout) {
+      this.onmouseout();
+    }
+    if (options) return command.call(button, options);
+    return command.call(button);
+  };
+}
+
 
 function PanelCollection(idPostfix) {
   this.input = document.getElementById('wmd-input' + idPostfix);
@@ -246,35 +296,9 @@ function PanelCollection(idPostfix) {
   this.editor = document.getElementById('wmd-editor' + idPostfix);
 }
 
-function createEditor(panels) {
-  var editor = ace.edit(panels.editor.id);
-  // my preferred options, should change later for more customizability
-  editor.setTheme('ace/theme/xcode');
-  editor.getSession().setMode('ace/mode/markdown');
-  editor.getSession().setUseWrapMode(true);
-  editor.getSession().setWrapLimitRange(80, 80);
-  editor.setPrintMarginColumn(80);
-  // editor.renderer.setShowLineNumbers(false);
-  editor.renderer.setShowGutter(false);
-  editor.renderer.setShowInvisibles(true);
-  editor.renderer.setDisplayIndentGuides(true);
-  editor.renderer.setHighlightGutterLine(false);
-  editor.setHighlightActiveLine(false);
-  editor.setKeyboardHandler('ace/keyboard/emacs');
-  editor.on('change', function() {
-    panels.input.value = editor.getValue();
-  });
-  editor.on('focus', function(e) {
-    panels.editor.classList.add('focused');
-  });
-  editor.on('blur', function(e) {
-    panels.editor.classList.remove('focused');
-  });
-  return editor;
-}
+// functions that act on the editor, these are linked to buttons
 
-
-  function fenceEditor(options) {
+function fenceEditor(options) {
   var editor = options.editor;
   var session = editor.getSession();
   var fence = options.fence;
@@ -470,4 +494,141 @@ function ruleInsertEditor(options) {
   });
   editor.navigateFileEnd();
   editor.focus();  
+}
+
+function replaceCurrentRangeEditor(string, editor) {
+  var session = editor.getSession();
+  var selection = editor.getSelection();
+  var range = editor.getSelectionRange();
+  session.replace(range, string);
+  editor.findPrevious(']');
+  var to = editor.getCursorPosition();
+  editor.findPrevious('[');
+  var from = editor.getCursorPosition();    
+  editor.navigateTo(from.row, from.column);
+  selection.selectTo(to.row, to.column - 1)
+  editor.focus();
+}
+
+function createMarkdownImageLink(data) {
+  var url = data['image-url'].trim();
+  url = !url || url === 'http://' ? 'enter url to image here' : url;
+  var text = data['image-text'].trim() || defaultStrings['imageDescription'];
+  return '![' + text + '](' + url + ')';  
+}
+
+function createMarkdownLink(data) {
+  var url = data['url'].trim();
+  url = !url || url === 'http://' ? 'enter url to website here' : url;
+  var text = data['text'].trim() || defaultStrings['linkDescription'];
+  return '[' + text + '](' + url + ')';  
+}
+
+
+// various functions to get data from user with a dialog box
+
+function dialogFormCommand(options) {
+  var formOptions = options.formOptions;
+  var postProcess = options.postProcess;
+  var editor = options.editor;
+  var inserter = options.inserter;  
+  editor.blur();
+  createDialogForm(formOptions,
+                   function(formData) {
+                     var processedData = postProcess(formData);
+                     inserter(processedData, editor);
+                   });
+}
+
+
+
+function createDialogForm(formOptions, callback) {
+  var destroyDialogForm = function() {
+    document.body.removeChild(overlay);    
+    document.body.removeEventListener('keydown', keydown);
+  };
+  var keydown = function(event) {
+    switch(event.keyCode) {
+      case 27:                  // esc
+      destroyDialogForm();
+      break;
+      case 13:                  // enter
+      submit();
+      event.preventDefault();
+      break;
+    }
+  };
+  var submit = function() {
+    var inputs = Array.prototype.slice.call(form.getElementsByTagName('input'));
+    var formData = {};
+    inputs.forEach(function(input) {
+      formData[input.name] = input.value;
+    });
+    destroyDialogForm();
+    callback(formData);    
+  };
+  var overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.style.backgroundColor = 'rgba(0,0,0,0.3)';
+  overlay.style.height = document.body.scrollHeight + 'px';
+  overlay.style.width = document.body.scrollWidth + 'px';
+  overlay.style.display = 'block';
+  overlay.style.zIndex = 1000000;
+  document.body.appendChild(overlay);
+  var form = createForm(formOptions);  
+  form.addEventListener('click', function(event) {
+    event.stopPropagation();   
+  }, false);  
+  overlay.appendChild(form);
+  form.cancelButton.onclick = destroyDialogForm;
+  form.submitButton.onclick = submit;
+  overlay.addEventListener('click', function() {
+    destroyDialogForm();
+  });    
+  document.body.addEventListener('keydown', keydown);
+  form.getElementsByTagName('input')[0].focus();
+}
+
+function createForm(options) {
+  var form = document.createElement('div');
+  form.className = 'editor-dialog-box';
+  form.style.width = '400px';
+  form.style.height = '250px';
+  form.style.position = 'fixed';
+  form.style.left = '50%'
+  form.style.top = '50%'
+  form.style.marginLeft = '-200px';
+  form.style.marginTop = '-175px';
+  form.draggable = true;
+  form.style.zIndex = 10000000;
+  var title = document.createElement('h2');
+  title.textContent = options.title;  
+  form.appendChild(title);
+  options.fields.forEach(function(field, idx) {
+    var fieldset = document.createElement('fieldset');
+    var label = document.createElement('label');
+    label.textContent = field.label + ': ';
+    label.for = field.name;
+    var input = document.createElement('input')
+    input.type = 'text';
+    input.name = field.name;
+    if (field.type === 'url') input.value = 'http://';
+    if (field.placeholder) input.placeholder = field.placeholder;
+    fieldset.appendChild(label);
+    fieldset.appendChild(input);
+    form.appendChild(fieldset);    
+  });
+  var description = document.createElement('p');
+  description.innerHTML = options.description;
+  form.appendChild(description);
+  var buttons = document.createElement('div');
+  buttons.className = 'button-box';
+  form.cancelButton = document.createElement('button');
+  form.cancelButton.textContent = 'Cancel';
+  form.submitButton = document.createElement('button');
+  form.submitButton.textContent = 'Submit';
+  buttons.appendChild(form.cancelButton);
+  buttons.appendChild(form.submitButton);
+  form.appendChild(buttons);
+  return form;
 }
