@@ -74,6 +74,7 @@ li {
 }
 
 .topbar-div.logo svg {
+  width: 24px;
   height: 24px;
   margin-bottom: -5px;
   margin-right: -10px;
@@ -111,6 +112,7 @@ a.topbar-link {
 
 #header .logo svg {
   width: 70px;
+  height: 70px;
   margin-bottom: -14px;
   margin-left: 20px;  
 }
