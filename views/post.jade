@@ -6,11 +6,17 @@ block content
   form#post-form(method="POST", action="/post")
     .wmd-panel
       +fieldsetFilled('title', 'Title', 'Enter a title here')
-      #wmd-button-bar
-      textarea#wmd-input.wmd-input    
-    h2 Post Preview
+      #wmd-button-bar.wmd-button-bar
+      #wmd-editor.wmd-editor.tex2jax_ignore
+      textarea#wmd-input.wmd-input
+    h2#wmd-preview-title
     #wmd-preview.wmd-panel.wmd-preview
     +fieldsetFilled('tags', 'Tags', 'Enter a tags here separated by commas')
     input.submit-button(type="submit" value="Post")
-    
+  script.
+    var postTitle = document.querySelector('input[name="title"]');
+    var previewTitle = document.getElementById('wmd-preview-title');
+    postTitle.addEventListener('input', function() {
+       previewTitle.textContent = postTitle.value;
+    });
     

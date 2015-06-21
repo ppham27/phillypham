@@ -53,8 +53,8 @@ function createEditor(panels) {
   editor.setTheme('ace/theme/xcode');
   editor.getSession().setMode('ace/mode/markdown');
   editor.getSession().setUseWrapMode(true);
-  editor.getSession().setWrapLimitRange(80, 80);
-  editor.setPrintMarginColumn(80);
+  editor.getSession().setWrapLimitRange(89, 89);
+  editor.setPrintMarginColumn(89);
   // editor.renderer.$gutterLayer.setShowLineNumbers(false);
   editor.renderer.setShowGutter(false);
   editor.renderer.setShowInvisibles(true);
@@ -565,7 +565,8 @@ function createDialogForm(formOptions, callback) {
       formData[input.name] = input.value;
     });
     destroyDialogForm();
-    callback(formData);    
+    callback(formData);
+    return false;
   };
   var overlay = document.createElement('div');
   overlay.className = 'overlay';
@@ -580,8 +581,8 @@ function createDialogForm(formOptions, callback) {
     event.stopPropagation();   
   }, false);  
   overlay.appendChild(form);
-  form.cancelButton.onclick = destroyDialogForm;
-  form.submitButton.onclick = submit;
+  form.onreset = destroyDialogForm;
+  form.onsubmit = submit;
   overlay.addEventListener('click', function() {
     destroyDialogForm();
   });    
@@ -590,7 +591,7 @@ function createDialogForm(formOptions, callback) {
 }
 
 function createForm(options) {
-  var form = document.createElement('div');
+  var form = document.createElement('form');
   form.className = 'editor-dialog-box';
   form.style.width = '400px';
   form.style.height = '250px';
@@ -623,12 +624,14 @@ function createForm(options) {
   form.appendChild(description);
   var buttons = document.createElement('div');
   buttons.className = 'button-box';
-  form.cancelButton = document.createElement('button');
-  form.cancelButton.textContent = 'Cancel';
-  form.submitButton = document.createElement('button');
-  form.submitButton.textContent = 'Submit';
-  buttons.appendChild(form.cancelButton);
-  buttons.appendChild(form.submitButton);
+  var cancelButton = document.createElement('button');
+  cancelButton.type = 'reset';
+  cancelButton.textContent = 'Cancel';
+  var submitButton = document.createElement('button');
+  submitButton.type = 'submit';
+  submitButton.textContent = 'Submit';
+  buttons.appendChild(cancelButton);
+  buttons.appendChild(submitButton);
   form.appendChild(buttons);
   return form;
 }

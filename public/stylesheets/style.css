@@ -61,7 +61,7 @@ li {
 }
 
 #topbar-content-left { 
-   float: left; 
+  float: left; 
 } 
 
 .topbar-link-div, .topbar-div {  
@@ -146,14 +146,31 @@ a.header-link:hover {
   margin: 0px;
 }
 
-#content h1, #content h2, #content h3, #content h4, #content h5, #content h6, #content p, #content pre {
+#content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
+  margin: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#content blockquote {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-top: 5px;
+  padding-bottom: 5px;  
+}
+
+#content pre, #content p {
   margin: 0px;
   padding-top: 5px;
-  padding-bottom: 5px;
+  padding-bottom: 5px;  
 }
 
 #content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
   color: #003b52;
+}
+
+h2#wmd-preview-title {
+  padding-top: 20px;
 }
 
 #mainbar {
@@ -191,16 +208,28 @@ textarea#wmd-input {
   font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
   font-size: 100%;
   margin-top: 8px;
+  display: none;
+  width: 100%;
+  max-width: 100%;
+  height: 300px;
+}
+
+#wmd-editor { 
+  font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
+  font-size: 100%;
+  width: 100%;
+  max-width: 100%;
+  height: 300px;
+  outline: 1px solid #999;
+}
+
+
+#wmd-editor.focused {
+  outline: 3px solid rgb(112,154,192);
 }
 
 .wmd-panel {
   width: 98%;
-}
-
-.wmd-input {
-  width: 100%;
-  max-width: 100%;
-  height: 300px;
 }
 
 .wmd-button-row {
@@ -215,7 +244,7 @@ textarea#wmd-input {
 
 .wmd-button-bar {
   width: 100%;
-  background-color: Silver; 
+  margin-bottom: 18px;
 }
 
 .wmd-spacer {
@@ -367,4 +396,32 @@ textarea#wmd-input {
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+
+.overlay form.editor-dialog-box {
+  border: 1px solid #222;
+  background-color: #fefefe;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.overlay form.editor-dialog-box  input {
+  line-height: 1.5em;
+  margin-left: 10px;
+  width: 270px;
+}
+
+.overlay form.editor-dialog-box fieldset {
+  text-align: right;
+}
+
+.overlay form.editor-dialog-box .button-box {
+  text-align: right;
+}
+
+.overlay form.editor-dialog-box button {
+  padding: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
 }

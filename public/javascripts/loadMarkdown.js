@@ -1,5 +1,4 @@
 var markdown = require('../../lib/markdown');
-// var MarkdownEditor = require('./markdownEditor');
 var MarkdownAceEditor = require('./markdownAceEditor');
 var hljs = require('highlight.js');
 var pagedownExtra = require('../../lib/pagedownExtra');
@@ -7,7 +6,7 @@ var mathJax = require('../../lib/mathJax');
 var editor;
 
 (function() {
-  var makeTitle = document.getElementById('post-title') !== null;
+  var makeTitle = document.querySelector('#post-form input[name="title"]') !== null;
   var makeEditor = document.getElementById('wmd-input') !== null;
   if (makeEditor) {
     editor = new MarkdownAceEditor(markdown.Converter, undefined,
@@ -30,8 +29,9 @@ var editor;
         editor.run();
       }
       if (makeTitle) {
-        document.getElementById('post-title')
+        document.querySelector('#post-form input[name="title"]')
         .addEventListener('input', mathJax.run);
+        editor.editor.focus();
       }
     }
     document.head.appendChild(mathJaxCDN);
