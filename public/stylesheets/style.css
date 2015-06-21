@@ -73,6 +73,12 @@ li {
   padding-right: 10px;
 }
 
+.topbar-div.logo svg {
+  height: 24px;
+  margin-bottom: -5px;
+  margin-right: -10px;
+}
+
 .topbar-link-div:hover {  
   background: rgba(254, 254, 254, 0.5);  
 }
@@ -101,6 +107,12 @@ a.topbar-link {
 
 #header a {
   color: #003b52;
+}
+
+#header .logo svg {
+  width: 70px;
+  margin-bottom: -14px;
+  margin-left: 20px;  
 }
 
 #header-menu {
@@ -428,3 +440,5 @@ textarea#wmd-input {
   margin-left: 5px;
   margin-right: 5px;
 }
+
+

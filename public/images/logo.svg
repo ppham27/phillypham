@@ -1,0 +1,25 @@
+<svg viewbox="0 0 200 200">
+  <defs>
+    <g id="p-part1">
+      <rect x="20" y="70" width="60" height="20" style="stroke-width: 3;"></rect>
+      <rect x="0" y="70" width="20" height="90" style="stroke-width: 3;"></rect>
+      <path d="M80,80 a26,30 0 1,0 0,-70" style="fill: none; stroke-width: 23;"></path>
+    </g>
+    <g id="p-part2">
+      <rect x="20" y="0" width="60" height="20" style="stroke-width: 3;"></rect>
+      <rect x="0" y="0" width="20" height="70" style="stroke-width: 3;"></rect>
+    </g>
+  </defs>
+  <g transform="translate(18, 36)" style="fill: #4daf4a; stroke: #4daf4a;">
+    <use xlink:href="#p-part1"></use>
+  </g>
+  <g transform="translate(62, 4)" style="fill: #003b52; stroke: #003b52;">
+    <use xlink:href="#p-part1"></use>
+  </g>
+  <g transform="translate(62, 4)" style="fill: #003b52; stroke: #003b52;">
+    <use xlink:href="#p-part2"></use>
+  </g>
+  <g transform="translate(18, 36)" style="fill: #4daf4a; stroke: #4daf4a;">
+    <use xlink:href="#p-part2"></use>
+  </g>
+</svg>

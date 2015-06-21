@@ -1,7 +1,10 @@
 include ../mixins/headerLink.jade
 
 #header
-  a#header-title(href="/")= settings.ApplicationSettings.title
+  a#header-title(href="/")
+    span= settings.ApplicationSettings.title
+    span.logo
+      include ../../public/images/logo.svg    
   #header-menu
     +headerLink('Blog', '/')
     +headerLink('DataViz', 'http://bl.ocks.org/ppham27')

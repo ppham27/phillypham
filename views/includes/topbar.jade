@@ -3,6 +3,8 @@ include ../mixins/topbarLink.jade
 #topbar
   #topbar-content
     #topbar-content-left
+      .topbar-div.logo
+        include ../../public/images/logo.svg
       if locals.user
         if roles['poster']
           +topbarLink('Post', '/post')
