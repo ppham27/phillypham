@@ -3,20 +3,14 @@ include ./mixins/fieldsetFilled.jade
 extends layout
   
 block content
-  form#post-form(method="POST", action="/post")
+  form#post-form(method="GET", action="/post")
     .wmd-panel
       +fieldsetFilled('title', 'Title', 'Enter a title here')
       #wmd-button-bar.wmd-button-bar
       #wmd-editor.wmd-editor.tex2jax_ignore
-      textarea#wmd-input.wmd-input
+      textarea(name="body")#wmd-input.wmd-input
     h2#wmd-preview-title
     #wmd-preview.wmd-panel.wmd-preview
     +fieldsetFilled('tags', 'Tags', 'Enter tags here separated by commas')
     input.submit-button(type="submit" value="Post")
-  script.
-    var postTitle = document.querySelector('input[name="title"]');
-    var previewTitle = document.getElementById('wmd-preview-title');
-    postTitle.addEventListener('input', function() {
-       previewTitle.textContent = postTitle.value;
-    });
     

@@ -1,1 +1,1 @@
---require test/support/env.js -t 10000
+--require test/support/env.js

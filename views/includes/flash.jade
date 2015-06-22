@@ -1,7 +1,6 @@
 
 if locals.flash && flash.length
   #flash
-    span Error(s):
     ul
       while message = flash.shift()
         li(class="#{message.type}")= message.message

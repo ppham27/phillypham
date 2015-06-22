@@ -53,7 +53,9 @@
     "async": "~1.2.1",
     "brace": "~0.5.1",
     "uglifyify": "~3.0.1",
-    "closurecompiler": "~1.5.2"
+    "closurecompiler": "~1.5.2",
+    "public-encrypt": ">=2.0.1",
+    "envify": "^3.4.0"
   },
   "devDependencies": {
     "mocha": "~2.2.5",
@@ -61,6 +63,7 @@
     "sinon": "~1.14.1",
     "webdriverio": "~2.4.5",
     "fakeredis": "~0.3.1",
-    "sqlite3": "~3.0.8"
+    "sqlite3": "~3.0.8",
+    "gulp-mocha": "^2.1.2"
   }
 }

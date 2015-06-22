@@ -1,5 +1,10 @@
+var fs = require('fs');
+var path = require('path');
+
 var config = {
   secret: 'keyboard cat',
+  rsaPublicKey: fs.readFileSync(path.join(__dirname, 'test_rsa_pubkey.pem'), 'ascii'),
+  rsaPrivateKey: fs.readFileSync(path.join(__dirname, 'test_rsa_privkey.pem'), 'ascii'),
   redis: {
     port: 6379,
     host: '127.0.0.1',

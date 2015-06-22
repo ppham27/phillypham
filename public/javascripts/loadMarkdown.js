@@ -5,47 +5,50 @@ var pagedownExtra = require('../../lib/pagedownExtra');
 var mathJax = require('../../lib/mathJax');
 var editor;
 
-(function() {
-  var makeTitle = document.querySelector('#post-form input[name="title"]') !== null;
-  var makeEditor = document.getElementById('wmd-input') !== null;
-  if (makeEditor) {
-    editor = new MarkdownAceEditor(markdown.Converter, undefined,
-                                   {helpButton: editorHelp});
-    pagedownExtra.hookEditor(editor);
-  }
-  var mathJaxConfig = document.createElement('script');
-  mathJaxConfig.type = 'text/x-mathjax-config';
-  var mathJaxCDN = document.createElement('script');
-  mathJaxCDN.src = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML";
-  var mathJaxConfigRequest = new XMLHttpRequest();
-  mathJaxConfigRequest.open('GET', 'javascripts/mathJaxConfig.js', true);
-  mathJaxConfigRequest.onload = function(event) {
-    mathJaxConfig.textContent = this.responseText;
-    document.head.appendChild(mathJaxConfig);
-    mathJaxCDN.onload = function() {      
-      mathJax.initialize(MathJax);
-      if (makeEditor) {
-        mathJax.hookEditor(editor);
-        editor.run();
-      }
-      if (makeTitle) {
-        document.querySelector('#post-form input[name="title"]')
-        .addEventListener('input', mathJax.run);
-        editor.editor.focus();
-      }
+var inputTitle = document.querySelector('.wmd-panel input[name="title"]');
+var makeTitle = inputTitle !== null;
+var makeEditor = document.querySelector('.wmd-input') !== null;
+if (makeEditor) {
+  editor = new MarkdownAceEditor(markdown.Converter, undefined,
+                                 {helpButton: editorHelp});
+  pagedownExtra.hookEditor(editor);
+}
+var mathJaxConfig = document.createElement('script');
+mathJaxConfig.type = 'text/x-mathjax-config';
+var mathJaxCDN = document.createElement('script');
+mathJaxCDN.src = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML";
+var mathJaxConfigRequest = new XMLHttpRequest();
+mathJaxConfigRequest.open('GET', 'javascripts/mathJaxConfig.js', true);
+mathJaxConfigRequest.onload = function(event) {
+  mathJaxConfig.textContent = this.responseText;
+  document.head.appendChild(mathJaxConfig);
+  mathJaxCDN.onload = function() {      
+    mathJax.initialize(MathJax);
+    if (makeEditor) {
+      mathJax.hookEditor(editor);
+      editor.run();
     }
-    document.head.appendChild(mathJaxCDN);
-    var emacsStyle = document.createElement('style')
-    emacsStyle.type = 'text/css';
-    emacsStyle.textContent = '.emacs-mode .ace_cursor { border: 1px solid rgba(34, 34, 34, 0.8)!important; background-color: rgba(34, 34, 34, 0.9); }'
-    document.head.appendChild(emacsStyle);
+    if (makeTitle) {
+      var previewTitle = document.getElementById('wmd-preview-title');
+      inputTitle.addEventListener('input', function() {
+        previewTitle.textContent = inputTitle.value;
+      });
+      inputTitle
+      .addEventListener('input', mathJax.run);
+      editor.editor.focus();
+    }
   }
-  mathJaxConfigRequest.onerror = function(event) {
-    console.error(this.statusText);
-  }        
-  hljs.initHighlightingOnLoad();
-  mathJaxConfigRequest.send();  
-})();
+  document.head.appendChild(mathJaxCDN);
+  var emacsStyle = document.createElement('style')
+  emacsStyle.type = 'text/css';
+  emacsStyle.textContent = '.emacs-mode .ace_cursor { border: 1px solid rgba(34, 34, 34, 0.8)!important; background-color: rgba(34, 34, 34, 0.9); }'
+  document.head.appendChild(emacsStyle);
+}
+mathJaxConfigRequest.onerror = function(event) {
+  console.error(this.statusText);
+}        
+hljs.initHighlightingOnLoad();
+mathJaxConfigRequest.send();  
 
 function editorHelp() {
   var self = this;
@@ -75,8 +78,5 @@ function editorHelp() {
 //   });
 //   console.log(buttonBoundingClientRect);  
 // })()
-
-
-
 
 

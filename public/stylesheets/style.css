@@ -26,9 +26,13 @@ fieldset {
   margin-right: auto;
   margin-top: 5px;
   margin-bottom: 5px;
-  color: #d02027;
-  border: 2px solid #d02027;
+  border: 2px solid #003b52;
+  border-radius: 10px;
   padding: 10px;  
+}
+
+#flash .error {
+  color: #d02027;
 }
 
 ul, ol {

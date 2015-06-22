@@ -1,10 +1,12 @@
 extends layout
 
 block content
-  form#login-form(action="/login", method="POST")
+  script
+    include ../public/javascripts/encryptPasswordBundle-min.js
+  form#login-form(action="/login", method="POST", onsubmit="return encryptPassword(this);")
     input.text(type="text", name="email", placeholder="Email")
     br
-    input.text(type="password", name="password", placeholder="Password")
+    input.text.encrypt(type="password", name="password", placeholder="Password")
     br
     input(type="submit", value="Login")
   include ./includes/loginButtons.jade

@@ -6,6 +6,8 @@ var sequelizeConfig = JSON.parse(fs.readFileSync(__dirname + '/config.json', 'ut
 var config = {  
   siteUrl: 'http://www.phillypham.com',
   secret: process.env.SECRET,
+  rsaPublicKey: process.env.RSA_PUBLIC_KEY,
+  rsaPrivateKey: process.env.RSA_PRIVATE_KEY,
   redis: helper.parseSqlUrl(process.env.REDIS_URL),
   sequelize: helper.parseSequelizeConfig(sequelizeConfig),
   appKeys: {
