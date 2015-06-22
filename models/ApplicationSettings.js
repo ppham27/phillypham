@@ -1,47 +1,38 @@
-// TODO: publish changes and subscribe to changes
-
 var Promise = require('bluebird');
 var EventEmitter = require('events').EventEmitter;
 
 // singleton to store app settings in redis
 module.exports = function(redisClient) {
   var ApplicationSettings = new Object();  
+  ApplicationSettings.isReady = false;
+  Object.defineProperty(ApplicationSettings, '_data',
+                        {value: {},
+                         enumerable: false
+                        });  
+  var data = ApplicationSettings._data; // just a convenience variable
+  var subscriberClient = redisClient.createClient();
   var eventEmitter = new EventEmitter();
-  var data;
-  redisClient.exists('applicationSettings', function(err, doesExist) {
-    if(err) throw err;
-    if (doesExist) {
-      redisClient.hgetall('applicationSettings', function(err, d) {
-        if(err) throw err;
-        Object.defineProperty(ApplicationSettings, '_data',
-                              {value: d,
-                               enumerable: false
-                              });
-        data = ApplicationSettings._data;
-        for (var key in data) defineGetterAndSetter(key);
-        eventEmitter.emit('ready');
-      });
-    } else {
-      Object.defineProperty(ApplicationSettings, '_data',
-                            {value: {},
-                             enumerable: false
-                            });
-      data = ApplicationSettings._data;      
-      eventEmitter.emit('ready');
+
+  subscriberClient.on('message', function(channel, message) {    
+    // sync    
+    data = ApplicationSettings._data = JSON.parse(message);
+    for (var oldKey in ApplicationSettings) {
+      if (!(oldKey in data)) delete ApplicationSettings[oldKey];
     }
-  }); 
+    for (var newKey in data) defineGetterAndSetter(newKey);
+    eventEmitter.emit('message', channel, message);
+  });
 
   ApplicationSettings.on = function(event, callback) {
     eventEmitter.on(event, callback);
   }
-  
-  function defineGetterAndSetter(k) {
-    Object.defineProperty(ApplicationSettings, k, {
-      get: function() { return data[k]; },
-      set: function(val) { data[k] = val; },
-      enumerable: true,
-      configurable: true
-    });
+
+  ApplicationSettings.once = function(event, callback) {
+    eventEmitter.once(event, callback);
+  }
+
+  ApplicationSettings.emit = function() {
+    eventEmitter.emit.apply(eventEmitter, arguments)
   }
   
   ApplicationSettings.build = function(obj) {
@@ -72,33 +63,86 @@ module.exports = function(redisClient) {
     return ApplicationSettings;
   }  
 
+  ApplicationSettings.validate = function() {
+    if (!ApplicationSettings.sidebarPhotoUrl) 
+      return new TypeError('Sidebar photo url must be a nonempty string');
+    if (!ApplicationSettings.sidebarInfo) 
+      return new TypeError('Sidebar info must be a nonempty string');
+    if (!ApplicationSettings.defaultUserGroupId) 
+      return new TypeError('User Group must be set');
+    // add timestamp check here...
+    return true;  
+  }
+
   ApplicationSettings.save = function() {
-    return new Promise(function(resolve, reject) {
-                         // verify that required properties exist here
-                         if (ApplicationSettings.sidebarPhotoUrl && 
-                             ApplicationSettings.sidebarInfo &&
-                             ApplicationSettings.defaultUserGroupId) {
+    var validation = ApplicationSettings.validate();
+    if (!(validation instanceof Error)) {
+      return new Promise(function(resolve, reject) {
+                           if (!('updatedAt' in ApplicationSettings)) defineGetterAndSetter('updatedAt');
+                           ApplicationSettings.updatedAt = (new Date()).toISOString();
                            redisClient.hmset('applicationSettings', 
                                              ApplicationSettings,
                                              function(err) {
                                                if (err) reject(err);
-                                               resolve();
+                                               resolve(redisClient.publish('applicationSettings', 
+                                                                           JSON.stringify(ApplicationSettings)));
                                              });
-                         } else if (!ApplicationSettings.sidebarPhotoUrl) {
-                           reject(new TypeError('Sidebar photo url must be a nonempty string'));
-                         } else if (!ApplicationSettings.sidebarInfo) {
-                           reject(new TypeError('Sidebar info must be a nonempty string'));
-                         } else if (!ApplicationSettings.defaultUserGroupId) {
-                           reject(new TypeError('User Group must be set'));
-                         }                         
-                       });
+                         });
+    } else {
+      return Promise.reject(validation);
+    }
   }
+
+  subscriberClient.on('subscribe', function(channel) {
+    /* do this first? i'm just not going to worry about race conditions
+     * since this is a personal blog
+     * potential race issues:
+     * 1. user made a change in application settings between the initial grab of data and subscription
+     * 2. two users editing at the same time, check with timestamp?
+     */
+    redisClient.exists('applicationSettings', function(err, doesExist) {
+      if(err) throw err;
+      if (doesExist) {
+        redisClient.hgetall('applicationSettings', function(err, d) {
+          if(err) throw err;
+          data = ApplicationSettings._data = d;
+          for (var key in data) defineGetterAndSetter(key);
+
+          ApplicationSettings.isReady = true;
+          eventEmitter.emit('ready');
+        });
+      } else {      
+        ApplicationSettings.isReady = true;
+        eventEmitter.emit('ready');      
+      }
+    }); 
+  });
+
   Object.defineProperties(ApplicationSettings,
-                          {on: {enumerable: false},
+                          {isReady: {enumerable: false},
+                           on: {enumerable: false},
+                           once: {enumerable: false},
+                           emit: {enumerable: false},
+                           validate: {enumerable: false},
                            build: {enumerable: false},
                            set: {enumerable: false},
                            reset: {enumerable: false},
                            save: {enumerable: false}});
+  function defineGetterAndSetter(k) {
+    if (!(k in ApplicationSettings)) {
+      Object.defineProperty(ApplicationSettings, k, {
+        get: function() { return data[k]; },
+        set: function(val) { data[k] = val; },
+        enumerable: true,
+        configurable: true
+      });
+      return true;
+    }
+    return false;
+  }
+  subscriberClient.subscribe('applicationSettings');
   return ApplicationSettings;
 };
+
+
 

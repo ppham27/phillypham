@@ -8,9 +8,11 @@ describe('ApplicationSettings on fresh database', function() {
   beforeEach(function(done) {
     var self = this;
     this.redisClient = redis.createClient('redisDb');
+    this.redisClient.createClient = redis.createClient
     this.redisClient.flushdb(function(err, isSuccess) {
       self.ApplicationSettings = require('../models/ApplicationSettings')(self.redisClient);
-      self.ApplicationSettings.on('ready', done);
+      if (self.ApplicationSettings.isReady) done();
+      self.ApplicationSettings.once('ready', done);
     });
   });
 
@@ -115,6 +117,7 @@ describe('ApplicationSettings on fresh database', function() {
 describe('ApplicationSettings on existing database', function() {
   before(function() {
     this.redisClient = redis.createClient('redisDb');
+    this.redisClient.createClient = redis.createClient
     sinon.stub(this.redisClient, 'exists',
                function(key, callback) {
                  expect(key).to.equal('applicationSettings');
@@ -130,7 +133,8 @@ describe('ApplicationSettings on existing database', function() {
   });
   beforeEach(function(done) {
     this.ApplicationSettings = require('../models/ApplicationSettings.js')(this.redisClient);
-    this.ApplicationSettings.on('ready', done);
+    if (this.ApplicationSettings.isReady) done();
+    this.ApplicationSettings.once('ready', done);
   });
   after(function() {
     this.redisClient.exists.restore();

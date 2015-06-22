@@ -19,6 +19,12 @@ var config = {
       clientSecret: 'f98afb1786d320ed3465211c66efa47d'
     }
   },
+  applicationSettings: { title: 'PhillyPham',                         
+                         defaultUserGroupId: 2,
+                         sidebarTitle: 'About Me',
+                         sidebarPhotoUrl: 'picture.jpg',
+                         sidebarInfo: 'Hello, World!'
+                       },
   sequelize: helper.parseSequelizeConfig(sequelizeConfig)
 }
 
