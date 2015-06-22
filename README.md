@@ -37,6 +37,17 @@ and inherits from [default.js](https://github.com/ppham27/phillypham/blob/master
   - RSA key pair (passwords are encrypted client-side before being sent to the server, where they are decrypted; this is poor man's SSL).
   - Facebook, Google, and Twitter app keys
 
+### Building
+
+1. npm install, the following subtasks are automatically run post install
+  1. envify
+  2. uglifyify
+  2. browserify
+  2. closurecompiler
+2. npm start
+
+Now you can visit the site at [http://localhost:3000](http://localhost:3000).
+
 ### Testing
 
 There are unit tests, integration tests, and functional tests.
