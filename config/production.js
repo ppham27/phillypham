@@ -8,7 +8,7 @@ var config = {
   secret: process.env.SECRET,
   rsaPublicKey: process.env.RSA_PUBLIC_KEY,
   rsaPrivateKey: process.env.RSA_PRIVATE_KEY,
-  redis: helper.parseSqlUrl(process.env.REDIS_URL),
+  redis: helper.parseSqlUrl(process.env.REDISCLOUD_URL),
   sequelize: helper.parseSequelizeConfig(sequelizeConfig),
   appKeys: {
     facebook: {
