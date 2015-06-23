@@ -5,11 +5,9 @@
 
 var Markdown = require('../../lib/markdown.js');
 var cookie = require('cookie');
-window.COOK = cookie;
-
 
 var ace = require('brace');
-window.Ace = ace;
+
 var Range = ace.acequire('ace/range').Range;
 
 require('brace/mode/c_cpp');
@@ -59,23 +57,26 @@ var defaultAceOptions = {keybinding: 'Emacs',
                          highlightActiveLine: true,
                          invisibles: false,
                          indentGuides: true,
+                         printMargin: false,
                          wrapMode: true,
                          syntaxChecker: false};
 var aceSettingsFormOptions = {title: 'Ace Editor Settings',
-                              width: 280, height: 460,
+                              width: 280, height: 480,
                               fields: [{name: 'gutter', label: 'Gutter', type: 'checkbox'},
                                        {name: 'lineNumbers', label: 'Line Numbers', type: 'checkbox'},
                                        {name: 'highlightGutterLine', label: 'Highlight Gutter Line', type: 'checkbox'},
                                        {name: 'highlightActiveLine', label: 'Highlight Active Line', type: 'checkbox'},
                                        {name: 'invisibles', label: 'Invisibles', type: 'checkbox'},
                                        {name: 'indentGuides', label: 'Indent Guides', type: 'checkbox'},
+                                       {name: 'printMargin', label: 'Print Margin', type: 'checkbox'},
                                        {name: 'wrapMode', label: 'Wrap Mode', type: 'checkbox'},
                                        {name: 'syntaxChecker', label: 'Syntax Checker', type: 'checkbox'}],
                               description: 'Syntax checker only works in Javascript mode.' }
 
 var defaultImageFormOptions = {title: 'Insert Image',
                                fields: [{name: 'image-url', label: 'Image URL', type: 'url'},
-                                        {name: 'image-text', label: 'Text', placeholder: 'text describing the image'}],
+                                        {name: 'image-text', label: 'Text', type: 'text', 
+                                         placeholder: 'text describing the image'}],
                                description: 'If you need somewhere to host your images, I recommend the Dropbox Public folder or <a href="http://imgur.com" target="_blank">Imgur</a>.'}
 
 var defaultLinkFormOptions = {title: 'Insert Link',
@@ -117,12 +118,22 @@ function setEditorOptions(editor, options) {
   editor.setHighlightActiveLine(options.highlightActiveLine);
   editor.renderer.setShowInvisibles(options.invisibles);
   editor.renderer.setDisplayIndentGuides(options.indentGuides);
+  editor.setShowPrintMargin(options.printMargin);
   editor.getSession().setUseWrapMode(options.wrapMode);
   editor.session.setOption("useWorker", options.syntaxChecker);
   // my preferred options, should change later for more customizability
   editor.setTheme('ace/theme/xcode');
-  editor.getSession().setWrapLimitRange(88, 88);
-  editor.setPrintMarginColumn(88);
+  // this width applies to 785px at font size 100%?
+  var width;
+  if (!options.gutter) {
+    width = 88;
+  } else if (options.gutter && options.lineNumbers) {
+    width = 83;
+  } else if (options.gutter && !options.lineNumbers) {
+    width = 85;
+  }
+  editor.getSession().setWrapLimitRange(width, width);
+  editor.setPrintMarginColumn(width);
   return editor;
 }
 
@@ -454,6 +465,7 @@ function fenceEditor(options) {
     editor.navigateFileEnd();
   }
   editor.focus();
+  return false;
 }
 
 function fenceString(string, fence) {
@@ -491,6 +503,7 @@ function toggleIndentEditor(options) {
     editor.navigateFileEnd();
   }
   editor.focus();
+  return false;
 }
 
 function toggleIndentString(string, indent) {
@@ -722,7 +735,7 @@ function createDialogForm(formOptions, callback) {
   overlay.appendChild(form);
   form.onreset = destroyDialogForm;
   form.onsubmit = submit;
-  overlay.addEventListener('click', function() {
+  overlay.addEventListener('click', function(event) {
     destroyDialogForm();
   });    
   document.body.addEventListener('keydown', keydown);
