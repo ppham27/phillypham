@@ -9,9 +9,15 @@ var ace = require('brace');
 var Range = ace.acequire('ace/range').Range;
 require('brace/mode/markdown');
 require('brace/theme/xcode');
-require('./brace/keybinding/emacs');
+require('brace/keybinding/emacs');
+require('brace/keybinding/vim');
 
 // default options
+var keybindings = {'Emacs': 'ace/keyboard/emacs',
+                   'Vim': 'ace/keyboard/vim',
+                   'Ace': false}
+
+var defaultAceOptions = {keybinding: 'Emacs'}
 
 var defaultImageFormOptions = {title: 'Insert Image',
                                fields: [{name: 'image-url', label: 'Image URL', type: 'url'},
@@ -61,7 +67,7 @@ function createEditor(panels) {
   editor.renderer.setDisplayIndentGuides(true);
   editor.renderer.setHighlightGutterLine(false);
   editor.setHighlightActiveLine(false);
-  editor.setKeyboardHandler('ace/keyboard/emacs');
+  editor.setKeyboardHandler(keybindings[defaultAceOptions.keybinding]);
   editor.on('change', function() {
     panels.input.value = editor.getValue();
   });
@@ -76,6 +82,7 @@ function createEditor(panels) {
 
 
 function MarkdownAceEditor(converter, idPostfix, options) {
+  var self = this;
   this.converter = converter;  
   this.options = options;
   this.idPostfix = idPostfix || '';
@@ -83,9 +90,14 @@ function MarkdownAceEditor(converter, idPostfix, options) {
   this.editor = createEditor(this.panels);
   var panels = this.panels;
   var editor = this.editor;
+  var undoManager = editor.getSession().getUndoManager();
 
   var hooks = this.hooks = new Markdown.HookCollection();
-  hooks.addNoop("onPreviewRefresh");
+  /* hooks on preview refresh are passed the MarkdownAceEditor
+   * they should return editor, too
+   * they should look like: function(editor) { // YOUR CODE HERE; return editor; }
+   */
+  hooks.addNoop("onPreviewRefresh"); 
   // hooks.addNoop("postBlockquoteCreation");
   /* called with one parameter: a callback to be called with the URL of the image. 
    * If the application creates
@@ -154,6 +166,10 @@ function MarkdownAceEditor(converter, idPostfix, options) {
   // for these two buttons bind commands later
   buttons.makeButton('undo', defaultStrings['undo'], '-200px');
   buttons.makeButton('redo', defaultStrings['redo'], '-220px');
+  // ACE options
+  buttons.makeSpacer(4);
+  buttons.makeDropDown('keybinding', 'Keybinding: ', 
+                       keybindings, defaultAceOptions.keybinding);
 
   if (options.helpButton) {
     buttons.makeButton('help', defaultStrings['help'], '-240px');
@@ -168,44 +184,27 @@ function MarkdownAceEditor(converter, idPostfix, options) {
      
   this.refreshState = function() {
     panels.preview.innerHTML = converter.makeHtml(editor.getValue());
-    // make links open in a new tab, perhabs better addressed with a plugin
-    Array.prototype.slice.call(panels.preview.getElementsByTagName('a'))
-    .forEach(function(a) {
-      if (!a.target) a.target = '_blank';
-    });
-    
-    if (editor.getSession().getUndoManager().hasUndo()) {
-      setupButton(buttons.buttonElements.undo, 
-                  true);
-      bindButtonToCommand(buttons.buttonElements.undo,
-                          function() { 
-                            editor.getSession().getUndoManager().undo(); 
-                            editor.focus();
-                          })
-    } else {
-      setupButton(buttons.buttonElements.undo, false);
-      buttons.buttonElements.undo.onmouseover = 
-        buttons.buttonElements.undo.onmouseout = 
-        buttons.buttonElements.undo.onclick = function () { };
-    }
+    refreshButton(buttons.buttonElements.undo, 
+                  undoManager.hasUndo.bind(undoManager),
+                  undoManager.undo.bind(undoManager));
     // weird timing issue, i don't understand why i need to put this in a timeout block
-    setTimeout(function() {
-      if (editor.getSession().getUndoManager().hasRedo()) {
-        setupButton(buttons.buttonElements.redo, true);
-        bindButtonToCommand(buttons.buttonElements.redo,
-                            function() { 
-                              editor.getSession().getUndoManager().redo(); 
-                              editor.focus();
-                            })
+    setTimeout(refreshButton, 0,
+               buttons.buttonElements.redo,
+               undoManager.hasRedo.bind(undoManager),
+               undoManager.redo.bind(undoManager));
+    hooks.onPreviewRefresh(self);    
+    function refreshButton(button, stateChecker, command) {
+      if (stateChecker()) {
+        setupButton(button, true);
+        bindButtonToCommand(button, function() { 
+          command(); 
+          editor.focus();
+        });
       } else {
-        setupButton(buttons.buttonElements.redo, 
-                    false);
-        buttons.buttonElements.redo.onmouseover = 
-          buttons.buttonElements.redo.onmouseout = 
-          buttons.buttonElements.redo.onclick = function () { };
+        setupButton(button, false);
+        button.onmouseover = button.onmouseout = button.onclick = function () { };
       }
-    }, 0);
-    hooks.onPreviewRefresh();
+    }
   }
 }
 
@@ -257,6 +256,28 @@ ButtonCollection.prototype.makeSpacer = function(num) {
   spacer.id = 'wmd-spacer' + num + this.idPostfix;
   this.buttonRow.appendChild(spacer);
   this.xPosition += 25;
+}
+
+
+ButtonCollection.prototype.makeDropDown = function(id, title, 
+                                                   data, defaultSetting) {
+  var dropDown = document.createElement('li');
+  dropDown.style.left = this.xPosition + 'px';
+  this.xPosition += 25;         // probably needs to be more
+  dropDown.className = 'wmd-select'; 
+  var fieldset = dropDown.appendChild(document.createElement('fieldset'));
+  var label = fieldset.appendChild(document.createElement('label'));
+  label.textContent = title; label.for = id;
+  var select = fieldset.appendChild(document.createElement('select'));
+  select.name = id;
+  for (var key in data) {
+    var option = document.createElement('option');
+    option.value = data[key];
+    if (key === defaultSetting) option.selected = true;
+    option.textContent = key;
+    select.appendChild(option);
+  }
+  this.buttonRow.appendChild(dropDown);
 }
 
 function setupButton(button, isEnabled) {  
@@ -501,12 +522,12 @@ function replaceCurrentRangeEditor(string, editor) {
   var selection = editor.getSelection();
   var range = editor.getSelectionRange();
   session.replace(range, string);
-  editor.findPrevious(']');
+  editor.findPrevious('](');
   var to = editor.getCursorPosition();
   editor.findPrevious('[');
   var from = editor.getCursorPosition();    
   editor.navigateTo(from.row, from.column);
-  selection.selectTo(to.row, to.column - 1)
+  selection.selectTo(to.row, to.column - 2)
   editor.focus();
 }
 

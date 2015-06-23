@@ -13,11 +13,17 @@ a {
 }
 
 fieldset {
+  text-align: right;
   border: none;
   margin-left: 0px;
   margin-right: 0px;
   padding-left: 0px;
   padding-right: 0px;
+}
+
+input {
+  line-height: 1.5em;
+  margin-left: 10px;
 }
 
 #flash {
@@ -35,7 +41,7 @@ fieldset {
   color: #d02027;
 }
 
-ul, ol {
+dl, dd, dt, ul, ol {
   padding-top: 5px;
   padding-bottom: 5px;
   margin-top: 0px;  
@@ -80,7 +86,7 @@ li {
 .topbar-div.logo svg {
   width: 24px;
   height: 24px;
-  margin-bottom: -5px;
+  margin-bottom: -6px;
   margin-right: -10px;
 }
 
@@ -290,6 +296,10 @@ textarea#wmd-input {
   left: 300px;
 }
 
+.wmd-spacer4 {
+  left: 370px;
+}
+
 .wmd-button {
   width: 20px;
   height: 20px;
@@ -299,6 +309,20 @@ textarea#wmd-input {
   display: inline-block;
   list-style: none;
   cursor: pointer;
+}
+
+.wmd-button-bar .wmd-select {
+  font-size: 90%;
+  margin-top: -4px;
+}
+
+.wmd-select {
+  height: 20px;
+  padding-left: 2px;
+  padding-right: 3px;
+  position: absolute;
+  display: inline-block;
+  list-style: none;
 }
 
 .wmd-button > span {
@@ -341,19 +365,11 @@ textarea#wmd-input {
 #post-form label {
   font-weight: bold;  
   padding-top: 3px;
-  float: left;
 }
 
-#post-form .text-input-span {
-  display: block;
-  overflow: hidden;
-  padding-right: 8px;
-  padding-left: 10px;
-}
 
-#post-form .text-input-span .text-input {
-  width: 100%;
-  line-height: 1.5em;
+#post-form .text-input {
+  width: 90%;
   font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
   font-size: 100%;
 }
@@ -420,6 +436,9 @@ textarea#wmd-input {
 }
 
 
+
+
+
 .overlay form.editor-dialog-box {
   border: 1px solid #222;
   background-color: #fefefe;
@@ -427,9 +446,7 @@ textarea#wmd-input {
   padding: 20px;
 }
 
-.overlay form.editor-dialog-box  input {
-  line-height: 1.5em;
-  margin-left: 10px;
+.overlay form.editor-dialog-box input {
   width: 270px;
 }
 

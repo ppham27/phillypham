@@ -45,6 +45,7 @@ gulp.task('encryptPassword-browserify', function(done) {
 });
 
 gulp.task('encryptPassword-closurecompiler', ['encryptPassword-browserify'], function() {
+  // compilation_level: "ADVANCED_OPTIMIZATIONS", possible additional optimization?
   ClosureCompiler.compile('./public/javascripts/encryptPasswordBundle.js',
                           {language_in: 'ECMASCRIPT5'},
                           function(err, res) {

@@ -1,11 +1,28 @@
 var expect = require('chai').expect;
 var pagedown = require('pagedown');
+var linkTargeter = require('../lib/linkTargeter');
 var pagedownExtra = require('../lib/pagedownExtra');
 var mathJax = require('../lib/mathJax');
 var htmlSanitizer = require('../lib/htmlSanitizer');
 
 describe('Markdown', function() {
   describe('Extensions', function() {
+    describe('linkTargeter', function() {
+      this.converter = new pagedown.Converter();
+      linkTargeter.hookConverter(this.converter);
+      var markdown = '// <a href="http://www.google.com">phil</a>\n\
+// <a href="http://www.google.com" target="_self">self</a>\n\
+// <a href="#abc">chris</a>\n\
+// <a href="http://www.facebook.com">phil</a>\n\
+// <a hr>improper</a>\n\
+// <a href>nothing</a>\n\
+// <a href="">no space</a>\n\
+// <a href="http://www.yahoo.com">phil</a>';
+      var html = this.converter.makeHtml(markdown);
+      var expectedHtml = '<p>// <a href="http://www.google.com" target="_blank">phil</a>\n// <a href="http://www.google.com" target="_self">self</a>\n// <a href="#abc">chris</a>\n// <a href="http://www.facebook.com" target="_blank">phil</a>\n// <a hr="" target="_blank">improper</a>\n// <a href="" target="_blank">nothing</a>\n// <a href="" target="_blank">no space</a>\n// <a href="http://www.yahoo.com" target="_blank">phil</a></p>';
+      expect(html).to.equal(expectedHtml);
+    });
+    
     describe('pagedownExtra', function() {
       before(function() {
         this.converter = new pagedown.Converter();

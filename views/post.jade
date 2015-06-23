@@ -3,7 +3,7 @@ include ./mixins/fieldsetFilled.jade
 extends layout
   
 block content
-  form#post-form(method="GET", action="/post")
+  form#post-form(method="POST", action="/post")
     .wmd-panel
       +fieldsetFilled('title', 'Title', 'Enter a title here')
       #wmd-button-bar.wmd-button-bar
@@ -11,6 +11,11 @@ block content
       textarea(name="body")#wmd-input.wmd-input
     h2#wmd-preview-title
     #wmd-preview.wmd-panel.wmd-preview
-    +fieldsetFilled('tags', 'Tags', 'Enter tags here separated by commas')
+    .wmd-panel
+      +fieldsetFilled('tags', 'Tags', 'Enter tags here separated by commas')
     input.submit-button(type="submit" value="Post")
-    
+  // maybe move this script somewhere else later
+  script.
+    document.getElementById('post-form').addEventListener('keydown', function(event) {
+      if (event.keyCode === 13) event.preventDefault();
+    }, false);

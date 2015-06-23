@@ -50,6 +50,7 @@ mathJaxConfigRequest.onerror = function(event) {
 hljs.initHighlightingOnLoad();
 mathJaxConfigRequest.send();  
 
+
 function editorHelp() {
   var self = this;
   var helpTip = document.createElement('div');
@@ -80,3 +81,10 @@ function editorHelp() {
 // })()
 
 
+// <a href="http://www.google.com">phil</a>
+// <a href="#abc">chris</a>
+// <a href="http://www.facebook.com">phil</a>
+// <a hr>improper</a>
+// <a href>nothing</a>
+// <a href="">no space</a>
+// <a href="http://www.yahoo.com">phil</a>
