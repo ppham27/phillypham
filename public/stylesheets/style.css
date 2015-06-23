@@ -271,7 +271,7 @@ textarea#wmd-input {
 
 .wmd-button-bar {
   width: 100%;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .wmd-spacer {
@@ -297,7 +297,7 @@ textarea#wmd-input {
 }
 
 .wmd-spacer4 {
-  left: 370px;
+  left: 371px;
 }
 
 .wmd-button {
@@ -311,12 +311,10 @@ textarea#wmd-input {
   cursor: pointer;
 }
 
-.wmd-button-bar .wmd-select {
-  font-size: 90%;
-  margin-top: -4px;
-}
 
-.wmd-select {
+.wmd-button-bar .wmd-select {
+  text-align: right;
+  font-size: 90%;
   height: 20px;
   padding-left: 2px;
   padding-right: 3px;
@@ -435,10 +433,6 @@ textarea#wmd-input {
   margin-right: auto;
 }
 
-
-
-
-
 .overlay form.editor-dialog-box {
   border: 1px solid #222;
   background-color: #fefefe;
@@ -446,8 +440,12 @@ textarea#wmd-input {
   padding: 20px;
 }
 
-.overlay form.editor-dialog-box input {
+.overlay form.editor-dialog-box input.text {
   width: 270px;
+}
+
+.overlay form.editor-dialog-box input.checkbox {
+  margin-right: 80px;
 }
 
 .overlay form.editor-dialog-box fieldset {

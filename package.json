@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://github.com/ppham27/phillypham.git"
   },
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "private": true,
   "engines": {
@@ -32,6 +32,7 @@
     "compression": "^1.5.0",
     "config": "~1.14.0",
     "connect-redis": "~2.3.0",
+    "cookie": "^0.1.3",
     "cookie-parser": "~1.3.5",
     "debug": "~2.2.0",
     "envify": "^3.4.0",

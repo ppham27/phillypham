@@ -4,20 +4,74 @@
  */
 
 var Markdown = require('../../lib/markdown.js');
+var cookie = require('cookie');
+window.COOK = cookie;
+
 
 var ace = require('brace');
+window.Ace = ace;
 var Range = ace.acequire('ace/range').Range;
+
+require('brace/mode/c_cpp');
+require('brace/mode/css');
+require('brace/mode/html');
+require('brace/mode/java');
+require('brace/mode/javascript');
+require('brace/mode/json');
+require('brace/mode/latex');
 require('brace/mode/markdown');
+require('brace/mode/plain_text');
+require('brace/mode/python');
+require('brace/mode/r');
+require('brace/mode/ruby');
+require('brace/mode/sql');
+require('brace/mode/svg');
 require('brace/theme/xcode');
 require('brace/keybinding/emacs');
 require('brace/keybinding/vim');
 
-// default options
-var keybindings = {'Emacs': 'ace/keyboard/emacs',
-                   'Vim': 'ace/keyboard/vim',
-                   'Ace': false}
 
-var defaultAceOptions = {keybinding: 'Emacs'}
+var keybindings = {'Ace': false,
+                   'Emacs': 'ace/keyboard/emacs',
+                   'Vim': 'ace/keyboard/vim'}
+
+var modes = {'C/C++': 'ace/mode/c_cpp',
+             'CSS': 'ace/mode/css',
+             'HTML': 'ace/mode/html',
+             'Javascript': 'ace/mode/javascript',
+             'Java': 'ace/mode/java',
+             'JSON': 'ace/mode/json',
+             'LaTeX': 'ace/mode/latex',
+             'Markdown': 'ace/mode/markdown',
+             'Plain Text': 'ace/mode/plain_text',
+             'Python': 'ace/mode/python',
+             'R': 'ace/mode/r',
+             'Ruby': 'ace/mode/ruby',
+             'SQL': 'ace/mode/sql',
+             'SVG': 'ace/mode/svg'}
+
+// default options
+var defaultAceOptions = {keybinding: 'Emacs', 
+                         mode: 'Markdown',
+                         gutter: true,
+                         lineNumbers: true,
+                         highlightGutterLine: true,
+                         highlightActiveLine: true,
+                         invisibles: false,
+                         indentGuides: true,
+                         wrapMode: true,
+                         syntaxChecker: false};
+var aceSettingsFormOptions = {title: 'Ace Editor Settings',
+                              width: 280, height: 460,
+                              fields: [{name: 'gutter', label: 'Gutter', type: 'checkbox'},
+                                       {name: 'lineNumbers', label: 'Line Numbers', type: 'checkbox'},
+                                       {name: 'highlightGutterLine', label: 'Highlight Gutter Line', type: 'checkbox'},
+                                       {name: 'highlightActiveLine', label: 'Highlight Active Line', type: 'checkbox'},
+                                       {name: 'invisibles', label: 'Invisibles', type: 'checkbox'},
+                                       {name: 'indentGuides', label: 'Indent Guides', type: 'checkbox'},
+                                       {name: 'wrapMode', label: 'Wrap Mode', type: 'checkbox'},
+                                       {name: 'syntaxChecker', label: 'Syntax Checker', type: 'checkbox'}],
+                              description: 'Syntax checker only works in Javascript mode.' }
 
 var defaultImageFormOptions = {title: 'Insert Image',
                                fields: [{name: 'image-url', label: 'Image URL', type: 'url'},
@@ -50,24 +104,31 @@ var defaultStrings = {
   hr: 'Horizontal Rule <hr>',
   undo: 'Undo',
   redo: 'Redo',
+  settings: 'Ace Editor Settings',
   help: 'Markdown Editing Help'
 };
 
-function createEditor(panels) {
-  var editor = ace.edit(panels.editor.id);
+function setEditorOptions(editor, options) {
+  if (options.mode) editor.getSession().setMode(modes[options.mode]);
+  if (options.keybinding) editor.setKeyboardHandler(keybindings[options.keybinding]);
+  editor.renderer.setShowGutter(options.gutter);
+  editor.renderer.$gutterLayer.setShowLineNumbers(options.lineNumbers);
+  editor.renderer.setHighlightGutterLine(options.highlightGutterLine);  
+  editor.setHighlightActiveLine(options.highlightActiveLine);
+  editor.renderer.setShowInvisibles(options.invisibles);
+  editor.renderer.setDisplayIndentGuides(options.indentGuides);
+  editor.getSession().setUseWrapMode(options.wrapMode);
+  editor.session.setOption("useWorker", options.syntaxChecker);
   // my preferred options, should change later for more customizability
   editor.setTheme('ace/theme/xcode');
-  editor.getSession().setMode('ace/mode/markdown');
-  editor.getSession().setUseWrapMode(true);
-  editor.getSession().setWrapLimitRange(89, 89);
-  editor.setPrintMarginColumn(89);
-  // editor.renderer.$gutterLayer.setShowLineNumbers(false);
-  editor.renderer.setShowGutter(false);
-  editor.renderer.setShowInvisibles(true);
-  editor.renderer.setDisplayIndentGuides(true);
-  editor.renderer.setHighlightGutterLine(false);
-  editor.setHighlightActiveLine(false);
-  editor.setKeyboardHandler(keybindings[defaultAceOptions.keybinding]);
+  editor.getSession().setWrapLimitRange(88, 88);
+  editor.setPrintMarginColumn(88);
+  return editor;
+}
+
+function createEditor(panels, options) {
+  var editor = ace.edit(panels.editor.id);
+  setEditorOptions(editor, options || defaultAceOptions);
   editor.on('change', function() {
     panels.input.value = editor.getValue();
   });
@@ -81,13 +142,20 @@ function createEditor(panels) {
 }
 
 
+// constructor
 function MarkdownAceEditor(converter, idPostfix, options) {
   var self = this;
   this.converter = converter;  
   this.options = options;
   this.idPostfix = idPostfix || '';
   this.panels = new PanelCollection(this.idPostfix);
-  this.editor = createEditor(this.panels);
+  this.aceOptions = readSettingsCookie();
+  for (var key in defaultAceOptions) {
+    if (!(key in this.aceOptions)) this.aceOptions[key] = defaultAceOptions[key];
+  }
+  this.editor = createEditor(this.panels, this.aceOptions);
+
+  var aceOptions = this.aceOptions;
   var panels = this.panels;
   var editor = this.editor;
   var undoManager = editor.getSession().getUndoManager();
@@ -168,8 +236,34 @@ function MarkdownAceEditor(converter, idPostfix, options) {
   buttons.makeButton('redo', defaultStrings['redo'], '-220px');
   // ACE options
   buttons.makeSpacer(4);
-  buttons.makeDropDown('keybinding', 'Keybinding: ', 
-                       keybindings, defaultAceOptions.keybinding);
+  buttons.makeButton('settings', defaultStrings['settings'], '-280px');  
+  aceSettingsFormOptions.fields.forEach(function(field) { field.checked = aceOptions[field.name]; })
+  bindButtonToCommand(buttons.buttonElements.settings,
+                      dialogFormCommand,
+                      {editor: editor, formOptions: aceSettingsFormOptions,
+                       postProcess: function(settings) {
+                         for (var key in settings) {
+                           aceOptions[key] = settings[key];
+                         }
+                         // synchronize
+                         aceSettingsFormOptions.fields.forEach(function(field) { field.checked = aceOptions[field.name]; })
+                         setSettingsCookie(aceOptions);
+                         editor.focus();
+                         return settings; 
+                       },
+                       inserter: setEditorOptions});
+  buttons.xPosition += 13;
+  buttons.makeDropDown('keybinding', 'Keybinding: ', 180, false, '-15px',
+                       keybindings, this.aceOptions.keybinding);
+  buttons.buttonElements.keybinding.addEventListener('change',
+                                                     changeDropDown.bind(buttons.buttonElements.keybinding,
+                                                                         function(d) { editor.setKeyboardHandler(d); }));
+
+  buttons.makeDropDown('mode', 'Mode: ', 180, true, '5px',
+                       modes, this.aceOptions.mode);
+  buttons.buttonElements.mode.addEventListener('change',
+                                               changeDropDown.bind(buttons.buttonElements.mode,
+                                                                   function(d) { editor.getSession().setMode(d); }));
 
   if (options.helpButton) {
     buttons.makeButton('help', defaultStrings['help'], '-240px');
@@ -205,6 +299,17 @@ function MarkdownAceEditor(converter, idPostfix, options) {
         button.onmouseover = button.onmouseout = button.onclick = function () { };
       }
     }
+  }
+
+  function changeDropDown(handler, event) {
+    var id = this._id;
+    var data = this._data;
+    var select = this.querySelector('select');
+    var value = select.options[select.selectedIndex].textContent;
+    aceOptions[id] = value;
+    setSettingsCookie(aceOptions);
+    handler(data[value]);
+    editor.focus();
   }
 }
 
@@ -256,15 +361,19 @@ ButtonCollection.prototype.makeSpacer = function(num) {
   spacer.id = 'wmd-spacer' + num + this.idPostfix;
   this.buttonRow.appendChild(spacer);
   this.xPosition += 25;
+  return spacer;
 }
 
 
-ButtonCollection.prototype.makeDropDown = function(id, title, 
+ButtonCollection.prototype.makeDropDown = function(id, title, width, shift, marginTop,
                                                    data, defaultSetting) {
   var dropDown = document.createElement('li');
+  dropDown._id = id;
+  dropDown._data = data;
+  dropDown.style.marginTop = marginTop;
   dropDown.style.left = this.xPosition + 'px';
-  this.xPosition += 25;         // probably needs to be more
-  dropDown.className = 'wmd-select'; 
+  if (shift) this.xPosition += width;
+  dropDown.className = 'wmd-select ' + id; 
   var fieldset = dropDown.appendChild(document.createElement('fieldset'));
   var label = fieldset.appendChild(document.createElement('label'));
   label.textContent = title; label.for = id;
@@ -278,6 +387,8 @@ ButtonCollection.prototype.makeDropDown = function(id, title,
     select.appendChild(option);
   }
   this.buttonRow.appendChild(dropDown);
+  this.buttonElements[id] = dropDown;
+  return dropDown;
 }
 
 function setupButton(button, isEnabled) {  
@@ -517,7 +628,7 @@ function ruleInsertEditor(options) {
   editor.focus();  
 }
 
-function replaceCurrentRangeEditor(string, editor) {
+function replaceCurrentRangeEditor(editor, string) {
   var session = editor.getSession();
   var selection = editor.getSelection();
   var range = editor.getSelectionRange();
@@ -557,7 +668,7 @@ function dialogFormCommand(options) {
   createDialogForm(formOptions,
                    function(formData) {
                      var processedData = postProcess(formData);
-                     inserter(processedData, editor);
+                     inserter(editor, processedData);
                    });
 }
 
@@ -583,7 +694,14 @@ function createDialogForm(formOptions, callback) {
     var inputs = Array.prototype.slice.call(form.getElementsByTagName('input'));
     var formData = {};
     inputs.forEach(function(input) {
-      formData[input.name] = input.value;
+      switch(input.type) {
+        case 'text':
+        formData[input.name] = input.value;
+        break;
+        case 'checkbox':
+        formData[input.name] = input.checked;
+        break;        
+      }
     });
     destroyDialogForm();
     callback(formData);
@@ -614,14 +732,13 @@ function createDialogForm(formOptions, callback) {
 function createForm(options) {
   var form = document.createElement('form');
   form.className = 'editor-dialog-box';
-  form.style.width = '400px';
-  form.style.height = '250px';
+  form.style.width = options.width ? options.width + 'px' : '400px';
+  form.style.height = options.height ? options.height + 'px' : '250px';
   form.style.position = 'fixed';
   form.style.left = '50%'
   form.style.top = '50%'
-  form.style.marginLeft = '-200px';
-  form.style.marginTop = '-175px';
-  form.draggable = true;
+  form.style.marginLeft = options.width ? (-options.width/2) + 'px' : '-200px';
+  form.style.marginTop = options.height ? (-options.height/2 - 50) + 'px' : '-175px';
   form.style.zIndex = 10000000;
   var title = document.createElement('h2');
   title.textContent = options.title;  
@@ -632,17 +749,34 @@ function createForm(options) {
     label.textContent = field.label + ': ';
     label.for = field.name;
     var input = document.createElement('input')
-    input.type = 'text';
     input.name = field.name;
-    if (field.type === 'url') input.value = 'http://';
-    if (field.placeholder) input.placeholder = field.placeholder;
+    switch(field.type) {
+      case 'url':
+      input.type = 'text';  
+      input.className = 'text';
+      input.value = 'http://';
+      if (field.placeholder) input.placeholder = field.placeholder;
+      break;
+      case 'text':
+      input.type = 'text';  
+      input.className = 'text';
+      if (field.placeholder) input.placeholder = field.placeholder;
+      break;
+      case 'checkbox':
+      input.type = 'checkbox';
+      input.className = 'checkbox';
+      if (field.checked) input.checked = true;
+      break;
+    }       
     fieldset.appendChild(label);
     fieldset.appendChild(input);
     form.appendChild(fieldset);    
   });
-  var description = document.createElement('p');
-  description.innerHTML = options.description;
-  form.appendChild(description);
+  if (options.description) {
+    var description = document.createElement('p');
+    description.innerHTML = options.description;
+    form.appendChild(description);
+  }
   var buttons = document.createElement('div');
   buttons.className = 'button-box';
   var cancelButton = document.createElement('button');
@@ -655,4 +789,14 @@ function createForm(options) {
   buttons.appendChild(submitButton);
   form.appendChild(buttons);
   return form;
+}
+
+function setSettingsCookie(options) {
+  document.cookie = "markdownAceEditorSettings=" + JSON.stringify(options);
+  return options;
+}
+
+function readSettingsCookie() {
+  var parsedCookie = cookie.parse(document.cookie);
+  return parsedCookie.markdownAceEditorSettings ? JSON.parse(parsedCookie.markdownAceEditorSettings) : {};
 }

@@ -39,10 +39,6 @@ mathJaxConfigRequest.onload = function(event) {
     }
   }
   document.head.appendChild(mathJaxCDN);
-  var emacsStyle = document.createElement('style')
-  emacsStyle.type = 'text/css';
-  emacsStyle.textContent = '.emacs-mode .ace_cursor { border: 1px solid rgba(34, 34, 34, 0.8)!important; background-color: rgba(34, 34, 34, 0.9); }'
-  document.head.appendChild(emacsStyle);
 }
 mathJaxConfigRequest.onerror = function(event) {
   console.error(this.statusText);
