@@ -91,7 +91,7 @@ You will need to enable the Google+ API, and you will also need a google.json fi
 }
 ```
 
+
 ### Editor
 
 It may be worth while to extract the editor and customize it for your own purposes. To customize, use the `onPreviewRefresh` hook. It passes the editor itself as an argument and expects your function to return the editor back again.
-
