@@ -75,8 +75,32 @@ Run with
 gulp test:functional
 ```
 
-You'll also need to start the databases for this. You'll need an internet connection as well because it redirects to Facebook. These require a [Selenium](http://www.seleniumhq.org/) server. The default configuration is to test with Chrome, so you'll need [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/), too. Of course, you can use a different browser by editing [test/support/browser.js](https://github.com/ppham27/phillypham/blob/master/test/support/browser.js).
+You'll also need to start the databases for this. You'll need an internet connection as well because it redirects to Facebook and Google. These require a [Selenium](http://www.seleniumhq.org/) server. The default configuration is to test with Chrome, so you'll need [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/), too. Of course, you can use a different browser by editing [test/support/browser.js](https://github.com/ppham27/phillypham/blob/master/test/support/browser.js). 
+
+You will need to enable the Google+ API, and you will also need a google.json file in your config directory. It should look something like:
+
+```
+{
+  "appKey": {
+    "clientID": "GET THIS FROM GOOGLE DEVELOPER CONSOLE",
+    "clientSecret": "GET THIS FROM GOOGLE DEVELOPER CONSOLE"
+  },
+  "testUsers": [
+    {
+      "email": "create users by hand",
+      "password": "since it requires",
+      "displayName": "a captcha"
+    },
+    {
+      "email": "make a user that has",
+      "password": "the same email as",
+      "displayName": "a fixture for testing a merge"
+    }
+  ]
+}
+```
 
 ### Editor
 
-It may be worth while to extract the editor and customize it for your open purposes. I'll write more on this later...
+It may be worth while to extract the editor and customize it for your own purposes. To customize, use the onPreviewRefresh hook. It passes the editor itself as an argument and expects your function to return the editor back again.
+

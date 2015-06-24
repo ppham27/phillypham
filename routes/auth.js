@@ -21,9 +21,9 @@ router.get('/google',
                                            'email']}));
 
 router.get('/google/callback', 
-           preLogin,
            passport.authenticate('google', 
                                  { failureRedirect: '/login', 
-                                   failureFlash: true}));
+                                   failureFlash: true}),
+           postLogin);
 
 module.exports = router;

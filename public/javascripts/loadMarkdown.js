@@ -18,7 +18,7 @@ mathJaxConfig.type = 'text/x-mathjax-config';
 var mathJaxCDN = document.createElement('script');
 mathJaxCDN.src = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML";
 var mathJaxConfigRequest = new XMLHttpRequest();
-mathJaxConfigRequest.open('GET', 'javascripts/mathJaxConfig.js', true);
+mathJaxConfigRequest.open('GET', '/javascripts/mathJaxConfig.js', true);
 mathJaxConfigRequest.onload = function(event) {
   mathJaxConfig.textContent = this.responseText;
   document.head.appendChild(mathJaxConfig);
