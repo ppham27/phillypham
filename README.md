@@ -11,7 +11,7 @@ Developer Guide
 To get this app up and running there are several requirements:
 1. Redis, used for sessions and the Application Settings model
 2. A SQL database for the rest of the models (I used Postgres)
-3. Obviously, [Node.js](https://nodejs.org/)
+3. Obviously, [Node.js](https://nodejs.org/).
 
 The easiest way to get these things is [Homebrew](http://brew.sh/). 
 
@@ -68,7 +68,7 @@ Run with `gulp test:functional`.
 
 You'll also need to start the databases for this. You'll need an internet connection as well because it redirects to Facebook and Google. These require a [Selenium](http://www.seleniumhq.org/) server. The default configuration is to test with Chrome, so you'll need [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/), too. Of course, you can use a different browser by editing [test/support/browser.js](https://github.com/ppham27/phillypham/blob/master/test/support/browser.js). 
 
-You will need to enable the Google+ API, and you will also need a google.json file in your config directory. It should look something like:
+You will need to enable the Google+ API, and you will also need a `google.json` file in your config directory. It should look something like:
 
 ```
 {
