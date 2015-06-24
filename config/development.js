@@ -13,7 +13,9 @@ var config = {
     facebook: {
       clientID: '392842890908888',
       clientSecret: 'e77660d2bd22037cb091f97d9ef22fc8'
-    }
+    },
+    // an object with two keys: clientID and clientSecret
+    google: JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8')).appKey
   }
 }
 

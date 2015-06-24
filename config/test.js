@@ -19,6 +19,8 @@ var config = {
       clientSecret: 'f98afb1786d320ed3465211c66efa47d'
     },
     google: {
+      // an object with two keys: clientID and clientSecret
+      google: JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8')).appKey,
       // an array objects consisting of an email and password
       testUsers: JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8')).testUsers
     }
