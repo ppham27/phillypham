@@ -431,6 +431,34 @@ span.field-sublabel {
   position: relative; 
 }
 
+#registration-form #wmd-editor {
+  height: 150px;
+}
+
+#registration-form #wmd-preview {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-right: 40px;
+  width: 520px;
+}
+
+#registration-form img.profile-preview {
+  display: block;
+  float: right;
+  max-width: 250px;
+  max-height: 300px;  
+  border: 2px solid #222;
+}
+
+#registration-form input {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+#registration-form p {
+  margin-bottom: 3px;
+}
+
 .overlay {
   position: absolute;
   top: 0;
@@ -499,22 +527,4 @@ span.field-sublabel {
   padding: 5px;
   margin-left: 5px;
   margin-right: 5px;
-}
-
-#registration-form #wmd-editor {
-  height: 150px;
-}
-
-#registration-form #wmd-preview {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  margin-right: 40px;
-  width: 520px;
-}
-
-#registration-form img.profile-preview {
-  display: block;
-  float: right;
-  max-width: 250px;
-  max-height: 300px;
 }

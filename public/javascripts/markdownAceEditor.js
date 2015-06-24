@@ -389,7 +389,7 @@ ButtonCollection.prototype.makeDropDown = function(id, title, width, shift, marg
   var label = fieldset.appendChild(document.createElement('label'));
   label.textContent = title; label.for = id;
   var select = fieldset.appendChild(document.createElement('select'));
-  select.name = id;
+  select.id = 'wmd-' + id + '-select' + this.idPostfix;
   for (var key in data) {
     var option = document.createElement('option');
     option.value = data[key];
