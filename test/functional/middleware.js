@@ -1,4 +1,3 @@
-/*global  */
 var expect = require('chai').expect;
 var Promise = require('bluebird');
 var http = require('http');
@@ -6,7 +5,6 @@ var url = require('url');
 var request = require('request');
 var qs = require('querystring');
 var async = require('async');
-
 var config = require('config');
 
 describe('middleware', function() {  
@@ -146,6 +144,64 @@ describe('middleware', function() {
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/post');
         return done();
+      });
+    });
+
+    describe('google', function() {
+      it ('should login a user', function (done) {
+        var user = config.appKeys.google.testUsers[0];
+        var browser = this.browser;
+        var db = this.db;
+        browser.click('a.topbar-link[href="/login"]')
+        .click('#google-button')
+        .setValue('#Email', user.email)
+        .click('#next')
+        .pause(1000)
+        .setValue('#Passwd', user.password)
+        .click('#signIn')
+        .pause(2000)            //waiting for callback and redirects
+        .click('#submit_approve_access') // i can't preauthorize for some reason?
+        .pause(1000)
+        .then(function(res) {
+          // asuume 
+          // now check that the user actually exists
+          db.User.findOne({where: {email: user.email}})
+          .then(function(createdUser) {
+            expect(createdUser).to.not.be.null;
+            expect(createdUser.displayName).to.equal(user.displayName);
+            done();
+          });
+        });
+      });
+
+      it ('should merge user with existing user', function (done) {
+        var user = config.appKeys.google.testUsers[1];
+        var browser = this.browser;
+        var db = this.db;
+        db.User.findOne({where: {email: user.email}})
+        .then(function(oldUser) {
+          expect(oldUser).to.not.be.null;
+          expect(oldUser.displayName).to.not.equal(user.displayName);
+          browser.click('a.topbar-link[href="/login"]')
+          .click('#google-button')
+          .setValue('#Email', user.email)
+          .click('#next')
+          .pause(1000)  
+          .setValue('#Passwd', user.password)
+          .click('#signIn')
+          .pause(2000)            //waiting for callback and redirects
+          .click('#submit_approve_access') // i can't preauthorize for some reason?
+          .pause(1000)
+          .then(function(res) {
+            // now check that the user is merged
+            db.User.findOne({where: {email: user.email}})
+            .then(function(createdUser) {
+              expect(createdUser.displayName).to.equal(user.displayName);
+              expect(createdUser.photoUrl).to.not.equal('/images/default-profile.jpg');
+              done();
+            });
+          });
+        });
       });
     });
     
@@ -349,7 +405,35 @@ describe('middleware', function() {
                            done();
                          });
                        });  
-      });                       
+      });  
+
+      it('should merge facebook users and give their info priority', function(done) {
+        var db = this.db;
+        var siteUrl = this.siteUrl;
+        var browser = this.browser;
+        db.User.findOne({where: {email: 'gdsgtzj_sharpesen_1434574400@tfbnw.net'}})
+        .then(function(user) {
+          // make sure user exists
+          expect(user).to.not.be.null;
+          expect(user.facebookId).to.be.null;
+          expect(user.displayName).to.equal('not my real name');
+          // now log in from facebook          
+          browser.click('a.topbar-link[href="/login"]')
+          .click('#facebook-button')
+          .setValue('#email', 'gdsgtzj_sharpesen_1434574400@tfbnw.net')
+          .setValue('#pass', 'password')
+          .click('input[name="login"]')
+          .then(function() {
+            db.User.findOne({where: {email: 'gdsgtzj_sharpesen_1434574400@tfbnw.net'}})
+            .then(function(user) {
+              // new updated dispaly name from facebook
+              expect(user.facebookId).to.not.be.null;
+              expect(user.displayName).to.equal('Rick Amiibfhhcegg Sharpesen');
+              done();
+            });
+          });
+        });
+      });
     });    
   });
 });

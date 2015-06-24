@@ -17,6 +17,10 @@ var config = {
     facebook: {
       clientID: '392392270953950',
       clientSecret: 'f98afb1786d320ed3465211c66efa47d'
+    },
+    google: {
+      // an array objects consisting of an email and password
+      testUsers: JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8')).testUsers
     }
   },
   applicationSettings: { title: 'PhillyPham',                         
@@ -33,6 +37,11 @@ config.fixtures.push({model: 'User', data: {displayName: 'power', password: 'pow
 config.fixtures.push({model: 'User', data: {displayName: 'standard', password: 'standard', email: 'standard@gmail.com', emailVerified: true, UserGroup: {name: 'standard'}}});
 config.fixtures.push({model: 'User', data: {displayName: 'unverified', password: 'unverified', email: 'phil@phillypham.com', emailVerified: false, UserGroup: {name: 'standard'}}});
 config.fixtures.push({model: 'User', data: {displayName: 'moderator', password: 'moderator', email: 'moderator@gmail.com', emailVerified: true, UserGroup: {name: 'moderator'}}});
+// this user has the same email as the facebook test user
+config.fixtures.push({model: 'User', data: {displayName: 'not my real name', password: 'somejunk', email: 'gdsgtzj_sharpesen_1434574400@tfbnw.net', 
+                                            emailVerified: true, UserGroup: {name: 'standard'}}});
+config.fixtures.push({model: 'User', data: {displayName: 'no name joe', password: 'somejunk', email: 'phillyphamtest2@gmail.com', 
+                                            emailVerified: true, UserGroup: {name: 'standard'}}});
 
 module.exports = config;
 

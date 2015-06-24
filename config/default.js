@@ -13,7 +13,7 @@ var config = {
   },
   appKeys: {
     // an object with two keys: clientID and clientSecret
-    google: JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8'))
+    google: JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8')).appKey
   },
   sequelize: {
     dialect: 'postgres',
