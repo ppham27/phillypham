@@ -417,6 +417,17 @@ textarea#wmd-input {
   display: block;
 }
 
+#login-buttons .button-spacer {
+  margin-left: 13px;
+  margin-right: 13px;
+}
+
+#google-button img {
+  position: relative;
+  top: 4px;
+  height: 56px;
+}
+
 .dialog-overlay {
   position: absolute;
   top: 0;
