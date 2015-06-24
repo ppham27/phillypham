@@ -14,7 +14,8 @@ html
         #right-sidebar
           include ./includes/rightSidebar.jade
         #mainbar
-          h1= title
+          if locals.title
+            h1= title
           include ./includes/flash.jade
           block content
     script(src="/javascripts/markdownBundle-min.js")

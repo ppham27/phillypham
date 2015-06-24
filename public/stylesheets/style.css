@@ -202,7 +202,7 @@ h2#wmd-preview-title {
 
 #mainbar {
   width: 805px;
-  min-height: 800px;
+  min-height: 1000px;
   padding-left: 0px;
   padding-right: 20px;
   padding-top: 15px;
@@ -342,6 +342,10 @@ textarea#wmd-input {
   padding: 20px;
 }
 
+.wmd-preview {
+  word-wrap: break-word;
+}
+
 /* tables */
 .wmd-preview table {
   border-collapse: collapse;
@@ -360,7 +364,21 @@ textarea#wmd-input {
   border-bottom: 1px solid #222;
 }
 
-#post-form label {
+#registration-form input {
+  width: 200px;
+}
+
+span.field-sublabel {
+  display: inline-block;
+  text-align: left;
+  width: 365px;
+  padding-left: 15px;
+  font-size: 90%;
+  color: #888;
+  font-style: italic;
+}
+
+#post-form label, #registration-form label {
   font-weight: bold;  
   padding-top: 3px;
 }
@@ -381,13 +399,19 @@ textarea#wmd-input {
   padding-bottom: 8px;
   padding-left: 20px;
   padding-right: 20px;
+  display: inline-block;
+  position: relative; 
+}
+
+.submit-button:hover .overlay {
+  display: block;
 }
 
 #login-form {
   padding: 10px;
 }
 
-#login-form input  {
+#login-form input, #registration-form input  {
   line-height: 1.5em;
   margin-top: 2px;
   margin-bottom: 2px;
@@ -395,6 +419,10 @@ textarea#wmd-input {
 
 #login-form input.text {
   width: 200px;
+}
+
+#login-form .submit-button {
+  margin-top: 7px;
 }
 
 #login-buttons a {  
@@ -473,4 +501,20 @@ textarea#wmd-input {
   margin-right: 5px;
 }
 
+#registration-form #wmd-editor {
+  height: 150px;
+}
 
+#registration-form #wmd-preview {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-right: 40px;
+  width: 520px;
+}
+
+#registration-form img.profile-preview {
+  display: block;
+  float: right;
+  max-width: 250px;
+  max-height: 300px;
+}

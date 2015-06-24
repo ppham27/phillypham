@@ -1,0 +1,33 @@
+mixin descriptiveFieldSet(label, name, value, placeholder, note, secret)
+  fieldset
+    label(for=name)= label + ':'
+    if (secret===true)
+      input(type="password", value=value, placeholder=placeholder).encrypt
+    else 
+      input(type="text", value=value, placeholder=placeholder)
+    span.field-sublabel= note
+
+extends layout
+
+block content
+  script
+    include ../public/javascripts/encryptPasswordBundle-min.js
+  form#registration-form(method="POST", action="/post", onsubmit="return encryptPassword(this);")
+    +descriptiveFieldSet('First Name', 'givenName', locals.givenName || '', 'First Name')
+    +descriptiveFieldSet('Middle Name', 'middleName', locals.familyName || '', 'Middle Name', 'for completeness\' sake')
+    +descriptiveFieldSet('Last Name', 'familyName', locals.familyName || '', 'Last Name')
+    +descriptiveFieldSet('Username', 'displayName', locals.displayName || '', 'Username', 'required')
+    +descriptiveFieldSet('Email', 'email', locals.email || '', 'Email', 'required')
+    +descriptiveFieldSet('Password', 'password', '', 'Password', 'must be from 8 to 64 characters', true)
+    +descriptiveFieldSet('Password Confirmation', 'password_confirmed', '', 'Password', undefined, true)
+    +descriptiveFieldSet('Picture', 'photoUrl', locals.photoUrl || '', 'Picture URL', 'a url to a picture, e.g. http://example.com/me.jpg')
+    .wmd-panel
+      textarea(name="biography")#wmd-input.wmd-input
+      h2 Describe Yourself
+      #wmd-button-bar.wmd-button-bar
+      #wmd-editor.wmd-editor.wmd-panel.tex2jax_ignore= locals.biography
+    .wmd-panel
+      img.profile-preview(src="/images/default-profile.jpg")
+      #wmd-preview.wmd-preview
+    button.submit-button(type="submit") Register
+      .overlay

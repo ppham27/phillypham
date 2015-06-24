@@ -18,6 +18,7 @@ module.exports = function(sequelize, DataTypes) {
     middleName: {type: DataTypes.STRING, allowNull: true, field: 'middle_name'},
     photoUrl: {type: DataTypes.STRING, field: 'photo_url', defaultValue: '/images/default-profile.jpg'},
     biography: {type: DataTypes.TEXT, allowNull: true},
+    biographyHtml: {type: DataTypes.TEXT, allowNull: true},
     facebookId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'facebook_id'},
     googleId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'google_id'},
     twitterId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'twitter_id'}    

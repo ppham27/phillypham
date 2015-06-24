@@ -13,7 +13,8 @@ block content
     #wmd-preview.wmd-panel.wmd-preview
     .wmd-panel
       +fieldsetFilled('tags', 'Tags', 'Enter tags here separated by commas')
-    input.submit-button(type="submit" value="Post")
+    button.submit-button(type="submit") Post
+      .overlay
   // maybe move this script somewhere else later
   script.
     document.querySelector('#post-form input[name="title"]').addEventListener('keydown', disableEnterSubmit, false);

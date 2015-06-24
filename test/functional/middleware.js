@@ -60,7 +60,7 @@ describe('middleware', function() {
       browser.url(url.resolve(siteUrl, 'login'))
       .setValue('input[name="email"]', 'admin@admin.com')
       .setValue('input[name="password"]', 'password')
-      .click('input[value="Login"]')
+      .click('button[type="submit"]')
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/');
@@ -79,7 +79,7 @@ describe('middleware', function() {
       browser.url(url.resolve(siteUrl, 'login'))
       .setValue('input[name="email"]', 'power@gmail.com')
       .setValue('input[name="password"]', 'powerpower')
-      .click('input[value="Login"]')
+      .click('button[type="submit"]')
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/');
@@ -99,7 +99,7 @@ describe('middleware', function() {
       browser.url(url.resolve(siteUrl, 'login'))
       .setValue('input[name="email"]', 'standard@gmail.com')
       .setValue('input[name="password"]', 'wrongpassword')
-      .click('input[value="Login"]')
+      .click('button[type="submit"]')
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/login');
@@ -118,7 +118,7 @@ describe('middleware', function() {
       .click('a.topbar-link[href="/login"]')
       .setValue('input[name="email"]', 'moderator@gmail.com')
       .setValue('input[name="password"]', 'moderator')
-      .click('input[value="Login"]')
+      .click('button[type="submit"]')
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/post');
@@ -133,13 +133,13 @@ describe('middleware', function() {
       .click('a.topbar-link[href="/login"]')
       .setValue('input[name="email"]', 'moderator@gmail.com')
       .setValue('input[name="password"]', 'wrongpassword')
-      .click('input[value="Login"]')
+      .click('button[type="submit"]')      
       .setValue('input[name="email"]', 'wrongusername@gmail.com')
       .setValue('input[name="password"]', 'moderator')
-      .click('input[value="Login"]')
+      .click('button[type="submit"]')      
       .setValue('input[name="email"]', 'moderator@gmail.com')
       .setValue('input[name="password"]', 'moderator')
-      .click('input[value="Login"]')
+      .click('button[type="submit"]')      
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/post');
