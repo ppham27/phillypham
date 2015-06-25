@@ -19,7 +19,7 @@ block content
     if (locals.update)
       p.form-description Change your user settings here
     else
-      p.form-description Otherwise, only a username, email, and password are required. Other users will not be able to see your email address. You can update your information later at any time.
+      p.form-description Otherwise, only a username, email, and password are required. You will need to solve a captcha and verify your email address to prove that you're human. Other users will not be able to see your email address.
     +descriptiveFieldSet('First Name', 'givenName', temporaryUser.givenName || '', 'First Name', undefined, undefined, true)
     +descriptiveFieldSet('Middle Name', 'middleName', temporaryUser.middleName || '', 'Middle Name', 'for completeness\' sake')
     +descriptiveFieldSet('Last Name', 'familyName', temporaryUser.familyName || '', 'Last Name')
@@ -32,6 +32,8 @@ block content
       +descriptiveFieldSet('Password', 'password', '', 'Password', 'required, must be from 8 to 64 characters', true)
     +descriptiveFieldSet('Password Confirmation', 'passwordConfirmation', '', 'Password Confirmation', undefined, true)
     +descriptiveFieldSet('Picture', 'photoUrl', temporaryUser.photoUrl || '', 'Picture URL', 'a url to a picture, e.g. http://example.com/me.jpg')
+    fieldset.captcha!= captcha
+      span.field-sublabel
     .wmd-panel
       textarea(name="biography")#wmd-input.wmd-input= temporaryUser.biography || ''
       h2 Describe Yourself

@@ -4,4 +4,4 @@ h1= settings.ApplicationSettings.sidebarTitle
   a(href="#{settings.ApplicationSettings['sidebar:photoUrl']}")
     img#sidebar-photo(src="#{settings.ApplicationSettings['sidebar:photoUrl']}")
 
-#sidebar-info !{settings.ApplicationSettings['sidebar:infoHtml']}
+#sidebar-info!= settings.ApplicationSettings['sidebar:infoHtml']

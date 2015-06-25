@@ -10,13 +10,12 @@ var config = {
   redis: helper.parseSqlUrl('redis://h:password@127.0.0.1:6379'),
   sequelize: helper.parseSequelizeConfig(sequelizeConfig),
   appKeys: {
-    facebook: {
-      clientID: '392842890908888',
-      clientSecret: 'e77660d2bd22037cb091f97d9ef22fc8'
-    },
+    facebook: JSON.parse(fs.readFileSync(path.join(__dirname, 'facebookDevelopment.json'), 'utf8')),
     // an object with two keys: clientID and clientSecret
-    google: JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8')).appKey
-  }
+    google: JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8')).appKey,
+    sweetCaptcha: JSON.parse(fs.readFileSync(path.join(__dirname, 'sweetCaptcha.json'), 'utf8'))
+  },
+  smtpOptions: JSON.parse(fs.readFileSync(path.join(__dirname, 'smtp.json'), 'utf8'))
 }
 
 config.redis.database = 2;

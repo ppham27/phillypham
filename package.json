@@ -63,6 +63,7 @@
     "sequelize-cli": "~1.7.0",
     "sequelize-fixtures": "~0.4.4",
     "serve-favicon": "~2.2.1",
+    "sweetcaptcha": "0.0.2",
     "uglifyify": "~3.0.1",
     "validator": "~3.4.0"
   },

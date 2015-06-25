@@ -18,7 +18,22 @@ var config = {
     google: {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET      
+    },
+    sweetCaptcha: {
+      id: process.env.SWEET_CAPTCHA_ID,
+      key: process.env.SWEET_CAPTCHA_KEY,
+      secret: process.env.SWEET_CAPTCHA_SECRET
     }
+  },
+  smtpOptions: {
+    fromDomain: 'phillypham.com',
+    host: process.env.SMTP_HOST,
+    secure: true,
+    port: process.env.SMTP_PORT,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    }    
   }
 }
 config.redis.database = 0;

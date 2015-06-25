@@ -432,7 +432,7 @@ span.field-sublabel {
 }
 
 #registration-form #wmd-editor {
-  height: 150px;
+  height: 125px;
 }
 
 #registration-form .wmd-preview {
@@ -536,4 +536,14 @@ span.field-sublabel {
   padding: 5px;
   margin-left: 5px;
   margin-right: 5px;
+}
+
+fieldset.captcha {
+  text-align: right;
+}
+
+.sweetcaptcha {
+  display: inline-block;
+  width: 280px;
+
 }

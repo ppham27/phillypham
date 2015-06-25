@@ -28,13 +28,19 @@ var config = {
     facebook: {
       clientID: '',
       clientSecret: '',
+    },
+    sweetCaptcha: {
+      id: '',
+      key: '',
+      secret: ''
     }
   },
   smtpOptions: {
     fromDomain: '',
     host: '',
     secure: true,
-    port: {
+    port: 465,
+    auth: {
       user: '',
       pass: ''
     }    
