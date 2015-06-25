@@ -103,7 +103,7 @@ are made like, where the colons specify column alignment:
 LaTeX can be inserted directly.
 
 ```text
-$$\sum_{i=1}^n n = \frac{n(n+1)}{2}$$
+$$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
 ```
     
 makes
