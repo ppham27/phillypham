@@ -47,23 +47,23 @@ hljs.initHighlightingOnLoad();
 mathJaxConfigRequest.send();  
 
 function editorHelp() {
-  // self = document.getElementById('wmd-help-button');
   if (document.querySelector('.' + this.id + '.help-tip') !== null) {
     // remove if already there
     return false;
   } else {    
     var self = this;
-    self = document.getElementById('wmd-help-button');
     var helpTip = document.createElement('div');
     var buttonBoundingClientRect = self.getBoundingClientRect();
     helpTip.className = this.id + ' help-tip wmd-preview wmd-panel';
     helpTip.style.position = 'absolute';  
+    var top = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    var left = window.scrollX || document.documentElement.scrollLeft || document.body.scrollLeft || 0;    
     var width = 305;  
     var height = 200;
     helpTip.style.width = width + 'px';
     helpTip.style.height = height + 'px';
-    helpTip.style.left = (buttonBoundingClientRect.left-width + document.body.scrollLeft - 20).toString() + 'px';
-    helpTip.style.top = (buttonBoundingClientRect.top + document.body.scrollTop-height - 20).toString() + 'px';
+    helpTip.style.left = (buttonBoundingClientRect.left - width + left - 20).toString() + 'px';
+    helpTip.style.top = (buttonBoundingClientRect.top + top - height - 20).toString() + 'px';
     helpTip.innerHTML = require('./editorHelpHtml');
     helpTip.style.border = '1px solid #222';
     helpTip.style.padding = '15px';
@@ -76,6 +76,9 @@ function editorHelp() {
     document.body.appendChild(helpTip); 
     setTimeout(function() {
       editor.hooks.onPreviewRefresh(editor); // to render math
+      Array.prototype.slice.call(helpTip.querySelectorAll('pre code')).forEach(function(code) {
+        hljs.highlightBlock(code);
+      });      
       document.body.addEventListener('click', click, false);  
       function click() {
         document.body.removeChild(helpTip);
@@ -85,4 +88,3 @@ function editorHelp() {
     return false;
   }
 }
-
