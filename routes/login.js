@@ -1,7 +1,5 @@
 var express = require('express');
 var router = express.Router();
-
-var db = require('../models');
 var passport = require('../lib/passport');
 
 router.get('/', require('../lib/middleware/preLogin'), function(req, res, next) {

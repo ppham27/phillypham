@@ -1,12 +1,13 @@
 var Sequelize = require('sequelize');
 var Promise = require('bluebird');
 var bcrypt = require('bcrypt');
+var converter = require('../lib/markdown').Converter;
 
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define("User", {
     displayName: {type: DataTypes.STRING, field: 'display_name', unique: true, allowNull: false, 
-                  validate: { len: [1, 128]}},
+                  validate: { len: [1, 64]}},
     email: {type: DataTypes.STRING, unique: true, allowNull: true,
             validate: {isEmail: true}},
     emailVerified: {type: DataTypes.BOOLEAN, defaultValue: false, field: 'email_verified'},
@@ -18,7 +19,7 @@ module.exports = function(sequelize, DataTypes) {
     middleName: {type: DataTypes.STRING, allowNull: true, field: 'middle_name'},
     photoUrl: {type: DataTypes.STRING, field: 'photo_url', defaultValue: '/images/default-profile.jpg'},
     biography: {type: DataTypes.TEXT, allowNull: true},
-    biographyHtml: {type: DataTypes.TEXT, allowNull: true},
+    biographyHtml: {type: DataTypes.TEXT, allowNull: true, field: 'biography_html'},
     facebookId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'facebook_id'},
     googleId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'google_id'},
     twitterId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'twitter_id'}    
@@ -104,6 +105,10 @@ module.exports = function(sequelize, DataTypes) {
                                          user.displayName += Math.round(Math.random()*9999).toString();
                                          return Promise.resolve(user);                                         
                                        });
+                              },
+                              beforeCreate: function(user) {
+                                if (user.biography) user.biographyHtml = converter.makeHtml(user.biography);
+                                return Promise.resolve(user);
                               },
                               afterValidate: function(user) {
                                 if (user.email) user.email = user.email.toLowerCase();

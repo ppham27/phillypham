@@ -32,7 +32,7 @@ input {
   margin-right: auto;
   margin-top: 5px;
   margin-bottom: 5px;
-  border: 2px solid #003b52;
+  border: 1px solid rgba(34, 34, 34, 0.25);
   border-radius: 10px;
   padding: 10px;  
 }
@@ -202,7 +202,7 @@ h2#wmd-preview-title {
 
 #mainbar {
   width: 805px;
-  min-height: 1000px;
+  min-height: 1280px;
   padding-left: 0px;
   padding-right: 20px;
   padding-top: 15px;
@@ -435,19 +435,27 @@ span.field-sublabel {
   height: 150px;
 }
 
-#registration-form #wmd-preview {
-  margin-top: 20px;
+#registration-form .wmd-preview {
+  margin-top: 15px;
   margin-bottom: 20px;
-  margin-right: 40px;
-  width: 520px;
+  margin-left: 30px;
+  width: 400px;
+  float: left;
 }
 
 #registration-form img.profile-preview {
   display: block;
-  float: right;
+  float: left;
+  margin-top: 15px;
   max-width: 250px;
   max-height: 300px;  
   border: 2px solid #222;
+}
+
+#registration-form .submit-button {
+  margin-top: 15px;
+  margin-right: 20px;
+  float: right;
 }
 
 #registration-form input {
@@ -455,9 +463,10 @@ span.field-sublabel {
   margin-bottom: 0px;
 }
 
-#registration-form p {
+#registration-form p.form-description {
   margin-bottom: 3px;
 }
+
 
 .overlay {
   position: absolute;
