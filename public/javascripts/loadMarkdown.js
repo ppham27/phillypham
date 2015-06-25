@@ -46,41 +46,43 @@ mathJaxConfigRequest.onerror = function(event) {
 hljs.initHighlightingOnLoad();
 mathJaxConfigRequest.send();  
 
-
 function editorHelp() {
-  var self = this;
-  var helpTip = document.createElement('div');
-  helpTip.className = 'help-tip';
-  helpTip.innerHTML = 'Get help here';
-  alert('TODO');
+  // self = document.getElementById('wmd-help-button');
+  if (document.querySelector('.' + this.id + '.help-tip') !== null) {
+    // remove if already there
+    return false;
+  } else {    
+    var self = this;
+    self = document.getElementById('wmd-help-button');
+    var helpTip = document.createElement('div');
+    var buttonBoundingClientRect = self.getBoundingClientRect();
+    helpTip.className = this.id + ' help-tip wmd-preview wmd-panel';
+    helpTip.style.position = 'absolute';  
+    var width = 305;  
+    var height = 200;
+    helpTip.style.width = width + 'px';
+    helpTip.style.height = height + 'px';
+    helpTip.style.left = (buttonBoundingClientRect.left-width + document.body.scrollLeft - 20).toString() + 'px';
+    helpTip.style.top = (buttonBoundingClientRect.top + document.body.scrollTop-height - 20).toString() + 'px';
+    helpTip.innerHTML = require('./editorHelpHtml');
+    helpTip.style.border = '1px solid black';
+    helpTip.style.padding = '15px';
+    helpTip.style.borderRadius = '15px';
+    helpTip.style.background = '#fff';
+    helpTip.style.overflow = 'scroll';
+    helpTip.addEventListener('click', function(event) {
+      event.stopPropagation();
+    }, false);
+    document.body.appendChild(helpTip); 
+    setTimeout(function() {
+      editor.hooks.onPreviewRefresh(editor); // to render math
+      document.body.addEventListener('click', click, false);  
+      function click() {
+        document.body.removeChild(helpTip);
+        document.body.removeEventListener('click', click);
+      }  
+    }, 0);
+    return false;
+  }
 }
 
-// (function() {
-//   self = document.getElementById('wmd-help-button');
-//   var width = 200;  
-//   var helpTip = document.createElement('div');
-//   helpTip.className = 'help-tip';
-//   helpTip.innerHTML = '### H3 ### H3### H3 ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3  ### H3 ### H3### H3 ';
-//   document.body.appendChild(helpTip);  
-//   var buttonBoundingClientRect = self.getBoundingClientRect();
-//   helpTip.style.position = 'absolute';  
-//   helpTip.style.left = (buttonBoundingClientRect.left-width + document.body.scrollLeft).toString() + 'px';
-//   helpTip.style.bottom = (buttonBoundingClientRect.top + document.body.scrollTop).toString() + 'px';
-//   helpTip.style.width = width.toString() + 'px';
-//   helpTip.style.border = '1px solid #222';
-//   helpTip.style.backgroundColor = 'yellow';
-  
-//   self.addEventListener('click', function() {
-//     document.body.removeChild(helpTip);
-//   });
-//   console.log(buttonBoundingClientRect);  
-// })()
-
-
-// <a href="http://www.google.com">phil</a>
-// <a href="#abc">chris</a>
-// <a href="http://www.facebook.com">phil</a>
-// <a hr>improper</a>
-// <a href>nothing</a>
-// <a href="">no space</a>
-// <a href="http://www.yahoo.com">phil</a>

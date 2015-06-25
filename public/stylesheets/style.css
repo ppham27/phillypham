@@ -439,8 +439,8 @@ span.field-sublabel {
   margin-top: 15px;
   margin-bottom: 20px;
   margin-left: 30px;
-  width: 400px;
-  float: left;
+  width: 380px;
+  display: inline-block;
 }
 
 #registration-form img.profile-preview {

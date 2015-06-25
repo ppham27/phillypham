@@ -6,6 +6,7 @@ config/smtp.json
 config/sweetCaptcha.json
 config/facebook*.json
 public/*.html
+public/javascripts/editorHelpHtml.js
 public/javascripts/markdownBundle.js
 public/javascripts/markdownBundle-min.js
 public/javascripts/encryptPasswordBundle.js

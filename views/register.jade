@@ -39,11 +39,11 @@ block content
       h2 Describe Yourself
       #wmd-button-bar.wmd-button-bar
       #wmd-editor.wmd-editor.wmd-panel.tex2jax_ignore= temporaryUser.biography
-    .wmd-panel
+    .wmd-panel 
       img.profile-preview(src=temporaryUser.photoUrl || "/images/default-profile.jpg", alt="Your picture URL is broken")
       #wmd-preview.wmd-preview
-    button.submit-button(type="submit")= locals.update ? 'Update' : 'Register'
-      .overlay
+      button.submit-button(type="submit")= locals.update ? 'Update' : 'Register'
+        .overlay
   script.
     var photoUrl = document.getElementById('registration-form').querySelector('input[name="photoUrl"]')
     photoUrl.addEventListener('input', function(event) {

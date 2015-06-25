@@ -8,10 +8,18 @@ var ClosureCompiler = require('closurecompiler');
 var envify = require('envify/custom');
 var child_process = require('child_process');
 var config = require('config')
+var markdown = require('./lib/markdown');
 
-gulp.task('markdown-browserify', function(done) {
+
+gulp.task('markdown-help', function(done) {
+  var html = JSON.stringify(markdown.Converter.makeHtml(fs.readFileSync('./public/MarkdownHelp.md','ascii')));
+  var output = "module.exports=" + html + ';';
+  fs.writeFileSync('./public/javascripts/editorHelpHtml.js', output);
+  done();
+});
+gulp.task('markdown-browserify', ['markdown-help'], function(done) {
   var b = browserify('./public/javascripts/loadMarkdown.js');
-  var bStream = b.transform('uglifyify').bundle();
+  var bStream = b.transform('uglifyify').bundle();  
   bStream.on('end', function() {
     console.log('markdown has been browserified!');
     done();
