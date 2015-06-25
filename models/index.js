@@ -53,7 +53,19 @@ sequelize.sync({force: env === 'development' || env === 'test'})
     db.ApplicationSettings = require('./ApplicationSettings')(redisClient);
     redisClient.exists('applicationSettings', function(err, doesExist) {
       db.ApplicationSettings.on('ready', function() {
-        if (!doesExist) db.ApplicationSettings.set(config.applicationSettings).save();
+        if (!doesExist) {
+          db.ApplicationSettings.set(config.applicationSettings).save();
+        } else {
+          var updated = false;
+          for (var key in config.applicationSettings) {
+            if (!(key in db.ApplicationSettings)) {
+              // update new keys
+              db.ApplicationSettings.set(key, config.applicationSettings[key]);
+              updated = true;            
+            }
+            if (updated) db.ApplicationSettings.save();
+          }
+        }
         db.isReady = true;
         db.emit('ready');
       });
