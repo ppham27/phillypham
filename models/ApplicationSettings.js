@@ -1,5 +1,6 @@
 var Promise = require('bluebird');
 var EventEmitter = require('events').EventEmitter;
+var converter = require('../lib/markdown').Converter;
 
 // singleton to store app settings in redis
 module.exports = function(redisClient) {
@@ -64,9 +65,9 @@ module.exports = function(redisClient) {
   }  
 
   ApplicationSettings.validate = function() {
-    if (!ApplicationSettings.sidebarPhotoUrl) 
+    if (!ApplicationSettings['sidebar:photoUrl']) 
       return new TypeError('Sidebar photo url must be a nonempty string');
-    if (!ApplicationSettings.sidebarInfo) 
+    if (!ApplicationSettings['sidebar:info'] || !ApplicationSettings['sidebar:infoHtml'])
       return new TypeError('Sidebar info must be a nonempty string');
     if (!ApplicationSettings.defaultUserGroupId) 
       return new TypeError('User Group must be set');
@@ -80,6 +81,7 @@ module.exports = function(redisClient) {
       return new Promise(function(resolve, reject) {
                            if (!('updatedAt' in ApplicationSettings)) defineGetterAndSetter('updatedAt');
                            ApplicationSettings.updatedAt = (new Date()).toISOString();
+                           ApplicationSettings['sidebar:infoHtml'] = converter.makeHtml(ApplicationSettings['sidebar:info']);
                            redisClient.hmset('applicationSettings', 
                                              ApplicationSettings,
                                              function(err) {

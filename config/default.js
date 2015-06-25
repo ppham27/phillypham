@@ -20,13 +20,37 @@ var config = {
     database: 'database',
     url: 'postgres://username:password@host:port/database'
   },
+  appKeys: {
+    google: {
+      clientID: '',
+      clientSecret: '',
+    },
+    facebook: {
+      clientID: '',
+      clientSecret: '',
+    }
+  },
+  smtpOptions: {
+    fromDomain: '',
+    host: '',
+    secure: true,
+    port: {
+      user: '',
+      pass: ''
+    }    
+  },
   // behavior is undetermined without at least one user group that matches
   // the default user group id
   applicationSettings: { title: 'PhillyPham',                         
                          defaultUserGroupId: 2,
-                         sidebarTitle: 'About Me',
-                         sidebarPhotoUrl: 'https://dl.dropboxusercontent.com/u/29552058/1504453_10151953824578353_1084290774_o.jpg',
-                         sidebarInfo: 'Hello, World!'
+                         "sidebar:title": 'About Me',
+                         "sidebar:photoUrl": 'https://dl.dropboxusercontent.com/u/29552058/1504453_10151953824578353_1084290774_o.jpg',
+                         "sidebar:info": 'Hello, World!',
+                         "sidebar:infoHtml": '<p>Hello, World!</p>',
+                         "contact:email": '',
+                         "contact:tacebook": '',
+                         "contact:twitter": '',
+                         "contact:instagram": ''
                        },
   fixtures: [
     {model: 'Role', data: {name: 'poster', description: 'can post'}},

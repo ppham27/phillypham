@@ -23,9 +23,10 @@ var config = {
   },
   applicationSettings: { title: 'PhillyPham',                         
                          defaultUserGroupId: 2,
-                         sidebarTitle: 'About Me',
-                         sidebarPhotoUrl: 'picture.jpg',
-                         sidebarInfo: 'Hello, World!'
+                         "sidebar:title": 'About Me',
+                         "sidebar:photoUrl": 'picture.jpg',
+                         "sidebar:info": 'Hello, World!',
+                         "sidebar:infoHtml": '<p>Hello, World!</p>'
                        },
   sequelize: helper.parseSequelizeConfig(sequelizeConfig)
 }

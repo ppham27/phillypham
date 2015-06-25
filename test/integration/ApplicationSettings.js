@@ -33,11 +33,11 @@ describe('application settings should stay in sync', function() {
     var self = this;
     self.ApplicationSettings2.once('message', function() {
       expect(self.ApplicationSettings1).to.have.property('title', 'PhillyPham');
-      expect(self.ApplicationSettings1).to.have.property('sidebarTitle', 'About Me');
-      expect(self.ApplicationSettings1).to.have.property('sidebarInfo', 'Hello, World!');
+      expect(self.ApplicationSettings1).to.have.property('sidebar:title', 'About Me');
+      expect(self.ApplicationSettings1).to.have.property('sidebar:info', 'Hello, World!');
       expect(self.ApplicationSettings2).to.have.property('title', 'PhillyPham');
-      expect(self.ApplicationSettings2).to.have.property('sidebarTitle', 'About Me');
-      expect(self.ApplicationSettings2).to.have.property('sidebarInfo', 'Hello, World!');
+      expect(self.ApplicationSettings2).to.have.property('sidebar:title', 'About Me');
+      expect(self.ApplicationSettings2).to.have.property('sidebar:info', 'Hello, World!');
       done();
     });
     self.ApplicationSettings1.set(config.applicationSettings);
@@ -50,22 +50,22 @@ describe('application settings should stay in sync', function() {
       self.ApplicationSettings1.once('message', function() {
         // make sure properties stay stable
         expect(self.ApplicationSettings1).to.have.property('title', 'PhillyPham');
-        expect(self.ApplicationSettings1).to.have.property('sidebarTitle', 'About Me');
-        expect(self.ApplicationSettings1).to.have.property('sidebarInfo', 'Hello, World!');
+        expect(self.ApplicationSettings1).to.have.property('sidebar:title', 'About Me');
+        expect(self.ApplicationSettings1).to.have.property('sidebar:info', 'Hello, World!');
         expect(self.ApplicationSettings2).to.have.property('title', 'PhillyPham');
-        expect(self.ApplicationSettings2).to.have.property('sidebarTitle', 'About Me');
-        expect(self.ApplicationSettings2).to.have.property('sidebarInfo', 'Hello, World!');
+        expect(self.ApplicationSettings2).to.have.property('sidebar:title', 'About Me');
+        expect(self.ApplicationSettings2).to.have.property('sidebar:info', 'Hello, World!');
         // check new properties
-        expect(self.ApplicationSettings1).to.have.property('sidebarPhotoUrl', 'newPicture.png');
-        expect(self.ApplicationSettings2).to.have.property('sidebarPhotoUrl', 'newPicture.png');
+        expect(self.ApplicationSettings1).to.have.property('sidebar:photoUrl', 'newPicture.png');
+        expect(self.ApplicationSettings2).to.have.property('sidebar:photoUrl', 'newPicture.png');
         expect(self.ApplicationSettings1).to.have.property('defaultUserGroupId', 4);
         expect(self.ApplicationSettings2).to.have.property('defaultUserGroupId', 4);
         done();
       });
       expect(self.ApplicationSettings2).to.have.property('defaultUserGroupId', 2);
-      expect(self.ApplicationSettings2).to.have.property('sidebarPhotoUrl', 'picture.jpg');
+      expect(self.ApplicationSettings2).to.have.property('sidebar:photoUrl', 'picture.jpg');
       self.ApplicationSettings2.defaultUserGroupId = 4;
-      self.ApplicationSettings2.sidebarPhotoUrl = 'newPicture.png';
+      self.ApplicationSettings2['sidebar:photoUrl'] = 'newPicture.png';
       self.ApplicationSettings2.save();
     });    
     self.ApplicationSettings1.set(config.applicationSettings);

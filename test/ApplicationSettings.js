@@ -90,12 +90,13 @@ describe('ApplicationSettings on fresh database', function() {
 
   it('should save', function(done) {
     this.ApplicationSettings.set({defaultUserGroupId: 1,
-                                  sidebarPhotoUrl: 'test.jpg',
-                                  sidebarInfo: 'Hello, World!'});
+                                  "sidebar:photoUrl": 'test.jpg',
+                                  "sidebar:info": 'Hello, World!',
+                                  "sidebar:infoHtml": '<p>Hello, World!</p>'});
     var stub = sinon.stub(this.redisClient, 'hmset', 
                           function(key, obj, callback) {
                             expect(key).to.equal('applicationSettings');
-                            expect(obj.sidebarPhotoUrl).to.equal('test.jpg');
+                            expect(obj['sidebar:photoUrl']).to.equal('test.jpg');
                             setTimeout(callback, 100);
                           });
     this.ApplicationSettings.save().then(done);
@@ -103,7 +104,7 @@ describe('ApplicationSettings on fresh database', function() {
   });
 
   it('should not save', function(done) {
-    this.ApplicationSettings.set({sidebarPhotoUrl: 'test.jpg'});
+    this.ApplicationSettings.set({'sidebar:photoUrl': 'test.jpg'});
     this.ApplicationSettings.save().catch(TypeError,
                                           function(err) {
                                             expect(err).to.be.instanceOf(TypeError);
@@ -127,8 +128,9 @@ describe('ApplicationSettings on existing database', function() {
                function(key, callback) {
                  expect(key).to.equal('applicationSettings');
                  setTimeout(callback, 300, undefined, {defaultUserGroupId: 1,
-                                                       sidebarPhotoUrl: 'test.jpg',
-                                                       sidebarInfo: 'Hello, World!'});
+                                                       'sidebar:photoUrl': 'test.jpg',
+                                                       'sidebar:info': 'Hello, World!',
+                                                       "sidebar:infoHtml": '<p>Hello, World!</p>'});
                });
   });
   beforeEach(function(done) {
@@ -142,8 +144,8 @@ describe('ApplicationSettings on existing database', function() {
   });
 
   it('should have values prepopulated', function() {
-    expect(this.ApplicationSettings.sidebarPhotoUrl).to.equal('test.jpg');
-    expect(this.ApplicationSettings.sidebarInfo).to.equal('Hello, World!');
+    expect(this.ApplicationSettings['sidebar:photoUrl']).to.equal('test.jpg');
+    expect(this.ApplicationSettings['sidebar:info']).to.equal('Hello, World!');
   });
 
   it('should take additional settings', function() {
@@ -152,11 +154,11 @@ describe('ApplicationSettings on existing database', function() {
   });
   
   it('should be able to be modified and saved', function(done) {
-    this.ApplicationSettings.sidebarPhotoUrl = 'example.png';
+    this.ApplicationSettings['sidebar:photoUrl'] = 'example.png';
     var stub = sinon.stub(this.redisClient, 'hmset', 
                           function(key, obj, callback) {
                             expect(key).to.equal('applicationSettings');
-                            expect(obj.sidebarPhotoUrl).to.equal('example.png');
+                            expect(obj['sidebar:photoUrl']).to.equal('example.png');
                             setTimeout(callback, 100);
                           });
     this.ApplicationSettings.save().then(done);
@@ -164,7 +166,7 @@ describe('ApplicationSettings on existing database', function() {
   });
 
   it('should reject invalid changes', function(done) {
-    this.ApplicationSettings.sidebarPhotoUrl = '';
+    this.ApplicationSettings['sidebar:photoUrl'] = '';
     this.ApplicationSettings.save().catch(TypeError,
                                           function(err) {
                                             expect(err).to.be.instanceOf(TypeError);
