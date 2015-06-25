@@ -38,7 +38,7 @@ db.Sequelize = Sequelize;
 
 sequelize.sync({force: env === 'development' || env === 'test'})
 .then(function() {
-  if ({force: env === 'development' || env === 'test'}) {
+  if (env === 'development' || env === 'test') {
     redisClient.flushdb(function(err, isSuccess) {
       if (err) throw err;
       db.ApplicationSettings = require('./ApplicationSettings')(redisClient);
@@ -49,15 +49,14 @@ sequelize.sync({force: env === 'development' || env === 'test'})
       });
     });
   } else {
+    // we're in production
     db.ApplicationSettings = require('./ApplicationSettings')(redisClient);
     redisClient.exists('applicationSettings', function(err, doesExist) {
-      if (!doesExist) {
-        db.ApplicationSettings.on('ready', function() {
-          db.ApplicationSettings.set(config.applicationSettings).save();
-          db.isReady = true;
-          db.emit('ready');
-        });
-      }
+      db.ApplicationSettings.on('ready', function() {
+        if (!doesExist) db.ApplicationSettings.set(config.applicationSettings).save();
+        db.isReady = true;
+        db.emit('ready');
+      });
     });
   }  
 });
