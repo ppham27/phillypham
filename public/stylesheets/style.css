@@ -202,7 +202,7 @@ h2#wmd-preview-title {
 
 #mainbar {
   width: 805px;
-  min-height: 1280px;
+  min-height: 1300px;
   padding-left: 0px;
   padding-right: 20px;
   padding-top: 15px;
@@ -540,10 +540,10 @@ span.field-sublabel {
 
 fieldset.captcha {
   text-align: right;
+  margin-bottom: -15px;
 }
 
 .sweetcaptcha {
   display: inline-block;
   width: 280px;
-
 }

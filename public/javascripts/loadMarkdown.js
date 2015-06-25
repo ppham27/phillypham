@@ -65,11 +65,11 @@ function editorHelp() {
     helpTip.style.left = (buttonBoundingClientRect.left-width + document.body.scrollLeft - 20).toString() + 'px';
     helpTip.style.top = (buttonBoundingClientRect.top + document.body.scrollTop-height - 20).toString() + 'px';
     helpTip.innerHTML = require('./editorHelpHtml');
-    helpTip.style.border = '1px solid black';
+    helpTip.style.border = '1px solid #222';
     helpTip.style.padding = '15px';
     helpTip.style.borderRadius = '15px';
-    helpTip.style.background = '#fff';
-    helpTip.style.overflow = 'scroll';
+    helpTip.style.background = '#fefefe';
+    helpTip.style.overflowY = 'scroll';
     helpTip.addEventListener('click', function(event) {
       event.stopPropagation();
     }, false);

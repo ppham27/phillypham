@@ -37,7 +37,9 @@ Headers are specified with differing numbers of `#`.
 
 Code can either be indented by 4 spaces.
 
-        cout << "Hello, world!" << endl;
+```text
+    cout << "Hello, world!" << endl;
+```
 
 or fenced by 3 backticks. You can specify the language:
 
@@ -49,6 +51,15 @@ or fenced by 3 backticks. You can specify the language:
     ```
 
 to help with the highlighting.
+
+#### Blockquotes
+
+Block quotes are denoted by `>`:
+
+```text
+> This is a block quote
+> that goes onto two lines.
+```
 
 #### Lists
 
@@ -79,17 +90,21 @@ Unordered lists are made with dashes
 
 are made like, where the colons specify column alignment:
 
-    | A | B | C |
-    |--:|:-:|:--|
-    | 1 | 2 | 3 |
-    | 4 | 5 | 6 |
-    | 7 | 8 | 9 |
+```text
+| A | B | C |
+|--:|:-:|:--|
+| 1 | 2 | 3 |
+| 4 | 5 | 6 |
+| 7 | 8 | 9 |
+```
     
 #### LaTeX
 
 LaTeX can be inserted directly.
 
-    $$\sum_{i=1}^n n = \frac{n(n+1)}{2}$$
+```text
+$$\sum_{i=1}^n n = \frac{n(n+1)}{2}$$
+```
     
 makes
 
