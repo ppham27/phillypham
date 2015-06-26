@@ -205,6 +205,25 @@ describe('passport', function() {
       }      
       passport._strategies.facebook._verify(undefined, undefined, profile, callback);
     });        
+    
+    // make a test for users with no    
+    it('should log in old users without changing their data', function(done) {
+      var profile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/facebookProfile.json'), 'ascii'));
+      var callback = function(err, user, message) {
+        user.givenName = 'new name';
+        user.save()
+        .then(function(user) {
+          var callback = function(err, user, message) {
+            expect(user.email).to.equal('pp@gmail.com');
+            expect(user.displayName).to.equal('user name'); 
+            expect(user.givenName).to.equal('new name'); //make sure we get new data from user
+            done();
+          }
+          passport._strategies.facebook._verify(undefined, undefined, profile, callback);          
+        }); 
+      }   
+      passport._strategies.facebook._verify(undefined, undefined, profile, callback);          
+    });
   });
 
   describe('google', function() {
@@ -212,7 +231,7 @@ describe('passport', function() {
       var profile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/googleProfile.json'), 'ascii'));
       var callback = function(err, user, message) {
         expect(user.email).to.equal('phillyphamtest@gmail.com');
-        db.User.findOne({where: {email: 'phillyphamtest@gmail.com'}})
+        db.User.findOne({where: {email: user.email}})
         .then(function(user) {
           expect(user).to.not.be.null;
           expect(user.displayName).to.equal('Tester1 Phillypham');
@@ -221,6 +240,24 @@ describe('passport', function() {
       }      
       passport._strategies.google._verify(undefined, undefined, profile, callback);
     });        
+
+    it('should relogin old user keeping their changes', function(done) {
+      var profile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/googleProfile.json'), 'ascii'));
+      var callback = function(err, user, message) {        
+        user.familyName = 'maiden';
+        user.save()
+        .then(function(user) {
+          var callback = function(err, user, message) {
+            expect(user.email).to.equal('phillyphamtest@gmail.com');
+            expect(user.displayName).to.equal('Tester1 Phillypham');
+            expect(user.familyName).to.equal('maiden'); // make sure data is updated
+            done();
+          }
+          passport._strategies.google._verify(undefined, undefined, profile, callback);      
+        });       
+      }      
+      passport._strategies.google._verify(undefined, undefined, profile, callback);      
+    });
   });
 });
 
