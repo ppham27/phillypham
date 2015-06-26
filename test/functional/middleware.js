@@ -230,7 +230,9 @@ describe('middleware', function() {
                                    function(err, res, body) {
                                      var user = JSON.parse(body);
                                      expect(user.id).to.not.be.undefined;
-                                     cb(err, user);
+                                     setTimeout(function() {
+                                       cb(err, user);
+                                     }, 500);
                                    });
                     }
                     return newUserRequest;
@@ -240,7 +242,7 @@ describe('middleware', function() {
                   async.series(newUserRequests,
                                function(err, results) {
                                  self.users = results;
-                                   done(err);
+                                 done(err);
                                });
                 });
       });

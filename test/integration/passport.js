@@ -200,3 +200,6 @@ describe('passport', function() {
 function encryptPassword(password)  {
   return crypto.publicEncrypt(config.rsaPublicKey, new Buffer(password, 'utf8')).toString('base64');
 }
+
+
+
