@@ -2,10 +2,13 @@ var expect = require('chai').expect;
 var sinon = require('sinon');
 
 var crypto = require('crypto');
+var Promise = require('bluebird');
 
 var config = require('config');
 var db = require('../../models');
 var passport = require('../../lib/passport');
+
+var FakeRequest = require('../support/fakeRequest');
 
 describe('passport', function() {  
   beforeEach(function(done) {
@@ -79,8 +82,36 @@ describe('passport', function() {
     });
   });
 
-  describe('localRegistration', function() {
-    
+  describe.only('localRegistration', function() {
+    before(function() {
+      var sweetCaptcha = this.sweetCaptcha = require('../../lib/sweetCaptcha');
+      var emailVerifier = this.emailVerifier = require('../../lib/emailVerifier');
+      sinon.stub(sweetCaptcha, 'api', function(method, sweetCaptchaKeys, callback) {        
+        expect(method).to.equal('check');
+        // just make the captcha true
+        callback(null, 'true');
+      });      
+      sinon.stub(emailVerifier, 'verify').returns(Promise.resolve(true));
+    });
+    after(function() {      
+      this.sweetCaptcha.api.restore();
+      this.emailVerifier.verify.restore();
+    });
+    it('should create a new user', function(done) {
+      var req = new FakeRequest({displayName: 'phil', 
+                                 email: ' phiL@abc.com ', 
+                                 password: encryptPassword('abcabcabc'), 
+                                 passwordConfirmation: encryptPassword('abcabcabc'),
+                                 biography: 'hello'});
+      var callback = function(err, user, message) {
+        expect(user).to.not.be.null;
+        expect(user.email).to.equal('phil@abc.com'); // make sure email is trimmed
+        expect(user.photoUrl).to.equal('/images/default-profile.jpg'); // no image means default
+        expect(user.biographyHtml).to.equal('<p>hello</p>'); // bio is converted
+        done();
+      };
+      passport._strategies.localRegistration._verify(req, undefined, undefined, callback);
+    });
   });
 });
 

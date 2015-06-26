@@ -81,7 +81,8 @@ var defaultImageFormOptions = {title: 'Insert Image',
 
 var defaultLinkFormOptions = {title: 'Insert Link',
                                fields: [{name: 'url', label: 'URL', type: 'url'},
-                                        {name: 'text', label: 'Text', placeholder: 'text describing the link'}],
+                                        {name: 'text', label: 'Text', type: 'text',
+                                         placeholder: 'text describing the link'}],
                                description: 'The URL is the address of the website. The text is what others will see in your document.'}
 
 var defaultStrings = {

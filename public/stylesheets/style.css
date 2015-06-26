@@ -202,7 +202,7 @@ h2#wmd-preview-title {
 
 #mainbar {
   width: 805px;
-  min-height: 1300px;
+  min-height: 800px;
   padding-left: 0px;
   padding-right: 20px;
   padding-top: 15px;
@@ -441,6 +441,7 @@ span.field-sublabel {
   margin-left: 30px;
   width: 380px;
   display: inline-block;
+  min-height: 300px;
 }
 
 #registration-form img.profile-preview {
