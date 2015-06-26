@@ -82,7 +82,44 @@ describe('passport', function() {
     });
   });
 
-  describe.only('localRegistration', function() {
+  describe('localRegistration captcha fail', function() {
+    before(function() {
+      var sweetCaptcha = this.sweetCaptcha = require('../../lib/sweetCaptcha');
+      var emailVerifier = this.emailVerifier = require('../../lib/emailVerifier');
+      sinon.stub(sweetCaptcha, 'api', function(method, sweetCaptchaKeys, callback) {        
+        expect(method).to.equal('check');
+        // just make the captcha true
+        callback(null, 'false');
+      });      
+      sinon.stub(emailVerifier, 'verify').returns(Promise.resolve(true));
+    });
+
+    after(function() {      
+      this.sweetCaptcha.api.restore();
+      this.emailVerifier.verify.restore();
+    });
+
+    it('should reject if the captcha is false', function(done) {
+      var req = new FakeRequest({displayName: 'phil', 
+                                 email: ' phiL@abc.com ', 
+                                 password: encryptPassword('abcabcabc'), 
+                                 passwordConfirmation: encryptPassword('abcabcabc'),
+                                 biography: 'hello'});
+      var self = this;
+      var callback = function(err, user, message) {
+        expect(user).be.false;
+        var captchaError = false;
+        req.session.flash.forEach(function(flashMessage) {
+          if (flashMessage.type === 'error' && /failed the captcha/.test(flashMessage.message)) captchaError = true;
+        });
+        expect(captchaError).to.be.true;
+        done();
+      };      
+      passport._strategies.localRegistration._verify(req, undefined, undefined, callback);
+    });
+  });
+
+  describe('localRegistration', function() {
     before(function() {
       var sweetCaptcha = this.sweetCaptcha = require('../../lib/sweetCaptcha');
       var emailVerifier = this.emailVerifier = require('../../lib/emailVerifier');
@@ -93,10 +130,12 @@ describe('passport', function() {
       });      
       sinon.stub(emailVerifier, 'verify').returns(Promise.resolve(true));
     });
+
     after(function() {      
       this.sweetCaptcha.api.restore();
       this.emailVerifier.verify.restore();
     });
+
     it('should create a new user', function(done) {
       var req = new FakeRequest({displayName: 'phil', 
                                  email: ' phiL@abc.com ', 
@@ -112,6 +151,49 @@ describe('passport', function() {
       };
       passport._strategies.localRegistration._verify(req, undefined, undefined, callback);
     });
+
+    it('should reject when password is too short', function(done) {
+      var req = new FakeRequest({displayName: 'phil', 
+                                 email: ' phiL@abc.com ', 
+                                 password: encryptPassword('abc'), 
+                                 passwordConfirmation: encryptPassword('abc'),
+                                 biography: 'hello'});
+      var callback = function(err, user, message) {
+        expect(user).to.be.false;
+        var foundPasswordLengthError = false;
+        req.session.flash.forEach(function(flashMessage) {
+          if (flashMessage.type === 'error' && /too short/.test(flashMessage.message)) foundPasswordLengthError = true;
+        });
+        expect(foundPasswordLengthError).to.be.true;
+        done();
+      };
+      passport._strategies.localRegistration._verify(req, undefined, undefined, callback);
+    });
+
+    it('should reject when there is no username', function(done) {
+      var req = new FakeRequest({displayName: '',
+                                 email: ' phiL@abc.com ', 
+                                 password: encryptPassword('abcabcabc'), 
+                                 passwordConfirmation: encryptPassword('abcabcabc'),
+                                 biography: 'hello'});
+      var callback = function(err, user, message) {
+        expect(user).to.be.false;
+        var displayNameLengthError = false;
+        req.session.flash.forEach(function(flashMessage) {
+          if (flashMessage.type === 'error' && /too short/.test(flashMessage.message)) displayNameLengthError = true;
+        });
+        expect(displayNameLengthError).to.be.true;
+        done();
+      };
+      passport._strategies.localRegistration._verify(req, undefined, undefined, callback);
+    });
+  });
+
+  describe('facebook', function() {
+    it('should make a new user', function(done) {
+      
+      done();
+    });        
   });
 });
 
