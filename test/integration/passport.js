@@ -1,12 +1,14 @@
 var expect = require('chai').expect;
 var sinon = require('sinon');
 
+var path = require('path');
 var crypto = require('crypto');
 var Promise = require('bluebird');
 
 var config = require('config');
 var db = require('../../models');
 var passport = require('../../lib/passport');
+var fs = require('fs');
 
 var FakeRequest = require('../support/fakeRequest');
 
@@ -191,8 +193,33 @@ describe('passport', function() {
 
   describe('facebook', function() {
     it('should make a new user', function(done) {
-      
-      done();
+      var profile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/facebookProfile.json'), 'ascii'));
+      var callback = function(err, user, message) {
+        expect(user.email).to.equal('pp@gmail.com');
+        db.User.findOne({where: {email: 'pp@gmail.com'}})
+        .then(function(user) {
+          expect(user).to.not.be.null;
+          expect(user.displayName).to.equal('user name');
+          done();
+        });       
+      }      
+      passport._strategies.facebook._verify(undefined, undefined, profile, callback);
+    });        
+  });
+
+  describe('google', function() {
+    it('should make a new user', function(done) {
+      var profile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/googleProfile.json'), 'ascii'));
+      var callback = function(err, user, message) {
+        expect(user.email).to.equal('phillyphamtest@gmail.com');
+        db.User.findOne({where: {email: 'phillyphamtest@gmail.com'}})
+        .then(function(user) {
+          expect(user).to.not.be.null;
+          expect(user.displayName).to.equal('Tester1 Phillypham');
+          done();
+        });       
+      }      
+      passport._strategies.google._verify(undefined, undefined, profile, callback);
     });        
   });
 });
