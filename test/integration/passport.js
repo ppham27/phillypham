@@ -90,7 +90,7 @@ describe('passport', function() {
       var emailVerifier = this.emailVerifier = require('../../lib/emailVerifier');
       sinon.stub(sweetCaptcha, 'api', function(method, sweetCaptchaKeys, callback) {        
         expect(method).to.equal('check');
-        // just make the captcha true
+        // autofail captcha
         callback(null, 'false');
       });      
       sinon.stub(emailVerifier, 'verify').returns(Promise.resolve(true));
@@ -154,6 +154,42 @@ describe('passport', function() {
       passport._strategies.localRegistration._verify(req, undefined, undefined, callback);
     });
 
+    it('should reject when email address is not unique', function(done) {
+      var req = new FakeRequest({displayName: 'phil', 
+                                 email: 'admin@admin.com', 
+                                 password: encryptPassword('password'), 
+                                 passwordConfirmation: encryptPassword('password'),
+                                 biography: 'hello'});
+      var callback = function(err, user, message) {
+        expect(user).to.be.false;
+        var uniqueError = false;
+        req.session.flash.forEach(function(flashMessage) {
+          if (flashMessage.type === 'error' && /already exists/.test(flashMessage.message)) uniqueError = true;
+        });
+        expect(uniqueError).to.be.true;
+        done();
+      };
+      passport._strategies.localRegistration._verify(req, undefined, undefined, callback);
+    });
+
+    it('should reject when email is not properly formatted', function(done) {
+      var req = new FakeRequest({displayName: 'phil', 
+                                 email: 'admin.com', 
+                                 password: encryptPassword('password'), 
+                                 passwordConfirmation: encryptPassword('password'),
+                                 biography: 'hello'});
+      var callback = function(err, user, message) {
+        expect(user).to.be.false;
+        var emailError = false;
+        req.session.flash.forEach(function(flashMessage) {
+          if (flashMessage.type === 'error' && /not properly formatted/.test(flashMessage.message)) emailError = true;
+        });
+        expect(emailError).to.be.true;
+        done();
+      };
+      passport._strategies.localRegistration._verify(req, undefined, undefined, callback);
+    });
+
     it('should reject when password is too short', function(done) {
       var req = new FakeRequest({displayName: 'phil', 
                                  email: ' phiL@abc.com ', 
@@ -196,7 +232,7 @@ describe('passport', function() {
       var profile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/facebookProfile.json'), 'ascii'));
       var callback = function(err, user, message) {
         expect(user.email).to.equal('pp@gmail.com');
-        db.User.findOne({where: {email: 'pp@gmail.com'}})
+        db.User.findOne({where: {email: user.email}})
         .then(function(user) {
           expect(user).to.not.be.null;
           expect(user.displayName).to.equal('user name');
@@ -206,7 +242,22 @@ describe('passport', function() {
       passport._strategies.facebook._verify(undefined, undefined, profile, callback);
     });        
     
-    // make a test for users with no    
+    it('should create unverified user if he or she has no email', function(done) {
+      var profile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/facebookProfile.json'), 'ascii'));
+      profile.emails.shift();
+      var callback = function(err, user, message) {
+        expect(user.displayName).to.equal('user name');
+        db.User.findOne({where: {displayName: user.displayName}})
+        .then(function(user) {
+          expect(user).to.not.be.null;
+          expect(user.email).to.be.null;
+          expect(user.emailVerified).to.be.false;
+          done();
+        });       
+      }      
+      passport._strategies.facebook._verify(undefined, undefined, profile, callback);            
+    });
+
     it('should log in old users without changing their data', function(done) {
       var profile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/facebookProfile.json'), 'ascii'));
       var callback = function(err, user, message) {
@@ -223,6 +274,23 @@ describe('passport', function() {
         }); 
       }   
       passport._strategies.facebook._verify(undefined, undefined, profile, callback);          
+    });
+
+    it('should overwrite the profiles of old users', function(done) {
+      var profile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/facebookProfile.json'), 'ascii'));
+      profile.emails[0].value = 'power@gmail.com';
+      db.User.findOne({where: {email: 'power@gmail.com'}})
+      .then(function(oldUser) {
+        expect(oldUser.displayName).to.equal('power');
+        var callback = function(err, user, message) {
+          db.User.findOne({where: {email: 'power@gmail.com'}})
+          .then(function(newUser) {
+            expect(newUser.displayName).to.equal('user name');
+            done();
+          });
+        }   
+        passport._strategies.facebook._verify(undefined, undefined, profile, callback);          
+      });
     });
   });
 
@@ -250,13 +318,45 @@ describe('passport', function() {
           var callback = function(err, user, message) {
             expect(user.email).to.equal('phillyphamtest@gmail.com');
             expect(user.displayName).to.equal('Tester1 Phillypham');
-            expect(user.familyName).to.equal('maiden'); // make sure data is updated
+            expect(user.familyName).to.equal('maiden'); // make sure data is updated and not overwritten
             done();
           }
           passport._strategies.google._verify(undefined, undefined, profile, callback);      
         });       
       }      
       passport._strategies.google._verify(undefined, undefined, profile, callback);      
+    });
+
+    it('should overwrite the profiles of old users', function(done) {
+      var profile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/googleProfile.json'), 'ascii'));
+      profile.emails[0].value = 'power@gmail.com';
+      db.User.findOne({where: {email: 'power@gmail.com'}})
+      .then(function(oldUser) {
+        expect(oldUser.displayName).to.equal('power');
+        var callback = function(err, user, message) {
+          db.User.findOne({where: {email: 'power@gmail.com'}})
+          .then(function(newUser) {
+            expect(newUser.displayName).to.equal('Tester1 Phillypham');
+            done();
+          });
+        }   
+        passport._strategies.google._verify(undefined, undefined, profile, callback);          
+      });      
+    });
+
+    it('should respect facebook profile info', function(done) {
+      var facebookProfile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/facebookProfile.json'), 'ascii'));
+      facebookProfile.emails[0].value = 'power@gmail.com';
+      var callback = function(err, user, message) {
+        var profile = JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/googleProfile.json'), 'ascii'));
+        profile.emails[0].value = 'power@gmail.com';
+        var callback = function(err, user, message) {
+          expect(user.displayName).to.equal('user name');
+          done();          
+        }
+        passport._strategies.google._verify(undefined, undefined, profile, callback);          
+      }          
+      passport._strategies.facebook._verify(undefined, undefined, facebookProfile, callback);                    
     });
   });
 });
