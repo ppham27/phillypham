@@ -9,6 +9,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var expressValidator = require('express-validator');
 var session = require('express-session');
 var flash = require('flash');
 var RedisStore = require('connect-redis')(session);
@@ -41,6 +42,7 @@ app.use(compression());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(expressValidator());
 app.use(cookieParser(config.secret));
 app.use(session({resave: false,
                  secret: config.secret,

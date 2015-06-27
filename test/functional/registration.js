@@ -38,9 +38,12 @@ describe('registration', function() {
     });
   });
 
-  after(function() {
+  after(function(done) {
     this.sweetCaptcha.api.restore();
     this.emailVerifier.verify.restore();
+    this.server.close(function(err) {
+      done(err);
+    });
   });
 
   it('should register a user', function(done) {

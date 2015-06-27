@@ -10,6 +10,8 @@ var db = require('../../models');
 var passport = require('../../lib/passport');
 var fs = require('fs');
 
+var random = require('../../lib/random');
+
 var FakeRequest = require('../support/fakeRequest');
 
 describe('passport', function() {  
@@ -357,6 +359,36 @@ describe('passport', function() {
         passport._strategies.google._verify(undefined, undefined, profile, callback);          
       }          
       passport._strategies.facebook._verify(undefined, undefined, facebookProfile, callback);                    
+    });
+  });
+
+  describe('emailVerify', function(done) {
+    it('should given an error message when the token is invalid', function(done) {
+      var callback = function(err, user, message) {
+        expect(user).to.be.false;
+        expect(message).to.match(/expired/);
+        done();        
+      }
+      passport._strategies.emailVerify._verify('nonsense token', callback);
+    });
+
+    it('should set the email verification flag to true', function(done) {
+      var emailVerifier = require('../../lib/emailVerifier');
+      var stub = sinon.stub(random, 'token');
+      stub.returns('mytoken');
+      db.User.create({displayName: 'phil', email: 'phil@abc.com', password: 'longpassword', userGroupId: 2})
+      .then(function(user) {
+        expect(user.emailVerified).to.be.false;
+        return emailVerifier.createToken(user.email);
+      })
+      .then(function(token) {
+        var callback = function(err, user, message) {          
+          expect(user.emailVerified).to.be.true;
+          random.token.restore();
+          done();
+        }
+        passport._strategies.emailVerify._verify('mytoken', callback);
+      });
     });
   });
 });

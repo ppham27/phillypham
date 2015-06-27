@@ -1,6 +1,10 @@
 var expect = require('chai').expect;
+var sinon = require('sinon');
+
 var Sequelize = require('sequelize');
 var Promise = require('bluebird');
+
+var random = require('../lib/random');
 
 describe('User', function() {
   beforeEach(function(done) {
@@ -21,17 +25,49 @@ describe('User', function() {
     var User = this.User;
     User.create({displayName: 'phil', email: 'phil@phillypham.com', password: 'philphilphil'})
     .then(function(user) {
+      expect(user.displayName).to.equal('phil');
       return User.create({displayName: 'phil', password: 'chrischris'})
     })    
     .then(function(user) {
       expect(user.displayName).to.match(/^phil[0-9]+$/);
+      return User.create({displayName: 'phil', password: 'chrischris'})
       return User.count();
     })
+    .then(function(user) {
+      expect(user.displayName).to.match(/^phil[0-9]+$/);
+      return User.count();      
+    })
     .then(function(cnt) {
-      expect(cnt).to.equal(2);
+      expect(cnt).to.equal(3);
       done();
     });    
   }); 
+
+  it('should automatically rename many duplicate names', function(done) {
+    var stub = sinon.stub(random, 'int');    
+    for (var i = 0; i <= 9; ++i) {
+      stub.onCall(i).returns(i);
+    }
+    var db = this.db;
+    var User = this.User;
+    Promise.all(
+      [User.create({displayName: 'phil', password: 'philphilphil'}),
+       User.create({displayName: 'phil0', password: 'philphilphil'}),
+       User.create({displayName: 'phil1', password: 'philphilphil'}),
+       User.create({displayName: 'phil2', password: 'philphilphil'}),
+       User.create({displayName: 'phil3', password: 'philphilphil'}),
+       User.create({displayName: 'phil4', password: 'philphilphil'})       
+      ])
+    .then(function(users) {
+      return User.create({displayName: 'phil', password: 'philphilphil'})
+    })
+    .then(function(user) {
+      expect(user.displayName).to.equal('phil5');
+      random.int.restore();
+      done();
+    });
+
+  });
 
   it('should not allow short passwords', function(done) {
     var db = this.db;

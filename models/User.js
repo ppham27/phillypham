@@ -2,6 +2,7 @@ var Sequelize = require('sequelize');
 var Promise = require('bluebird');
 var bcrypt = require('bcrypt');
 var converter = require('../lib/markdown').Converter;
+var random = require('../lib/random');
 
 
 module.exports = function(sequelize, DataTypes) {
@@ -97,14 +98,17 @@ module.exports = function(sequelize, DataTypes) {
                               beforeValidate: function(user) {
                                 // user already exists, do nothing
                                 if (user.id) return Promise.resolve(user);
-                                return user.Model.findOne({where: {displayName: user.displayName}})
-                                       .then(function(oldUser) {
-                                         // the displayName is unique do nothing
-                                         if (oldUser === null) return Promise.resolve(user);
-                                         // I suspect 4 digits will cover me, my app is small
-                                         user.displayName += Math.round(Math.random()*9999).toString();
-                                         return Promise.resolve(user);                                         
-                                       });
+                                var originalDisplayName = user.displayName;
+                                function newNamePromise(displayName) {
+                                  return user.Model.findOne({where: {displayName: displayName}})
+                                         .then(function(oldUser) {
+                                           if (oldUser === null) return Promise.resolve(user);
+                                           // 1 byte should be enough
+                                           user.displayName = originalDisplayName + random.int(1);
+                                           return newNamePromise(user.displayName);
+                                         });
+                                }
+                                return newNamePromise(originalDisplayName);
                               },
                               beforeCreate: function(user) {
                                 if (user.biography) user.biographyHtml = converter.makeHtml(user.biography);

@@ -34,6 +34,12 @@ describe('middleware', function() {
     });
   });
   
+  after(function(done) {
+    this.server.close(function(err) {
+      done(err);
+    });
+  });
+  
   describe('user login', function() {    
     beforeEach(function(done) {
       var siteUrl = this.siteUrl;

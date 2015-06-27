@@ -3,6 +3,7 @@ var router = express.Router();
 var passport = require('../lib/passport');
 var config = require('config');
 var sweetCaptcha = require('../lib/sweetCaptcha');
+var postLogin = require('../lib/middleware/postLogin');
 
 router.get('/', require('../lib/middleware/preLogin'), function(req, res, next) {
   sweetCaptcha.api('get_html', function(err, html)  {
@@ -15,7 +16,12 @@ router.get('/', require('../lib/middleware/preLogin'), function(req, res, next) 
 });
 
 router.post('/', passport.authenticate('localRegistration', {failureRedirect: '/register', failureFlash: true}),
-            require('../lib/middleware/postLogin'));
+            postLogin);
+
+router.get('/verify/:hash', passport.authenticate('emailVerify', {failureRedirect: '/', 
+                                                                  failureFlash: true,
+                                                                  successFlash: true}),
+           postLogin);
 
 
 module.exports = router;
