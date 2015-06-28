@@ -5,38 +5,44 @@ mixin descriptiveFieldSet(label, name, value, placeholder, note, secret, autofoc
       input(type="password", name=name, value=value, placeholder=placeholder, autofocus=autofocus).encrypt
     else 
       input(type="text", name=name, value=value, placeholder=placeholder, autofocus=autofocus)
-    span.field-sublabel= note
+    span.field-sublabel!= note
 
 if (locals.update)
-  p.form-description Change your user settings here
+  p.form-description Change your user settings here. Other users will not be able to see your email address.
 else
   p.form-description Otherwise, only a username, email, and password are required. You will need to solve a captcha and verify your email address to prove that you're human. Other users will not be able to see your email address.
-  +descriptiveFieldSet('First Name', 'givenName', temporaryUser.givenName || '', 'First Name', undefined, undefined, true)
-  +descriptiveFieldSet('Middle Name', 'middleName', temporaryUser.middleName || '', 'Middle Name', 'for completeness\' sake')
-  +descriptiveFieldSet('Last Name', 'familyName', temporaryUser.familyName || '', 'Last Name')
-  +descriptiveFieldSet('Username', 'displayName', temporaryUser.displayName || '', 'Username', 'required, must be from 1 to 64 characters')
++descriptiveFieldSet('First Name', 'givenName', temporaryUser.givenName || '', 'First Name', undefined, undefined, true)
++descriptiveFieldSet('Middle Name', 'middleName', temporaryUser.middleName || '', 'Middle Name', 'for completeness\' sake')
++descriptiveFieldSet('Last Name', 'familyName', temporaryUser.familyName || '', 'Last Name')
++descriptiveFieldSet('Username', 'displayName', temporaryUser.displayName || '', 'Username', 'required, must be from 1 to 64 characters')
+if (locals.update)
+  +descriptiveFieldSet('Email', 'email', temporaryUser.email || '', 'Email', '<button class="verify-email">Verify email address</button>')
+  +descriptiveFieldSet('Old Password', 'oldPassword', '', 'Old Password', '<button class="reset-password" onclick="return notImplemented();">Reset password</button>', true)
+  +descriptiveFieldSet('New Password', 'password', '', 'New Password', 'must be from 8 to 64 characters', true)
+else
   +descriptiveFieldSet('Email', 'email', temporaryUser.email || '', 'Email', 'required')
-  if (locals.update) 
-    +descriptiveFieldSet('Old Password', 'oldPassword', '', 'Old Password', undefined, true)
-    +descriptiveFieldSet('New Password', 'password', '', 'New Password', 'must be from 8 to 64 characters', true)
-  else 
-    +descriptiveFieldSet('Password', 'password', '', 'Password', 'required, must be from 8 to 64 characters', true)
-    +descriptiveFieldSet('Password Confirmation', 'passwordConfirmation', '', 'Password Confirmation', undefined, true)
-  +descriptiveFieldSet('Picture', 'photoUrl', temporaryUser.photoUrl || '', 'Picture URL', 'a url to a picture, e.g. http://example.com/me.jpg')
+  +descriptiveFieldSet('Password', 'password', '', 'Password', 'required, must be from 8 to 64 characters', true)
++descriptiveFieldSet('Password Confirmation', 'passwordConfirmation', '', 'Password Confirmation', undefined, true)
++descriptiveFieldSet('Picture', 'photoUrl', temporaryUser.photoUrl || '', 'Picture URL', 'a url to a picture, e.g. http://example.com/me.jpg')
+if (!locals.update)
   fieldset.captcha!= captcha
     span.field-sublabel
-  .wmd-panel
-    textarea(name="biography")#wmd-input.wmd-input= temporaryUser.biography || ''
-    h2 Describe Yourself
-    #wmd-button-bar.wmd-button-bar
-    #wmd-editor.wmd-editor.wmd-panel.tex2jax_ignore= temporaryUser.biography
-  .wmd-panel 
-    img.profile-preview(src=temporaryUser.photoUrl || "/images/default-profile.jpg", alt="Your picture URL is broken")
-    #wmd-preview.wmd-preview
-    button.submit-button(type="submit")= locals.update ? 'Update' : 'Register'
-      .overlay
+.wmd-panel
+textarea(name="biography")#wmd-input.wmd-input!= temporaryUser.biography || ''
+h2 Describe Yourself
+#wmd-button-bar.wmd-button-bar
+#wmd-editor.wmd-editor.wmd-panel.tex2jax_ignore!= temporaryUser.biography
+.wmd-panel 
+  img.profile-preview(src=temporaryUser.photoUrl || "/images/default-profile.jpg", alt="Your picture URL is broken")
+  #wmd-preview.wmd-preview
+  button.submit-button(type="submit")= locals.update ? 'Update' : 'Register'
+    .overlay
 script.
   var photoUrl = document.getElementById('registration-form').querySelector('input[name="photoUrl"]')
   photoUrl.addEventListener('input', function(event) {
     document.querySelector('img.profile-preview').src = this.value || '/images/default-profile.jpg';  
   });
+  function notImplemented() {
+    alert('This feature is not yet implemented');
+    return false;
+  }

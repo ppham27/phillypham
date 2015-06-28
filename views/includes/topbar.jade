@@ -14,8 +14,9 @@ include ../mixins/topbarLink.jade
           +topbarLink('Application Settings', '/application-settings')      
     #topbar-content-right
       if locals.user
-        .topbar-div Hello, #{user.displayName}!        
-        +topbarLink('User Settings', '/user/' + user.id.toString())
+        - var displayNameURI = encodeURIComponent(locals.user.displayName)
+        +topbarLink('Hello, ' + user.displayName + '!', '/user/' + displayNameURI)
+        +topbarLink('User Settings', '/user/edit/' + displayNameURI)
         +topbarLink('Logout', '/logout')
       else 
         +topbarLink('Login', '/login')

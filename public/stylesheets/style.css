@@ -444,13 +444,25 @@ span.field-sublabel {
   min-height: 300px;
 }
 
-#registration-form img.profile-preview {
+img.profile-preview {
+  border: 2px solid #222;
   display: block;
+  max-width: 250px;
+  max-height: 300px; 
+  margin-top: 10px;
+}
+
+.profile.mainbar {
+  display: inline-block;
+  margin-left: 30px;
+  width: 510px;
+}
+
+#registration-form img.profile-preview {  
   float: left;
-  margin-top: 15px;
   max-width: 250px;
   max-height: 300px;  
-  border: 2px solid #222;
+  margin-top: 15px;
 }
 
 #registration-form .submit-button {
@@ -468,6 +480,17 @@ span.field-sublabel {
   margin-bottom: 3px;
 }
 
+.profile.left-sidebar {
+  float: left;
+}
+
+.profile.field {
+
+}
+
+.profile.facts {
+  margin-top: 20px;
+}
 
 .overlay {
   position: absolute;

@@ -1,0 +1,21 @@
+extends ../layout
+
+block content
+  .profile.left-sidebar
+    img.profile-preview(src=displayedUser.photoUrl)
+    .profile.facts
+      h2.info-header Information
+      - var name = [];
+      - if (displayedUser.givenName) name.push(displayedUser.givenName)
+      - if (displayedUser.middleName) name.push(displayedUser.middleName)
+      - if (displayedUser.familyName) name.push(displayedUser.familyName)
+      - var name = name.join(' ');
+      if (name)
+        h3 Name
+        p.profile.field= name
+  .profile.mainbar
+    h2 Biography
+    .wmd-preview!= displayedUser.biographyHtml || '<p>This user has not filled out his or her biography </p>'
+
+
+  

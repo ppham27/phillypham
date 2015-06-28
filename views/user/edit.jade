@@ -1,0 +1,8 @@
+extends ../layout
+  
+block content
+  script
+    include ../../public/javascripts/encryptPasswordBundle-min.js
+  form#registration-form(method="POST", action="/update", onsubmit="return encryptPassword(this);")
+    h2 Update User Settings
+    include ../includes/userSettings.jade
