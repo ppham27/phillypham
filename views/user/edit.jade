@@ -1,8 +1,83 @@
 extends ../layout
   
 block content
-  script
-    include ../../public/javascripts/encryptPasswordBundle-min.js
-  form#registration-form(method="POST", action="/update", onsubmit="return encryptPassword(this);")
+  form#registration-form(method="POST", onsubmit="return false;")
     h2 Update User Settings
     include ../includes/userSettings.jade
+  script
+    include ../../public/javascripts/encryptPasswordBundle-min.js
+  script.
+    var currentDisplayName = '#{temporaryUser.displayName}';
+    var displayNameInput = document.querySelector('input[name="displayName"]');
+    var displayNameField = displayNameInput.parentNode;
+    var displayNameLabel = displayNameField.querySelector('span.field-sublabel');
+    var userExistsRequest = new XMLHttpRequest();
+    userExistsRequest.responseType = 'json';
+    userExistsRequest.addEventListener('load', function(event) {
+      if (userExistsRequest.response.error) {
+        displayNameLabel.textContent = 'this username is available';
+        displayNameLabel.classList.remove('error');
+        displayNameLabel.classList.add('success');
+      } else if (userExistsRequest.response.displayName === currentDisplayName) {
+        displayNameLabel.textContent = 'required, must be from 1 to 64 characters';
+        displayNameLabel.classList.remove('success');
+        displayNameLabel.classList.remove('error');
+      } else {
+        displayNameLabel.textContent = 'this username is already taken';
+        displayNameLabel.classList.remove('success');
+        displayNameLabel.classList.add('error');
+      }
+    }, false);
+    displayNameInput.addEventListener('input', function(event) {
+      if (this.value) {
+        userExistsRequest.abort();
+        userExistsRequest.open('GET', '/user/' + this.value);
+        userExistsRequest.setRequestHeader('Accept', 'application/json');
+        userExistsRequest.send();        
+      } else {
+        displayNameLabel.textContent = 'required, must be from 1 to 64 characters';
+        displayNameLabel.classList.remove('success');
+        displayNameLabel.classList.remove('error');
+      }
+    });
+    var submitButton = document.querySelector('.submit-button');
+    var updateRequest = new XMLHttpRequest();
+    updateRequest.responseType = 'json';
+    submitButton.onclick = function() {
+      updateRequest.abort();
+      updateRequest.open('PUT', window.location.pathname);
+      updateRequest.setRequestHeader('Accept', 'application/json');
+      encryptPassword(document.getElementById('registration-form'));
+      var data = {};
+      ['givenName', 'middleName', 'familyName', 'displayName', 'email',
+       'oldPassword', 'password', 'passwordConfirmation',
+       'photoUrl', 'biography'].forEach(function(k) {
+        data[k] = getValue(k);
+      });
+      setValue('oldPassword', '');
+      setValue('password', '');
+      setValue('passwordConfirmation', '');
+      console.log(data);
+      return false;
+      function getValue(name) {
+        if (name === 'biography') {
+          var textarea = document.querySelector('textarea[name="' + name + '"]');
+          return textarea.value;
+        }
+        var input = document.querySelector('input[name="' + name + '"]');
+        return input.value;
+        
+      }
+      function setValue(name, value) {
+        if (name === 'biography') {
+          var textarea = document.querySelector('textarea[name="' + name + '"]');
+          textarea.value = value;
+          return true;
+        }
+        var input = document.querySelector('input[name="' + name + '"]');
+        input.value = value;
+        return true;
+        
+      }
+    }
+    submitButton.disabled = false;

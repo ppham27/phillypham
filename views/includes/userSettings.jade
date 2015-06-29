@@ -16,7 +16,7 @@ else
 +descriptiveFieldSet('Last Name', 'familyName', temporaryUser.familyName || '', 'Last Name')
 +descriptiveFieldSet('Username', 'displayName', temporaryUser.displayName || '', 'Username', 'required, must be from 1 to 64 characters')
 if (locals.update)
-  +descriptiveFieldSet('Email', 'email', temporaryUser.email || '', 'Email', '<button class="verify-email">Verify email address</button>')
+  +descriptiveFieldSet('Email', 'email', temporaryUser.email || '', 'Email', '<button disabled class="verify-email">Verify email address</button>')
   +descriptiveFieldSet('Old Password', 'oldPassword', '', 'Old Password', '<button class="reset-password" onclick="return notImplemented();">Reset password</button>', true)
   +descriptiveFieldSet('New Password', 'password', '', 'New Password', 'must be from 8 to 64 characters', true)
 else
@@ -35,8 +35,12 @@ h2 Describe Yourself
 .wmd-panel 
   img.profile-preview(src=temporaryUser.photoUrl || "/images/default-profile.jpg", alt="Your picture URL is broken")
   #wmd-preview.wmd-preview
-  button.submit-button(type="submit")= locals.update ? 'Update' : 'Register'
-    .overlay
+  if (locals.update)
+    button.submit-button(type="submit", disabled=true) Update
+      .overlay
+  else
+    button.submit-button(type="submit") Register
+      .overlay
 script.
   var photoUrl = document.getElementById('registration-form').querySelector('input[name="photoUrl"]')
   photoUrl.addEventListener('input', function(event) {

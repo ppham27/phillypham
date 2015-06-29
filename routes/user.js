@@ -8,11 +8,21 @@ router.get('/:name', function(req, res, next) {
   var displayName = decodeURIComponent(req.params.name);
   db.User.findOne({where: { displayName: displayName}})
   .then(function(user) {
-    if (user === null) {
-      req.flash('error', 'The requested user does not exist');
-      res.redirect('/');
-    } else {
-      res.render('user/index', {title: user.displayName, displayedUser: user});
+    if (req.accepts('html')) {
+      if (user === null) {
+        req.flash('error', 'The requested user does not exist');
+        res.redirect('/');
+      } else {
+        res.render('user/index', {title: user.displayName, displayedUser: user});
+      }
+    } else if (req.accepts('json')) {
+      if (user === null) {
+        res.json({error: 'requested user does not exist'});
+      } else {
+        res.json({displayName: user.displayName, email: user.email,
+                  givenName: user.givenName, familyName: user.familyName,
+                  middleName: user.middleName});
+      }
     }
   });
 });

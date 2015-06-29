@@ -378,6 +378,17 @@ span.field-sublabel {
   font-style: italic;
 }
 
+span.field-sublabel.error {
+  color: #d02027;
+  font-style: normal;
+}
+
+span.field-sublabel.success {
+  color: rgb(77, 175, 74);
+  font-style: normal;
+  
+}
+
 #post-form label, #registration-form label {
   font-weight: bold;  
   padding-top: 3px;
@@ -401,6 +412,10 @@ span.field-sublabel {
   padding-right: 20px;
   display: inline-block;
   position: relative; 
+}
+
+.submit-button:disabled {
+  cursor: not-allowed;
 }
 
 .submit-button:hover .overlay {
