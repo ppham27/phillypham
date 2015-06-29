@@ -47,13 +47,20 @@ block content
     var updateRequest = new XMLHttpRequest();
     updateRequest.responseType = 'json';
     updateRequest.addEventListener('load', function() {
-      
+      if (this.response.error) {
+        flash(this.response.error, {reset: true, className: 'error'});
+      } else if (this.response.success) {
+        if (this.response.message) flash(this.response.message, {reset: true, className: 'info'});
+      }
+      submitButton.disabled = false;
+      if (this.response.redirect) window.location.href = this.response.redirectLink;
     });
-    submitButton.onclick = function() {
+    submitButton.addEventListener('click', function() {
       submitButton.disabled = true;
       updateRequest.abort();
       updateRequest.open('PUT', window.location.pathname);
       updateRequest.setRequestHeader('Accept', 'application/json');
+      updateRequest.setRequestHeader('Content-Type', 'application/json');
       encryptPassword(document.getElementById('registration-form'));
       var data = {};
       ['givenName', 'middleName', 'familyName', 'displayName', 'email',
@@ -64,7 +71,7 @@ block content
       setValue('oldPassword', '');
       setValue('password', '');
       setValue('passwordConfirmation', '');
-      console.log(data);
+      updateRequest.send(JSON.stringify(data));
       return false;
       function getValue(name) {
         if (name === 'biography') {
@@ -85,7 +92,7 @@ block content
         input.value = value;
         return true;     
       }
-    }
+    });
     submitButton.disabled = false;
     // email verification
     var emailInput = document.querySelector('input[name="email"]');

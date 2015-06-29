@@ -41,9 +41,7 @@ module.exports = function(sequelize, DataTypes) {
                                          } else {                                           
                                            return new Promise(function(resolve, reject) {
                                                                 bcrypt.compare(password, user.password, function(err, res) {
-                                                                  if (err) {                                                       
-                                                                    reject(err);
-                                                                  }
+                                                                  if (err) reject(err);
                                                                   if (res) return resolve(user);
                                                                   return reject(new Sequelize.ValidationError('invalid password'));
                                                                 });
@@ -110,7 +108,7 @@ module.exports = function(sequelize, DataTypes) {
                                 }
                                 return newNamePromise(originalDisplayName);
                               },
-                              beforeCreate: function(user) {
+                              beforeUpdate: function(user) {
                                 if (user.biography) user.biographyHtml = converter.makeHtml(user.biography);
                                 return Promise.resolve(user);
                               },

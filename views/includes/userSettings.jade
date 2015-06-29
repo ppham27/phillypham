@@ -16,8 +16,8 @@ else
 +descriptiveFieldSet('Last Name', 'familyName', temporaryUser.familyName || '', 'Last Name')
 +descriptiveFieldSet('Username', 'displayName', temporaryUser.displayName || '', 'Username', 'required, must be from 1 to 64 characters')
 if (locals.update)
-  +descriptiveFieldSet('Email', 'email', temporaryUser.email || '', 'Email', '<button disabled class="verify-email">Verify email address</button>')
-  +descriptiveFieldSet('Old Password', 'oldPassword', '', 'Old Password', '<button class="reset-password" onclick="return notImplemented();">Reset password</button>', true)
+  +descriptiveFieldSet('Email', 'email', temporaryUser.email || '', 'Email', '<button type="button" disabled class="verify-email" tabindex="100">Verify email address</button>')
+  +descriptiveFieldSet('Old Password', 'oldPassword', '', 'Old Password', '<button type="button" class="reset-password" tabindex="101" onclick="return notImplemented();">Reset password</button>', true)
   +descriptiveFieldSet('New Password', 'password', '', 'New Password', 'must be from 8 to 64 characters', true)
 else
   +descriptiveFieldSet('Email', 'email', temporaryUser.email || '', 'Email', 'required')
@@ -47,6 +47,6 @@ script.
     document.querySelector('img.profile-preview').src = this.value || '/images/default-profile.jpg';  
   });
   function notImplemented() {
-    alert('This feature is not yet implemented');
+    alert('This feature is not yet implemented. Contact me if you need this feature.');
     return false;
   }
