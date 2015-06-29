@@ -7,6 +7,7 @@ block content
   script
     include ../../public/javascripts/encryptPasswordBundle-min.js
   script.
+    // user existence
     var currentDisplayName = '#{temporaryUser.displayName}';
     var displayNameInput = document.querySelector('input[name="displayName"]');
     var displayNameField = displayNameInput.parentNode;
@@ -40,6 +41,8 @@ block content
         displayNameLabel.classList.remove('error');
       }
     });
+    
+    // updating
     var submitButton = document.querySelector('.submit-button');
     var updateRequest = new XMLHttpRequest();
     updateRequest.responseType = 'json';
@@ -76,8 +79,30 @@ block content
         }
         var input = document.querySelector('input[name="' + name + '"]');
         input.value = value;
-        return true;
-        
+        return true;     
       }
     }
     submitButton.disabled = false;
+    // email verification
+    var emailInput = document.querySelector('input[name="email"]');
+    var emailField = emailInput.parentNode;
+    var emailLabel = emailField.querySelector('span.field-sublabel');
+    var emailButton = emailLabel.querySelector('button');
+    var emailVerifyRequest = new XMLHttpRequest();
+    emailVerifyRequest.responseType = 'json';
+    emailVerifyRequest.addEventListener('load', function() {
+      console.log(this.response);
+      emailButton.disabled = false;
+    });
+    emailButton.addEventListener('click', function() {
+      if (emailInput.value) {
+        emailButton.disabled = true;
+        emailVerifyRequest.abort();
+        emailVerifyRequest.open('POST', '/user/verify/' + encodeURIComponent(currentDisplayName));
+        emailVerifyRequest.setRequestHeader('Accept', 'application/json');
+        emailVerifyRequest.setRequestHeader('Content-Type', 'application/json');
+        emailVerifyRequest.send(JSON.stringify({email: emailInput.value}));
+      }
+    });
+    emailButton.disabled = false;
+  
