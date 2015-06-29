@@ -9,6 +9,8 @@ var db = require('../models');
 
 var emailVerifier = require('../lib/emailVerifier');
 
+var config = require('config');
+
 
 router.get('/:displayName', authorize({userId: true, loggedIn: true}), function(req, res, next) {
   var displayName = decodeURIComponent(req.params.displayName);
@@ -41,17 +43,56 @@ router.get('/edit/:displayName', authorize({userId: true, role: 'user_manager'})
   });
 });
 
+router.put('/edit/:displayName', authorize({userId: true, role: 'user_manager'}), function(req, res, next) {
+  var displayName = decodeURIComponent(req.params.displayName);
+  // expect json object of users
+  var errors = [];
+  db.User.findOne({where: { displayName: displayName}})
+  .then(function(user) {
+    var newUser = req.body;
+    Object.keys(newUser).forEach(function(key) {
+      if (key === 'password' || key === 'oldPassword' || key === 'passwordConfirmation') {
+        newUser[key] = crypto.privateDecrypt(config.rsaPrivateKey,
+                                             new Buffer(newUser[key], 'base64')).toString();
+      } else {
+        newUser[key] = newUser[key].trim();
+        if (key === 'email') newUser[key] = newUser[key].toLowerCase();
+      }
+    });
+    if (newUser.givenName) user.biograpy = newUser.givenName;
+    if (newUser.biography) user.biograpy = newUser.biography;
+    if (newUser.password) {
+      // logic for updating password
+    }
+    if (newUser.email && newUser.email !== user.email) {
+      // logic for updating email
+    }
+    if (newUser.displayName && newUser.displayName !== user.displayName) {
+      // logic for updating display name
+      db.User.findOne({where: { displayName: newUser.displayName}})
+    } else {
+      // displayName stays the same
+      if (errors.length) {
+      }
+      
+    }
+  });
+});
+
 router.post('/verify/:displayName', authorize({userId: true, role: 'user_manager'}), function(req, res, next) {
   var displayName = decodeURIComponent(req.params.displayName);
   // expect an email in the form of json {email: 'a@a.com'}
   if (!req.body.email) return res.json({error: 'no email was found in request'});
+  var email = req.body.email.trim().toLowerCase();
   req.checkBody('email').isEmail();
   if (req.validationErrors().length) return res.json({error: req.validationErrors()[0].msg});
-  Promise.join(db.User.findOne({where: { displayName: displayName}}), db.User.findOne({where: { email: req.body.email}}))
+  Promise.join(db.User.findOne({where: { displayName: displayName}}), db.User.findOne({where: { email: email}}))
   .spread(function(userA, userB) {
     if (userB && userA.id !== userB.id) return res.json({error: 'this email has already been taken'});      
     if (userB && userA.id === userB.id && userA.emailVerified) return res.json({error: 'this email is already verified'});      
-    userA.email = req.body.email;
+    // email address is available 
+    userA.email = email;
+    userA.emailVerified = false; // make it unverified
     return userA.save()
            .then(function() {
              return emailVerifier.resetToken(userA.email)
@@ -59,7 +100,7 @@ router.post('/verify/:displayName', authorize({userId: true, role: 'user_manager
                       return emailVerifier.verify(userA, token);
                     })
                     .then(function() {
-                      res.json({success: true, message: 'email address has been updated and verification email has been sent.'});
+                      res.json({success: true, message: 'Email address has been updated and verification email has been sent.'});
                     });
            });    
   });

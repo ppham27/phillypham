@@ -46,7 +46,11 @@ block content
     var submitButton = document.querySelector('.submit-button');
     var updateRequest = new XMLHttpRequest();
     updateRequest.responseType = 'json';
+    updateRequest.addEventListener('load', function() {
+      
+    });
     submitButton.onclick = function() {
+      submitButton.disabled = true;
       updateRequest.abort();
       updateRequest.open('PUT', window.location.pathname);
       updateRequest.setRequestHeader('Accept', 'application/json');
