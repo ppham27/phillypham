@@ -95,7 +95,11 @@ block content
     var emailVerifyRequest = new XMLHttpRequest();
     emailVerifyRequest.responseType = 'json';
     emailVerifyRequest.addEventListener('load', function() {
-      console.log(this.response);
+      if (this.response.error) {
+        flash(this.response.error, {reset: true, className: 'error'});
+      } else if (this.response.success) {
+        flash(this.response.message, {reset: true, className: 'info'});
+      }
       emailButton.disabled = false;
     });
     emailButton.addEventListener('click', function() {
@@ -109,4 +113,33 @@ block content
       }
     });
     emailButton.disabled = false;
+
+    function flash(messages, options) {
+      options = options || {};
+      var reset = options.reset || false;
+      var className = options.className || false;
+      var flashBox = document.getElementById('flash');
+      if (!flashBox) {
+        flashBox = document.createElement('div');
+        flashBox.id = 'flash';
+        var mainbar = document.getElementById('mainbar');        
+        mainbar.insertBefore(flashBox, document.getElementById('registration-form'));        
+      }
+      if (reset) flashBox.innerHTML = '';
+      var messageList = flashBox.querySelector('li') || document.createElement('ul');
+      if (typeof messages === 'string') {
+        var li = document.createElement('li');
+        li.textContent = messages;
+        if (className) li.classList.add(className);
+        messageList.appendChild(li);
+      } else if (Array.isArray(messages)) {
+        messages.forEach(function(message) {
+          var li = document.createElement('li');
+          li.textContent = message;
+          if (className) li.classList.add(className);
+          messageList.appendChild(li);
+        });
+      }
+      flashBox.appendChild(messageList);
+    }
   
