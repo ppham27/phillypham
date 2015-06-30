@@ -48,8 +48,9 @@ router.get('/edit/:displayName', authorize({userId: true, role: 'user_manager'})
 });
 
 router.put('/edit/:displayName', authorize({userId: true, role: 'user_manager'}), function(req, res, next) {
-  var displayName = decodeURIComponent(req.params.displayName);
+  var displayName = req.params.displayName;
   // expect json object of user
+  if (!req.is('json')) return res.json({error: 'only json requests are accepted'});
   var errors = [];
   var userToUpdate;
   var updates = {};
@@ -166,12 +167,14 @@ router.put('/edit/:displayName', authorize({userId: true, role: 'user_manager'})
 router.post('/verify/:displayName', authorize({userId: true, role: 'user_manager'}), function(req, res, next) {
   var displayName = req.params.displayName;
   // expect an email in the form of json {email: 'a@a.com'}
+  if (!req.is('json')) return res.json({error: 'only json requests are accepted'});
   if (!req.body.email) return res.json({error: 'no email was found in request'});
   var email = req.body.email.trim().toLowerCase();
   req.checkBody('email').isEmail();
   if (req.validationErrors().length) return res.json({error: req.validationErrors()[0].msg});
   Promise.join(db.User.findOne({where: { displayName: displayName}}), db.User.findOne({where: { email: email}}))
   .spread(function(userA, userB) {
+    if (userA === null) return res.json({error: 'user does not exist'});
     if (userB && userA.id !== userB.id) return res.json({error: 'this email has already been taken'});      
     if (userB && userA.id === userB.id && userA.emailVerified) return res.json({error: 'this email is already verified'});      
     // email address is available 
