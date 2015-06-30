@@ -14,7 +14,7 @@ var config = require('config');
 
 
 router.get('/:displayName', authorize({userId: true, loggedIn: true}), function(req, res, next) {
-  var displayName = decodeURIComponent(req.params.displayName);
+  var displayName = req.params.displayName;
   db.User.findOne({where: { displayName: displayName}})
   .then(function(user) {
     if (req.accepts('html')) {
@@ -36,7 +36,7 @@ router.get('/:displayName', authorize({userId: true, loggedIn: true}), function(
 });
 
 router.get('/edit/:displayName', authorize({userId: true, role: 'user_manager'}), function(req, res, next) {
-  var displayName = decodeURIComponent(req.params.displayName);
+  var displayName = req.params.displayName;
   db.User.findOne({where: { displayName: displayName}})
   .then(function(user) {
     if (user === null) {
@@ -154,7 +154,7 @@ router.put('/edit/:displayName', authorize({userId: true, role: 'user_manager'})
   .catch(function(err) {
            if (err.errors) {
              err.errors.forEach(function(err) {
-               errors.push(err.toString());
+               errors.push(err.message);
              });
            } else if (!errors.length) {
              errors.push(err.toString());
@@ -164,7 +164,7 @@ router.put('/edit/:displayName', authorize({userId: true, role: 'user_manager'})
 });
 
 router.post('/verify/:displayName', authorize({userId: true, role: 'user_manager'}), function(req, res, next) {
-  var displayName = decodeURIComponent(req.params.displayName);
+  var displayName = req.params.displayName;
   // expect an email in the form of json {email: 'a@a.com'}
   if (!req.body.email) return res.json({error: 'no email was found in request'});
   var email = req.body.email.trim().toLowerCase();
