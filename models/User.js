@@ -108,14 +108,17 @@ module.exports = function(sequelize, DataTypes) {
                                 }
                                 return newNamePromise(originalDisplayName);
                               },
-                              beforeUpdate: function(user) {
-                                if (user.biography) user.biographyHtml = converter.makeHtml(user.biography);
-                                return Promise.resolve(user);
-                              },
+                              beforeUpdate: beforeSave,
+                              beforeCreate: beforeSave,
                               afterValidate: function(user) {
                                 if (user.email) user.email = user.email.toLowerCase();
                                 return user.hashPassword();
                               }
                             }});
 
+}
+
+function beforeSave(user) {
+  if (user.biography) user.biographyHtml = converter.makeHtml(user.biography);
+  return Promise.resolve(user);  
 }

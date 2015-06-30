@@ -18,13 +18,15 @@ var redisClient = require('./lib/redisClient')
 var routes = require('./routes/index');
 
 var app = express();
+app.isReady = false;
 
 var db = require('./models');
 db.once('ready', function() {
   app.set('ApplicationSettings', db.ApplicationSettings);
   db.loadFixtures(config.fixtures, process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')
   .then(function() {
-    app.emit('ready');
+    app.isReady = true;
+    app.emit('ready');    
   });
 });
 

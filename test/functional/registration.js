@@ -2,6 +2,7 @@ var expect = require('chai').expect;
 var sinon = require('sinon');
 var http = require('http');
 var url = require('url');
+var config = require('config');
 
 describe('registration', function() {  
   before(function(done) {    
@@ -17,9 +18,20 @@ describe('registration', function() {
     this.db = require('../../models');
     this.server = http.createServer(this.app);
     this.server.listen(8888);     
-    this.app.once('ready', function() {
-      done();
-    });    
+    if (this.app.isReady) {
+      var db = this.db;
+      db.sequelize.sync({force: true})
+      .then(function() {        
+        return db.loadFixtures(config.fixtures);        
+      })
+      .then(function() {
+        done();
+      });
+    } else {
+      this.app.once('ready', function() {
+        done();
+      });    
+    }
   });
 
   beforeEach(function(done) {
