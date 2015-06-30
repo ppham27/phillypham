@@ -71,6 +71,7 @@
   "devDependencies": {
     "mocha": "~2.2.5",
     "chai": "~3.0.0",
+    "proxyquire": "^1.5.0",
     "sinon": "~1.15.4",
     "webdriverio": "~2.4.5",
     "fakeredis": "~0.3.1",

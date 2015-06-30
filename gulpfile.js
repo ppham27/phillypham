@@ -120,6 +120,12 @@ gulp.task('test:functional', function(done) {
   var mocha = child_process.spawn('mocha', ['test/functional', '-t', '180000']);
   mocha.stdout.pipe(process.stdout);
   mocha.stderr.pipe(process.stdout);
+  mocha.on('exit', function() {
+    // needs to run in a separate process because of authorization
+    var mocha = child_process.spawn('mocha', ['test/functional/api', '-t', '180000']);
+    mocha.stdout.pipe(process.stdout);
+    mocha.stderr.pipe(process.stdout);
+  });
   done();
 });
 
