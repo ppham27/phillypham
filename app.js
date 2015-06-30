@@ -72,10 +72,12 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
+    var locals = {
       message: err.message,
       error: err
-    });
+    }
+    if (req.accepts('json')) return res.json(locals);
+    return res.render('error', locals);
   });
 }
 
@@ -83,10 +85,12 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.render('error', {
+  var locals = {
     message: err.message,
     error: {}
-  });
+  }
+  if (req.accepts('json')) return res.json(locals);
+  return res.render('error', locals);
 });
 
 

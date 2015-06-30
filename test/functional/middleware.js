@@ -13,9 +13,13 @@ describe('middleware', function() {
     this.app = require('../../app');
     this.server = http.createServer(this.app);
     this.server.listen(8888);     
-    this.app.once('ready', function() {
+    if (this.app.isReady) {
       done();
-    });
+    } else {
+      this.app.once('ready', function() {
+        done();
+      });
+    }
   });
 
   beforeEach(function(done) {
