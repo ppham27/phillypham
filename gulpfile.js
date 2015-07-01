@@ -106,14 +106,18 @@ gulp.task('test:unit', function(done) {
   var mocha = child_process.spawn('mocha', ['test']);
   mocha.stdout.pipe(process.stdout);
   mocha.stderr.pipe(process.stdout);
-  done();
+  mocha.on('exit', function() {
+    done();
+  });
 });
 
 gulp.task('test:integration', function(done) {
   var mocha = child_process.spawn('mocha', ['test/integration', '-t', '5000']);
   mocha.stdout.pipe(process.stdout);
   mocha.stderr.pipe(process.stdout);
-  done();
+  mocha.on('exit', function() {
+    done();
+  });
 });
 
 gulp.task('test:functional', function(done) {
@@ -121,12 +125,8 @@ gulp.task('test:functional', function(done) {
   mocha.stdout.pipe(process.stdout);
   mocha.stderr.pipe(process.stdout);
   mocha.on('exit', function() {
-    // needs to run in a separate process because of authorization
-    var mocha = child_process.spawn('mocha', ['test/functional/api', '-t', '180000']);
-    mocha.stdout.pipe(process.stdout);
-    mocha.stderr.pipe(process.stdout);
+    done();
   });
-  done();
 });
 
 // necessary tasks to start the app
