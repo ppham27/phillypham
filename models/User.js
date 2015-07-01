@@ -8,13 +8,13 @@ var random = require('../lib/random');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define("User", {
     displayName: {type: DataTypes.STRING, field: 'display_name', unique: true, allowNull: false, 
-                  validate: { len: [1, 64]}},
+                  validate: {len: {args: [1, 64], msg: 'username is too short'}}},
     email: {type: DataTypes.STRING, unique: true, allowNull: true,
-            validate: {isEmail: true}},
+            validate: {isEmail: {args: true, msg: 'email is address is not properly formatted'}}},
     emailVerified: {type: DataTypes.BOOLEAN, defaultValue: false, field: 'email_verified'},
     salt: {type: DataTypes.STRING, allowNull: true},
     password: {type: DataTypes.STRING, allowNull: true, 
-               validate: {len: [8, 64]}},
+               validate: {len: {args: [8, 64], msg: 'password is too short'}}},
     familyName: {type: DataTypes.STRING, allowNull: true, field: 'family_name'},
     givenName: {type: DataTypes.STRING, allowNull: true, field: 'given_name'},
     middleName: {type: DataTypes.STRING, allowNull: true, field: 'middle_name'},

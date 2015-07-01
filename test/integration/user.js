@@ -1,16 +1,18 @@
 var expect = require('chai').expect;
 var sinon = require('sinon');
 
+var crypto = require('crypto');
+
+var Promise = require('bluebird');
+
 var config = require('config');
+var random = require('../../lib/random');
+var transporter = require('../../lib/smtpTransporter');
+var redisClient = require('../../lib/redisClient');
+
 var userRoutes = require('../../routes/user');
 
 var FakeRequest = require('../support/fakeRequest');
-
-var random = require('../../lib/random');
-var transporter = require('../../lib/smtpTransporter');
-
-var redisClient = require('../../lib/redisClient');
-
 
 describe('user routes', function() {
   before(function(done) {
@@ -157,7 +159,141 @@ describe('user routes', function() {
     });
   });
 
-  describe('updates', function() {
+  describe.only('updates', function() {
+    before(function() {
+      this.sendMailStub = sinon.stub(transporter, 'sendMail', function(mailOptions, callback) {
+                            callback(null, true);      
+                          });      
+      this.handle = userRoutes.stack.filter(function(handle) {
+                      return handle.route.path === '/edit/:displayName' && handle.route.methods.put;
+                    });
+      this.handle = this.handle[0].route.stack[1].handle;
+    });
+
+    after(function() {
+      transporter.sendMail.restore();      
+    });
     
-  });
+    it('should update user', function(done) {
+      var db = this.db;
+      var sendMailStub = this.sendMailStub;
+      var req = new FakeRequest({givenName: 'first name',
+                                 middleName: 'middle name',
+                                 familyName: 'family name',
+                                 biography: 'my new bio',
+                                 displayName: 'new_name',
+                                 oldPassword: encryptPassword('powerpower'),
+                                 password: encryptPassword('newPassword'),
+                                 passwordConfirmation: encryptPassword('newPassword'),
+                                 email: 'new_email@gmail.com'}, 
+                                true, 
+                                {accepts: ['json'], is: ['json']});   
+      req.params.displayName = req.user.displayName = 'power';
+      var res = {json: function(json) {
+                   expect(json.success).to.be.true;
+                   expect(json.redirect).to.be.true; // redirect on user name changes
+                   expect(json.message.some(function(msg) { return /Password/.test(msg); })).to.be.true;
+                   expect(json.message.some(function(msg) { return /Email/.test(msg); })).to.be.true;
+                   expect(sendMailStub.calledOnce).to.be.true;
+                   var promises = [];
+                   promises.push(db.User.findOne({where: {displayName: 'new_name'}})
+                                 .then(function(user) {
+                                   expect(user.givenName).to.equal('first name');
+                                   expect(user.middleName).to.equal('middle name');
+                                   expect(user.familyName).to.equal('family name');
+                                   expect(user.biography).to.equal('my new bio');
+                                   expect(user.biographyHtml).to.equal('<p>my new bio</p>');
+                                   expect(user.email).to.equal('new_email@gmail.com');
+                                   return Promise.resolve(true);
+                                 }))
+                   promises.push(db.User.authenticate('new_email@gmail.com', 'newPassword'));
+                   promises.push(new Promise(function(resolve, reject) {
+                                               redisClient.get('emailVerifyToken:new_email@gmail.com', function(err, token) {
+                                                 if (token) {
+                                                   redisClient.get('emailVerifyToken:' + token, function(err, email) {
+                                                     expect(email).to.equal('new_email@gmail.com');
+                                                     resolve(true);
+                                                   });
+                                                 } else {
+                                                   reject(false);
+                                                 }
+                                               });
+                                             }));
+                   Promise.all(promises)
+                   .then(function() {
+                     done();
+                   });
+                 }};
+      this.handle(req, res);
+    });
+    
+    it('should fail on if password does not match old password', function(done) {
+      var req = new FakeRequest({oldPassword: encryptPassword('wrongpassword'),
+                                 password: encryptPassword('newPassword'),
+                                 passwordConfirmation: encryptPassword('newPassword')}, 
+                                true, 
+                                {accepts: ['json'], is: ['json']});   
+      req.params.displayName = req.user.displayName = 'power';
+      var res = {json: function(json) {
+                   expect(json.error.some(function(msg) { return /invalid old password/.test(msg); })).to.be.true;
+                   done();
+                 }};
+      this.handle(req, res);
+    });
+
+    it('should fail on if password too short', function(done) {
+      var req = new FakeRequest({oldPassword: encryptPassword('powerpower'),
+                                 password: encryptPassword('new'),
+                                 passwordConfirmation: encryptPassword('new')}, 
+                                true, 
+                                {accepts: ['json'], is: ['json']});   
+      req.params.displayName = req.user.displayName = 'power';
+      var res = {json: function(json) {
+                   expect(json.error.some(function(msg) { return /too short/.test(msg); })).to.be.true;
+                   done();
+                 }};
+      this.handle(req, res);
+    });
+
+    it('should fail on if email is not unique', function(done) {
+      var req = new FakeRequest({email: 'admin@admin.com'}, 
+                                true, 
+                                {accepts: ['json'], is: ['json']});   
+      req.params.displayName = req.user.displayName = 'power';
+      var res = {json: function(json) {
+                   expect(json.error.some(function(msg) { return /already exists/.test(msg); })).to.be.true;
+                   done();
+                 }};
+      this.handle(req, res);
+    });
+
+
+    it('should fail on if email is not properly formatted', function(done) {
+      var req = new FakeRequest({email: 'admifsafsa'}, 
+                                true, 
+                                {accepts: ['json'], is: ['json']});   
+      req.params.displayName = req.user.displayName = 'power';
+      var res = {json: function(json) {
+                   expect(json.error.some(function(msg) { return /not properly formatted/.test(msg); })).to.be.true;
+                   done();
+                 }};
+      this.handle(req, res);
+    });
+
+    it('should fail on if displayName is not unique', function(done) {
+      var req = new FakeRequest({displayName: 'admin'}, 
+                                true, 
+                                {accepts: ['json'], is: ['json']});   
+      req.params.displayName = req.user.displayName = 'power';
+      var res = {json: function(json) {
+                   expect(json.error.some(function(msg) { return /already exists/.test(msg); })).to.be.true;
+                   done();
+                 }};
+      this.handle(req, res);
+    });
+  }); 
 });
+
+function encryptPassword(password)  {
+  return crypto.publicEncrypt(config.rsaPublicKey, new Buffer(password, 'utf8')).toString('base64');
+}
