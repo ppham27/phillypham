@@ -196,9 +196,9 @@ a.header-link:hover {
   color: #003b52;
 }
 
-h2#wmd-preview-title {
-  padding-top: 20px;
-}
+/* h2#wmd-preview-title { */
+/*   padding-top: 20px; */
+/* } */
 
 #mainbar {
   width: 805px;
@@ -585,4 +585,21 @@ fieldset.captcha {
 .sweetcaptcha {
   display: inline-block;
   width: 280px;
+}
+
+.post {
+  margin-left: auto;
+  margin-right: auto;
+  width: 700px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.post hr {
+  border-style: dotted;
+  border-width: 1px;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  margin-top: 20px;
 }

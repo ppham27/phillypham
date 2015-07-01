@@ -1,6 +1,6 @@
-include ./mixins/fieldsetFilled.jade
+include ../mixins/fieldsetFilled.jade
   
-extends layout
+extends ../layout
   
 block content
   form#post-form(method="POST", action="/post")
@@ -9,8 +9,9 @@ block content
       #wmd-button-bar.wmd-button-bar
       #wmd-editor.wmd-editor.tex2jax_ignore
       textarea(name="body")#wmd-input.wmd-input
-    h2#wmd-preview-title
-    #wmd-preview.wmd-panel.wmd-preview
+    .post
+      h2#wmd-preview-title
+      #wmd-preview.wmd-panel.wmd-preview
     .wmd-panel
       +fieldsetFilled('tags', 'Tags', 'Enter tags here separated by commas')
     button.submit-button(type="submit") Post
