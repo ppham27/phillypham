@@ -21,7 +21,7 @@ router.get('/:displayName', authorize({userId: true, loggedIn: true}), function(
       if (user === null) {
         res.render('error', {message: 'User does not exist', error: {}});
       } else {
-        res.render('user/index', {title: user.displayName, displayedUser: user});
+        res.render('user/profile', {title: user.displayName, displayedUser: user});
       }
     } else if (req.accepts('json')) {
       if (user === null) {

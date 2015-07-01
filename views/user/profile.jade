@@ -2,7 +2,8 @@ extends ../layout
 
 block content
   .profile.left-sidebar
-    img.profile-preview(src=displayedUser.photoUrl)
+    a(href=displayedUser.photoUrl)
+      img.profile-preview(src=displayedUser.photoUrl, alt='URL to photo is broken')
     .profile.facts
       h2.info-header Information
       - var name = [];
