@@ -13,6 +13,7 @@ var redisClient = require('../../lib/redisClient');
 var userRoutes = require('../../routes/user');
 
 var FakeRequest = require('../support/fakeRequest');
+var encryptPassword = require('../support/encryptPassword');
 
 describe('user routes', function() {
   before(function(done) {
@@ -159,7 +160,7 @@ describe('user routes', function() {
     });
   });
 
-  describe.only('updates', function() {
+  describe('updates', function() {
     before(function() {
       this.sendMailStub = sinon.stub(transporter, 'sendMail', function(mailOptions, callback) {
                             callback(null, true);      
@@ -204,6 +205,7 @@ describe('user routes', function() {
                                    expect(user.biography).to.equal('my new bio');
                                    expect(user.biographyHtml).to.equal('<p>my new bio</p>');
                                    expect(user.email).to.equal('new_email@gmail.com');
+                                   expect(user.emailVerified).to.be.false;
                                    return Promise.resolve(true);
                                  }))
                    promises.push(db.User.authenticate('new_email@gmail.com', 'newPassword'));
@@ -294,6 +296,3 @@ describe('user routes', function() {
   }); 
 });
 
-function encryptPassword(password)  {
-  return crypto.publicEncrypt(config.rsaPublicKey, new Buffer(password, 'utf8')).toString('base64');
-}

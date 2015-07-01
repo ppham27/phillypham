@@ -13,6 +13,7 @@ var fs = require('fs');
 var random = require('../../lib/random');
 
 var FakeRequest = require('../support/fakeRequest');
+var encryptPassword = require('../support/encryptPassword');
 
 describe('passport', function() {  
   beforeEach(function(done) {
@@ -392,10 +393,4 @@ describe('passport', function() {
     });
   });
 });
-
-function encryptPassword(password)  {
-  return crypto.publicEncrypt(config.rsaPublicKey, new Buffer(password, 'utf8')).toString('base64');
-}
-
-
 
