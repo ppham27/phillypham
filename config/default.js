@@ -54,7 +54,7 @@ var config = {
                          "sidebar:info": 'Hello, World!',
                          "sidebar:infoHtml": '<p>Hello, World!</p>',
                          "contact:email": '',
-                         "contact:tacebook": '',
+                         "contact:facebook": '',
                          "contact:twitter": '',
                          "contact:instagram": ''
                        },

@@ -1,9 +1,9 @@
-h1= settings.ApplicationSettings['sidebar:title']
+h1#wmd-preview-title-sidebar= settings.ApplicationSettings['sidebar:title']
 
 #sidebar-photo-div
   a(href="#{settings.ApplicationSettings['sidebar:photoUrl']}")
-    img#sidebar-photo(src="#{settings.ApplicationSettings['sidebar:photoUrl']}")
+    img#sidebar-photo(src="#{settings.ApplicationSettings['sidebar:photoUrl']}", alt="Photo URL is broken")
 
-#sidebar-info!= settings.ApplicationSettings['sidebar:infoHtml']
+#wmd-preview-sidebar.wmd-preview!= settings.ApplicationSettings['sidebar:infoHtml']
 
 script !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");

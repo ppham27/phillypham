@@ -17,24 +17,24 @@ gulp.task('markdown-help', function(done) {
   fs.writeFileSync('./public/javascripts/editorHelpHtml.js', output);
   done();
 });
+
 gulp.task('markdown-browserify', ['markdown-help'], function(done) {
   var b = browserify('./public/javascripts/loadMarkdown.js');
   var bStream = b.transform('uglifyify').bundle();  
   bStream.on('end', function() {
-    console.log('markdown has been browserified!');
     done();
   });
   bStream.pipe(fs.createWriteStream('./public/javascripts/markdownBundle.js')); 
 });
 
-gulp.task('markdown-closurecompiler', ['markdown-browserify'], function() {
+gulp.task('markdown-closurecompiler', ['markdown-browserify'], function(done) {
   ClosureCompiler.compile('./public/javascripts/markdownBundle.js',
                           {language_in: 'ECMASCRIPT5'},
                           function(err, res) {
                             fs.writeFile('./public/javascripts/markdownBundle-min.js', res,
                                          function(err) {
                                            if (err) throw err;
-                                           console.log('markdown has been compiled!');
+                                           done();
                                          });
                           });
 });
@@ -46,13 +46,12 @@ gulp.task('encryptPassword-browserify', function(done) {
                 .transform('uglifyify')
                 .bundle();
   bStream.on('end', function() {
-    console.log('encryptPassword has been browserified!');
     done();
   });
   bStream.pipe(fs.createWriteStream('./public/javascripts/encryptPasswordBundle.js')); 
 });
 
-gulp.task('encryptPassword-closurecompiler', ['encryptPassword-browserify'], function() {
+gulp.task('encryptPassword-closurecompiler', ['encryptPassword-browserify'], function(done) {
   // compilation_level: "ADVANCED_OPTIMIZATIONS", possible additional optimization?
   ClosureCompiler.compile('./public/javascripts/encryptPasswordBundle.js',
                           {language_in: 'ECMASCRIPT5'},
@@ -60,7 +59,7 @@ gulp.task('encryptPassword-closurecompiler', ['encryptPassword-browserify'], fun
                             fs.writeFile('./public/javascripts/encryptPasswordBundle-min.js', res,
                                          function(err) {
                                            if (err) throw err;
-                                           console.log('encyptPassword has been compiled!');
+                                           done();
                                          });
                           });
 });
@@ -85,19 +84,21 @@ gulp.task('selenium', function() {
 });
 
 // running dbs for the app
-gulp.task('db:start', function(done) {
+gulp.task('db:start', function() {
   var pg = child_process.spawn('postgres', ['-D', '/usr/local/var/postgres/']);
   pg.stdout.pipe(process.stdout);
   pg.stderr.pipe(process.stdout);
   var redis = child_process.spawn('redis-server', ['/usr/local/etc/redis.conf'])
   redis.stdout.pipe(process.stdout);
   redis.stderr.pipe(process.stdout);
-  done();
 });
 
-gulp.task('db:migrate', function() {  
-  child_process.spawn('sequelize', ['db:migrate'])
-  .stdout.pipe(process.stdout);
+gulp.task('db:migrate', function(done) {  
+  var sequelize = child_process.spawn('sequelize', ['db:migrate'])
+                  .stdout.pipe(process.stdout);
+  sequelize.on('exit', function() {
+    done();
+  });
 });
 
 

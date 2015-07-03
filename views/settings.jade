@@ -1,0 +1,54 @@
+mixin settingsFieldSet(label, name, value, placeholder)
+  fieldset(class=name)
+    label(for=name)= label + ':'
+    input.text-input(type="text", name=name, value=value, placeholder=placeholder)
+
+
+extends layout
+
+block content
+  form#application-settings-form(action="POST", onsubmit="return false;")
+    .wmd-panel
+      h2 Sidebar Content
+      fieldset
+        label(for="sidebar:title") Sidebar Title:
+        input#wmd-input-title-sidebar.text-input.wmd-input-title(type="text", name="sidebar:title", placeholder="Enter a title here", value=settings.ApplicationSettings['sidebar:title'])
+      #wmd-button-bar-sidebar.wmd-button-bar
+      #wmd-editor-sidebar.wmd-editor.tex2jax_ignore= settings.ApplicationSettings['sidebar:info']
+      textarea(name="sidebar:info")#wmd-input-sidebar.wmd-input
+      +settingsFieldSet('Sidebar Photo', 'sidebar:photoUrl', settings.ApplicationSettings['sidebar:photoUrl'], 'URL to photo')
+      hr
+      h2 Contact Information
+      +settingsFieldSet('Email', 'contact:email', settings.ApplicationSettings['contact:email'], 'Email address')
+      +settingsFieldSet('Facebook', 'contact:facebook', settings.ApplicationSettings['contact:facebook'], 'Facebook username')
+      +settingsFieldSet('Instagram', 'contact:instagram', settings.ApplicationSettings['contact:instagram'], 'Instagram username')
+      +settingsFieldSet('Twitter', 'contact:twitter', settings.ApplicationSettings['contact:twitter'], 'Twitter username')
+    .wmd-panel.buttons
+      button.submit-button(disabled=true, type="submit") Update
+        .overlay
+  script
+    include ../public/javascripts/flash.js
+  script.
+    var photoUrl = document.getElementById('application-settings-form').querySelector('input[name="sidebar:photoUrl"]');
+    photoUrl.addEventListener('input', function(event) {
+      document.getElementById('sidebar-photo').src = this.value || '/images/default-profile.jpg';  
+    });
+
+    var submitButton = document.querySelector('#application-settings-form .submit-button');
+    var updateRequest = new XMLHttpRequest();
+    updateRequest.responseType = 'json';
+    updateRequest.addEventListener('load', function() {
+      flash('Application settings have been updated!', {reset: true, className: 'info'});
+      submitButton.disabled = false;
+    });
+    submitButton.addEventListener('click', function() {
+      submitButton.disabled = true;
+      updateRequest.abort();
+      updateRequest.open('PUT', window.location.pathname);
+      updateRequest.setRequestHeader('Accept', 'application/json');
+      updateRequest.setRequestHeader('Content-Type', 'application/json');
+      var data = {};
+      updateRequest.send(JSON.stringify(data));
+    });
+    submitButton.disabled = false;
+  

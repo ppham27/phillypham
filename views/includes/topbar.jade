@@ -11,7 +11,7 @@ include ../mixins/topbarLink.jade
         if roles['user_manager']
           +topbarLink('User Management', '/user')
         if roles['settings_manager']
-          +topbarLink('Application Settings', '/application-settings')      
+          +topbarLink('Application Settings', '/settings')      
     #topbar-content-right
       if locals.user
         - var displayNameURI = encodeURIComponent(locals.user.displayName)

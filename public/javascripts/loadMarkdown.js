@@ -3,15 +3,21 @@ var MarkdownAceEditor = require('./markdownAceEditor');
 var hljs = require('highlight.js');
 var pagedownExtra = require('../../lib/pagedownExtra');
 var mathJax = require('../../lib/mathJax');
-var editor;
 
-var inputTitle = document.querySelector('.wmd-panel input[name="title"]');
-var makeTitle = inputTitle !== null;
-var makeEditor = document.querySelector('.wmd-input') !== null;
+var inputTitles = document.querySelectorAll('.wmd-input-title');
+var editorDivs = document.querySelectorAll('.wmd-editor');
+var makeTitle = inputTitles.length !== 0;
+var makeEditor = editorDivs.length !== 0;
+var editors;
 if (makeEditor) {
-  editor = new MarkdownAceEditor(markdown.Converter, undefined,
-                                 {helpButton: editorHelp});
-  pagedownExtra.hookEditor(editor);
+  editorDivs = Array.prototype.slice.call(editorDivs);
+  editors = editorDivs.map(function(div) {
+              var postfix = div.id.substr(10); // get rid of wmd-editor
+              var editor = new MarkdownAceEditor(markdown.Converter, postfix,
+                                                 {helpButton: editorHelp});
+              pagedownExtra.hookEditor(editor);
+              return editor;
+            });
 }
 var mathJaxConfig = document.createElement('script');
 mathJaxConfig.type = 'text/x-mathjax-config';
@@ -25,17 +31,23 @@ mathJaxConfigRequest.onload = function(event) {
   mathJaxCDN.onload = function() {      
     mathJax.initialize(MathJax);
     if (makeEditor) {
-      mathJax.hookEditor(editor);
-      editor.run();
+      editors.forEach(function(editor) {
+        mathJax.hookEditor(editor);
+        editor.run();
+      });
     }
     if (makeTitle) {
-      var previewTitle = document.getElementById('wmd-preview-title');
-      inputTitle.addEventListener('input', function() {
-        previewTitle.textContent = inputTitle.value;
+      inputTitles = Array.prototype.slice.call(inputTitles);
+      inputTitles.forEach(function(inputTitle) {
+        var postfix = inputTitle.id.substr(15);
+        var previewTitle = document.getElementById('wmd-preview-title' + postfix);        
+        inputTitle.addEventListener('input', function() {
+          previewTitle.textContent = inputTitle.value;
+        });
+        inputTitle
+        .addEventListener('input', mathJax.run);        
       });
-      inputTitle
-      .addEventListener('input', mathJax.run);
-      editor.editor.focus();
+      //editor.editor.focus();
     }
   }
   document.head.appendChild(mathJaxCDN);

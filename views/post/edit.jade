@@ -1,11 +1,16 @@
-include ../mixins/fieldsetFilled.jade
+mixin postFieldset(name, label, placeholder)
+  fieldset
+    label(for=name)= label + ':'
+    input(class="text-input", type="text", name=name, placeholder=placeholder)
   
 extends ../layout
   
 block content
   form#post-form(method="POST", action="/post")
     .wmd-panel
-      +fieldsetFilled('title', 'Title', 'Enter a title here')
+      fieldset
+        label(for="title") Title:
+        input#wmd-input-title.text-input.wmd-input-title(type="text", name="title", placeholder="Enter a title here")
       #wmd-button-bar.wmd-button-bar
       #wmd-editor.wmd-editor.tex2jax_ignore
       textarea(name="body")#wmd-input.wmd-input
@@ -13,9 +18,11 @@ block content
       h2#wmd-preview-title
       #wmd-preview.wmd-panel.wmd-preview
     .wmd-panel
-      +fieldsetFilled('tags', 'Tags', 'Enter tags here separated by commas')
-    button.submit-button(type="submit") Post
-      .overlay
+      fieldset
+        label(for="tags") Tags:
+        input.text-input(type="text", name="tags", placeholder="Enter tags here separated by commas")
+      button.submit-button(type="submit") Post
+        .overlay
   // maybe move this script somewhere else later
   script.
     document.querySelector('#post-form input[name="title"]').addEventListener('keydown', disableEnterSubmit, false);

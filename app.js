@@ -22,6 +22,7 @@ app.isReady = false;
 
 var db = require('./models');
 db.once('ready', function() {
+  app.set('config', config);
   app.set('ApplicationSettings', db.ApplicationSettings);
   db.loadFixtures(config.fixtures, process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')
   .then(function() {
@@ -78,7 +79,6 @@ if (app.get('env') === 'development') {
     }
     if (req.accepts('html')) return res.render('error', locals);
     if (req.accepts('json')) return res.json(locals);
-
   });
 }
 

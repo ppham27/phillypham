@@ -12,5 +12,6 @@ router.use('/auth', require('./auth'));
 router.use('/user', require('./user'));
 router.use('/blog', require('./blog'));
 router.use('/post', require('./post'));
+router.use('/settings', require('./settings'));
 
 module.exports = router;

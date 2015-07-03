@@ -68,28 +68,31 @@ router.put('/edit/:displayName', authorize({userId: true, role: 'user_manager'})
         if (key === 'email') newUser[key] = newUser[key].toLowerCase();
       }
     });
-
    
     updates.givenName = newUser.givenName || null;
     updates.middleName = newUser.middleName || null;
     updates.familyName = newUser.familyName || null;
     updates.biography = newUser.biography || null;
     updates.photoUrl = newUser.photoUrl || db.User.tableAttributes.photoUrl.defaultValue;
-    
-    
+        
     if (newUser.password) {
       // logic for updating password      
       if (newUser.passwordConfirmation === newUser.password) {
-        promises.push(db.User.authenticate(user.email, newUser.oldPassword)
-                      .then(function(authenticatedUser) {
-                        user.salt = null
-                        updates.password = newUser.password || '';
-                        return Promise.resolve(user);
-                      })
-                      .catch(function(err) {
-                               errors.push('invalid old password');
-                               return Promise.reject(err);
-                             }));
+        if (user.password === null) { // no password yet, facebook user for example
+          user.salt = null;
+          updates.password = newUser.password || '';
+        } else {
+          promises.push(db.User.authenticate(user.email, newUser.oldPassword)
+                        .then(function(authenticatedUser) {
+                          user.salt = null;
+                          updates.password = newUser.password || '';
+                          return Promise.resolve(user);
+                        })
+                        .catch(function(err) {
+                                 errors.push('invalid old password');
+                                 return Promise.reject(err);
+                               }));
+        }
       } else {
         promises.push(Promise.reject(new Error('passwords do not match')));
         errors.push('passwords do not match');

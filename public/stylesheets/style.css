@@ -196,10 +196,6 @@ a.header-link:hover {
   color: #003b52;
 }
 
-/* h2#wmd-preview-title { */
-/*   padding-top: 20px; */
-/* } */
-
 #mainbar {
   width: 805px;
   min-height: 800px;
@@ -231,7 +227,7 @@ a.header-link:hover {
   border: 2px solid #222;
 }
 
-textarea#wmd-input {
+textarea.wmd-input {
   font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
   font-size: 100%;
   margin-top: 8px;
@@ -241,7 +237,7 @@ textarea#wmd-input {
   height: 300px;
 }
 
-#wmd-editor { 
+.wmd-editor { 
   font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
   font-size: 100%;
   width: 100%;
@@ -251,7 +247,7 @@ textarea#wmd-input {
 }
 
 
-#wmd-editor.focused {
+.wmd-editor.focused {
   outline: 3px solid rgb(112,154,192);
 }
 
@@ -389,7 +385,7 @@ span.field-sublabel.success {
   
 }
 
-#post-form label, #registration-form label {
+#post-form label, #registration-form label, #application-settings-form label {
   font-weight: bold;  
   padding-top: 3px;
 }
@@ -397,6 +393,12 @@ span.field-sublabel.success {
 
 #post-form .text-input {
   width: 90%;
+  font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
+  font-size: 100%;
+}
+
+#application-settings-form .text-input {
+  width: 80%;
   font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
   font-size: 100%;
 }
@@ -595,11 +597,22 @@ fieldset.captcha {
   margin-bottom: 10px;
 }
 
-.post hr {
+hr {
   border-style: dotted;
   border-width: 1px;
   border-top: none;
   border-left: none;
   border-right: none;
+}
+
+.post hr {
   margin-top: 20px;
+}
+
+#application-settings-form .wmd-editor {
+  margin-bottom: 15px;
+}
+
+#application-settings-form .wmd-panel.buttons {
+  text-align: right;
 }

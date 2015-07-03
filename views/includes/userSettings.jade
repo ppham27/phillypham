@@ -42,7 +42,7 @@ h2 Describe Yourself
     button.submit-button(type="submit") Register
       .overlay
 script.
-  var photoUrl = document.getElementById('registration-form').querySelector('input[name="photoUrl"]')
+  var photoUrl = document.getElementById('registration-form').querySelector('input[name="photoUrl"]');
   photoUrl.addEventListener('input', function(event) {
     document.querySelector('img.profile-preview').src = this.value || '/images/default-profile.jpg';  
   });
