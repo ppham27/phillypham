@@ -41,12 +41,13 @@ h2 Describe Yourself
   else
     button.submit-button(type="submit") Register
       .overlay
-script.
-  var photoUrl = document.getElementById('registration-form').querySelector('input[name="photoUrl"]');
-  photoUrl.addEventListener('input', function(event) {
-    document.querySelector('img.profile-preview').src = this.value || '/images/default-profile.jpg';  
-  });
-  function notImplemented() {
-    alert('This feature is not yet implemented. Contact me if you need this feature.');
-    return false;
-  }
+append body
+  script.
+    var photoUrl = document.getElementById('registration-form').querySelector('input[name="photoUrl"]');
+    photoUrl.addEventListener('input', function(event) {
+      document.querySelector('img.profile-preview').src = this.value || '/images/default-profile.jpg';  
+    });
+    function notImplemented() {
+      alert('This feature is not yet implemented. Contact me if you need this feature.');
+      return false;
+    }

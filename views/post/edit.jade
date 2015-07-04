@@ -1,8 +1,3 @@
-mixin postFieldset(name, label, placeholder)
-  fieldset
-    label(for=name)= label + ':'
-    input(class="text-input", type="text", name=name, placeholder=placeholder)
-  
 extends ../layout
   
 block content
@@ -15,7 +10,7 @@ block content
       #wmd-editor.wmd-editor.tex2jax_ignore
       textarea(name="body")#wmd-input.wmd-input
     .post
-      h2#wmd-preview-title
+      h2.wmd-preview-title
       #wmd-preview.wmd-panel.wmd-preview
     .wmd-panel
       fieldset
@@ -23,7 +18,7 @@ block content
         input.text-input(type="text", name="tags", placeholder="Enter tags here separated by commas")
       button.submit-button(type="submit") Post
         .overlay
-  // maybe move this script somewhere else later
+append body  
   script.
     document.querySelector('#post-form input[name="title"]').addEventListener('keydown', disableEnterSubmit, false);
     document.querySelector('#post-form input[name="tags"]').addEventListener('keydown', disableEnterSubmit, false);

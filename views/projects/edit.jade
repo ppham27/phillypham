@@ -1,0 +1,78 @@
+extends ../layout
+  
+block content
+  - var temporaryProject = locals.temporaryProject || {}
+  if (unpublishedProjects.length) 
+    h2 Unpublished Projects
+    ul
+      each project in unpublishedProjects
+        li
+          a(href='/projects/edit/'+encodeURIComponent(project.title))= project.title
+  hr
+  form#project-form.wmd-panel    
+    if (locals.update)
+      h2= 'Edit ' + temporaryProject.title
+    else
+      h2 New Project
+    fieldset
+      label(for="title") Title:
+      input#wmd-input-title-summary.text-input.wmd-input-title(type="text", name="title", placeholder="Enter a title here", value=temporaryProject.title || '')
+    fieldset
+      label(for="url") URL:
+      input.text-input(type="text", name="url", placeholder="URL to project", value=temporaryProject.url || '')
+    h3 Summary
+    fieldset
+      label(for="thumbnail") Thumbnail:
+      input.text-input(type="text", name="thumbnail", placeholder="Thumbnail URL", value=temporaryProject.thumbnail || '')
+    #wmd-button-bar-summary.wmd-button-bar
+    #wmd-editor-summary.wmd-editor.wmd-editor.tex2jax_ignore!= temporaryProject.summary || ''
+    textarea(name="summary")#wmd-input-summary.wmd-input!= temporaryProject.summary || ''
+    .project-list
+      .project-list-content
+        h2.wmd-preview-title-summary.project-title= temporaryProject.title
+        .left-sidebar
+          a.project-link
+            img(src=temporaryProject.thumbnail || '/images/Github-Mark.png', alt="image not found")  
+        #wmd-preview-summary.wmd-preview
+    h3 Description
+    fieldset
+      label(for="photoUrl") Photo URL:
+      input.text-input(type="text", name="photoUrl", placeholder="Project photo URL", value=temporaryProject.photoUrl || '')
+    #wmd-button-bar-description.wmd-button-bar
+    #wmd-editor-description.wmd-editor.wmd-editor.tex2jax_ignore!= temporaryProject.description || ''
+    textarea(name="summary")#wmd-input-description.wmd-input!= temporaryProject.description || ''    
+    .project.post
+      h1.wmd-preview-title-summary.project-title= temporaryProject.title
+      img.centered.project-img(src=temporaryProject.photoUrl || '/images/Github-Mark.png', alt='image not found')
+      p
+        strong URL: 
+        a.project-url(href=temporaryProject.url, target="_blank")= temporaryProject.url
+      #wmd-preview-description.wmd-preview
+    hr
+    .buttons
+      button.submit-button.save(disabled=true, type="submit") Save
+        .overlay
+      if (!locals.update)
+        button.submit-button.publish(disabled=true, type="submit") Publish
+          .overlay
+      else 
+        button.submit-button.destroy(disabled=true, type="submit") Destroy
+          .overlay
+        if (temporaryProject.published)
+          button.submit-button.publish(disabled=true, type="submit") Unpublish
+            .overlay
+        else
+          button.submit-button.publish(disabled=true, type="submit") Publish
+            .overlay
+append body 
+  script.
+    document.querySelector('input[name="thumbnail"]').addEventListener('input', function() {
+      document.querySelector('a.project-link img').src = this.value || '/images/Github-Mark.png';
+    });
+    document.querySelector('input[name="photoUrl"]').addEventListener('input', function() {
+      document.querySelector('img.project-img').src = this.value || '/images/Github-Mark.png';
+    });
+    document.querySelector('input[name="url"]').addEventListener('input', function() {
+      var projectUrl = document.querySelector('a.project-url');
+      projectUrl.textContent = projectUrl.href = this.value;
+    });

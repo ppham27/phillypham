@@ -1,26 +1,28 @@
 doctype html
 html
   head
-    title= locals.title ? title + ' - ' + settings.ApplicationSettings.title : settings.ApplicationSettings.title
-    meta(charset="utf-8")
-    link(rel="shortcut icon", href="/favicon.ico")
-    link(rel="stylesheet", href="/stylesheets/style.css")
-    link(rel="stylesheet", href="/stylesheets/highlight.js.css")
+    block head
+      title= locals.title ? title + ' - ' + settings.ApplicationSettings.title : settings.ApplicationSettings.title
+      meta(charset="utf-8")
+      link(rel="shortcut icon", href="/favicon.ico")
+      link(rel="stylesheet", href="/stylesheets/style.css")
+      link(rel="stylesheet", href="/stylesheets/highlight.js.css")
   body
-    include ./includes/facebookSDK.jade
-    include ./includes/twitterSDK.jade
-    include ./includes/topbar.jade    
-    #container
-      include ./includes/header.jade
-      #content
-        #right-sidebar
-          include ./includes/rightSidebar.jade
-        #mainbar
-          if locals.title
-            h1= title
-          include ./includes/flash.jade
-          block content
-    script(src="/javascripts/markdownBundle-min.js")
+    block body
+      include ./includes/facebookSDK.jade
+      include ./includes/twitterSDK.jade
+      include ./includes/topbar.jade    
+      #container
+        include ./includes/header.jade
+        #content
+          #right-sidebar
+            include ./includes/rightSidebar.jade
+          #mainbar
+            if locals.title
+              h1= title
+            include ./includes/flash.jade
+            block content
+      script(src="/javascripts/markdownBundle-min.js")
 
     
     

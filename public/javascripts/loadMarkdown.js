@@ -40,9 +40,12 @@ mathJaxConfigRequest.onload = function(event) {
       inputTitles = Array.prototype.slice.call(inputTitles);
       inputTitles.forEach(function(inputTitle) {
         var postfix = inputTitle.id.substr(15);
-        var previewTitle = document.getElementById('wmd-preview-title' + postfix);        
-        inputTitle.addEventListener('input', function() {
-          previewTitle.textContent = inputTitle.value;
+        var previewTitles = document.querySelectorAll('.wmd-preview-title' + postfix);
+        previewTitles = Array.prototype.slice.call(previewTitles);
+        inputTitle.addEventListener('input', function() {          
+          previewTitles.forEach(function(previewTitle) {
+            previewTitle.textContent = inputTitle.value;
+          });
         });
         inputTitle
         .addEventListener('input', mathJax.run);        

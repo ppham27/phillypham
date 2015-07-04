@@ -1,0 +1,21 @@
+include ../mixins/shareButtons.jade
+include ../mixins/projectAdmin.jade
+
+extends ../layout
+
+block content
+  .post.project.wmd-panel
+    h1.project-title 
+      a(href=project.url, target="_blank")= project.title
+    a(href=project.url, target="_blank")
+      img.centered.project-img(src=project.photoUrl)
+    if (project.url)
+      p
+        strong URL: 
+        a.project-url(href=project.url, target="_blank")= project.url
+    .wmd-preview!= project.descriptionHtml
+    hr
+    .footer
+      +shareButtons(settings.config.siteUrl + '/projects/' + encodeURIComponent(project.title), project.title)
+      if (locals.user && roles['project_manager'])
+        +projectAdmin(project)

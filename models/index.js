@@ -18,7 +18,7 @@ var redisClient = require('../lib/redisClient');
 var db        = new EventEmitter();
 db.isReady = false;
 
-var sequelizeModels = ['User', 'UserGroup', 'Role', 'UserRole', 'UserGroupRole'];
+var sequelizeModels = ['User', 'UserGroup', 'Role', 'UserRole', 'UserGroupRole', 'Project'];
 
 sequelizeModels
 .forEach(function(modelName) {

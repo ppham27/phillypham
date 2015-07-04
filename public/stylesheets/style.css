@@ -242,8 +242,13 @@ textarea.wmd-input {
   font-size: 100%;
   width: 100%;
   max-width: 100%;
-  height: 300px;
+  height: 275px;
   outline: 1px solid #999;
+}
+
+.ace_editor {
+  font-size: 100% !important; 
+  font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace !important;
 }
 
 
@@ -252,7 +257,7 @@ textarea.wmd-input {
 }
 
 .wmd-panel {
-  width: 98%;
+  width: 100%;
 }
 
 .wmd-button-row {
@@ -385,22 +390,24 @@ span.field-sublabel.success {
   
 }
 
-#post-form label, #registration-form label, #application-settings-form label {
+#post-form label, #registration-form label, #application-settings-form label, #project-form label {
   font-weight: bold;  
   padding-top: 3px;
 }
 
 
-#post-form .text-input {
+#post-form .text-input, #application-settings-form .text-input, #project-form .text-input {
   width: 90%;
   font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
   font-size: 100%;
 }
 
+#project-form .text-input {
+  width: 85%;
+}
+
 #application-settings-form .text-input {
   width: 80%;
-  font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
-  font-size: 100%;
 }
 
 .submit-button {
@@ -606,7 +613,7 @@ hr {
 }
 
 .post hr {
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
 #application-settings-form .wmd-editor {
@@ -615,4 +622,72 @@ hr {
 
 #application-settings-form .wmd-panel.buttons {
   text-align: right;
+}
+
+.project-list-content {
+  min-height: 220px;
+}
+
+.project-list .left-sidebar {
+ display: table;
+ float: left;
+}
+
+.project-list a.project-link {
+  display: block;
+  height: 160px;
+  width: 160px;
+  text-align: center;
+  line-height: 155px;
+  border: 2px solid #222;
+}
+
+
+.project-list-content a.project-link img {
+  vertical-align: middle;
+  max-height: 160px;
+  max-width: 160px;  
+}
+
+.project-title a {
+  text-decoration: none;    
+  color: #003b52;
+}
+
+.project-title a:hover {
+  text-decoration: underline;
+  color: #003b52;
+}
+
+.project-list-content .wmd-preview {
+  margin-left: 190px;
+}
+
+#project-form #wmd-editor-summary {
+  height: 125px;
+}
+
+img.project-img {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  max-width: 650px;  
+}
+
+a.twitter-share-button {
+  margin-top: 50px;
+}
+
+
+.share-div {
+  display: inline-block;
+  position: relative;
+}
+
+.share-div.spacer {
+  width: 5px;
+}
+
+.share-div.facebook {
+  position: relative;
+  top: -4px;
 }

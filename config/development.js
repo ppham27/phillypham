@@ -25,4 +25,32 @@ config.fixtures.push({model: 'User', data: {displayName: 'standard', password: '
 config.fixtures.push({model: 'User', data: {displayName: 'unverified', password: 'unverified', email: 'phil@phillypham.com', emailVerified: false, UserGroup: {name: 'standard'}}});
 config.fixtures.push({model: 'User', data: {displayName: 'moderator', password: 'moderator', email: 'moderator@gmail.com', emailVerified: true, UserGroup: {name: 'moderator'}}});
 
+config.fixtures.push({model: 'Project', 
+                      data: {title: 'First Project', 
+                             summary: 'My project summary',
+                             description: 'My project description',
+                             url: 'https://github.com/ppham27',
+                             published: true,
+                             User: {displayName: 'admin'}}});
+config.fixtures.push({model: 'Project', 
+                      data: {title: 'Second Project', 
+                             summary: 'Longer project summary. Longer project summary. Longer project summary. Longer project summary.',
+                             description: 'My project description. My project description. My project description.',
+                             url: 'https://github.com/ppham27',
+                             published: true,
+                             User: {displayName: 'admin'}}});
+
+config.fixtures.push({model: 'Project', 
+                      data: {title: 'Unpublished First Project', 
+                             summary: 'My project summary',
+                             description: 'My project description',
+                             url: 'https://github.com/ppham27',
+                             User: {displayName: 'admin'}}});
+config.fixtures.push({model: 'Project', 
+                      data: {title: 'Unpublished Second Project', 
+                             summary: 'Longer project summary. Longer project summary. Longer project summary. Longer project summary.',
+                             description: 'My project description. My project description. My project description.',
+                             url: 'https://github.com/ppham27',
+                             User: {displayName: 'admin'}}});
+
 module.exports = config;

@@ -1,0 +1,24 @@
+include ../mixins/shareButtons.jade
+include ../mixins/projectAdmin.jade
+
+extends ../layout
+
+block content
+  p Here is a sampling of a few programming projects that I've worked on.
+  each project, idx in projects  
+    .project-list.wmd-panel
+      .project-list-content
+        h2.project-title  
+          a(href='/projects/' + encodeURIComponent(project.title))= project.title          
+        .left-sidebar
+          a.project-link(href=project.url)
+            img(src=project.thumbnail)
+        .wmd-preview!=project.summaryHtml
+      .footer
+        +shareButtons(settings.config.siteUrl + '/projects/' + encodeURIComponent(project.title), project.title)
+        if (locals.user && roles['project_manager'])
+          +projectAdmin(project)
+      if (idx < projects.length - 1)
+        hr
+
+      

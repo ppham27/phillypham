@@ -4,6 +4,7 @@ block content
   form#registration-form(method="POST", onsubmit="return false;")
     h2 Update User Settings
     include ../includes/userSettings.jade
+append body
   script
     include ../../public/javascripts/encryptPasswordBundle-min.js
   script

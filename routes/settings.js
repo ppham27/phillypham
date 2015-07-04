@@ -11,6 +11,9 @@ router.get('/', function(req, res, next) {
 
 router.put('/', authorize({role: 'settings_manager'}), function(req, res, next) {
   if (!req.is('json')) return res.json({error: 'only json requests are accepted'});
+  Object.keys(req.body).forEach(function(key) {
+    req.body[key] = req.body[key].trim();
+  });
   db.ApplicationSettings.set(req.body);  
   db.ApplicationSettings.save()
   .then(function() {
