@@ -126,7 +126,7 @@ describe('application settings should stay in sync', function() {
   });
 });
 
-describe.only('Application Settings update routes', function() {
+describe('Application Settings update routes', function() {
   beforeEach(function(done) {
     var self = this;
     this.handle = settingsRoutes.stack.filter(function(handle) {
@@ -151,8 +151,16 @@ describe.only('Application Settings update routes', function() {
         });      
       });
     }
-  });  
-
+  });
+ 
+  after(function(done) {
+    this.db.ApplicationSettings.set(config.applicationSettings)
+    .save()
+    .then(function() {      
+      done();      
+    });
+  });
+  
   it('should update the application settings', function(done) {
     var self = this;
     var req = new FakeRequest(config.applicationSettings);
