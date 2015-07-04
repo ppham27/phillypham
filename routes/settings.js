@@ -16,7 +16,7 @@ router.put('/', authorize({role: 'settings_manager'}), function(req, res, next) 
     res.json({success: true});
   })
   .catch(function(err) {
-    // save failed revert
+    // save failed, revert
     db.ApplicationSettings.sync()
     .then(function() {
       res.json({error: err.toString()});

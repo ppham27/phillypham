@@ -1,4 +1,5 @@
 var expect = require('chai').expect;
+var sinon = require('sinon');
 var http = require('http');
 var url = require('url');
 var config = require('config');
@@ -84,6 +85,26 @@ describe('authorization', function() {
       expect(value).to.equal('power@gmail.com');
       done();
     })
+  });
+
+  it('should not allow anyone but admin to modify application settings', function(done) {
+    var self = this;
+    var stub = sinon.stub(self.db.ApplicationSettings, 'save');
+    var browser = this.browser;
+    browser.click('a.topbar-link[href="/login"]')
+    .setValue('input[name="email"]', 'moderator@gmail.com')
+    .setValue('input[name="password"]', 'moderator')
+    .click('button[type="submit"]')    
+    .url(url.resolve(this.siteUrl, '/settings'))
+    .click('button[type="submit"]')    
+    .pause(1000)
+    .getText('#flash')
+    .then(function(text) {
+      expect(text).to.match(/Not authorized/);
+      expect(stub.callCount).to.equal(0);
+      self.db.ApplicationSettings.save.restore();
+      done();
+    });
   });
 });
 

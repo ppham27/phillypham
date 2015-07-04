@@ -1,8 +1,8 @@
 var expect = require('chai').expect;
 var redisClient = require('../../lib/redisClient');
 var config = require('config');
-
-
+var FakeRequest = require('../support/fakeRequest');
+var settingsRoutes = require('../../routes/settings');
 
 describe('application settings sync', function() {
   beforeEach(function(done) {
@@ -123,5 +123,81 @@ describe('application settings should stay in sync', function() {
   it('should start empty', function() {
     expect(Object.keys(this.ApplicationSettings1).length).to.equal(0);
     expect(Object.keys(this.ApplicationSettings2).length).to.equal(0);
+  });
+});
+
+describe.only('Application Settings update routes', function() {
+  beforeEach(function(done) {
+    var self = this;
+    this.handle = settingsRoutes.stack.filter(function(handle) {
+                     return handle.route.path === '/' && handle.route.methods.put;
+                   });
+    this.handle = this.handle[0].route.stack[1].handle;
+    this.db = require('../../models');
+    if (this.db.isReady) {      
+      resetRedis();
+    } else {
+      this.db.once('ready', function() {
+        resetRedis();
+      });
+    }
+    function resetRedis() {
+      self.db.ApplicationSettings.set(config.applicationSettings)
+      .save()
+      .then(function() {
+        self.ApplicationSettings = require('../../models/ApplicationSettings')(redisClient);      
+        self.ApplicationSettings.once('ready', function() {
+          done();
+        });      
+      });
+    }
+  });  
+
+  it('should update the application settings', function(done) {
+    var self = this;
+    var req = new FakeRequest(config.applicationSettings);
+    expect(self.ApplicationSettings.title).to.equal('PhillyPham');
+    expect(self.ApplicationSettings['sidebar:info']).to.equal('Hello, World!');
+    req.body['title'] = 'new title';
+    req.body['sidebar:title'] = 'new sidebar title';
+    req.body['sidebar:info'] = 'new bio';
+    req.body['sidebar:photoUrl'] = 'pic.jpg';
+    var res = {json: function(json) {
+                 expect(json.success).to.be.true;
+                 // make sure updates propagate
+                 setTimeout(function() {
+                   expect(self.ApplicationSettings.title).to.equal('new title');
+                   expect(self.ApplicationSettings['sidebar:title']).to.equal('new sidebar title');
+                   expect(self.ApplicationSettings['sidebar:info']).to.equal('new bio');
+                   expect(self.ApplicationSettings['sidebar:infoHtml']).to.equal('<p>new bio</p>');
+                   expect(self.ApplicationSettings['sidebar:photoUrl']).to.equal('pic.jpg');
+                   done();
+                 }, 100);
+               }};
+    this.handle(req, res);
+  });
+  
+  it('should deny updates when sidebar:title is empty', function() {
+    var self = this;
+    var req = new FakeRequest(config.applicationSettings);
+    expect(self.ApplicationSettings['sidebar:title']).to.equal('About Me');
+    req.body['sidebar:title'] = '';
+    var res = {json: function(json) {
+                 expect(json.success).to.be.undefined;
+                 expect(json.error).to.match(/must be a nonempty string/);
+               }};
+    this.handle(req, res);
+  });
+
+  it('should deny updates when sidebar:info is empty', function() {
+    var self = this;
+    var req = new FakeRequest(config.applicationSettings);
+    expect(self.ApplicationSettings['sidebar:info']).to.equal('Hello, World!');
+    req.body['sidebar:info'] = '';
+    var res = {json: function(json) {
+                 expect(json.success).to.be.undefined;
+                 expect(json.error).to.match(/must be a nonempty string/);
+               }};
+    this.handle(req, res);
   });
 });

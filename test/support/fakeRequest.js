@@ -2,7 +2,8 @@
 var expressValidator = require('express-validator');
 
 module.exports = function(body, authorized, options)  {
-  this.body = body;
+  this.body = {};
+  for (var key in body) this.body[key] = body[key];
   options = options || {};
   options.accepts = options.accepts || [];
   options.is = options.is || [];

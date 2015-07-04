@@ -37,10 +37,11 @@ describe('user routes', function() {
 
   describe('simple view', function() {
     before(function() {
+      // filter should only return one entry
       this.handle = userRoutes.stack.filter(function(handle) {
                       return handle.route.path === '/:displayName' && handle.route.methods.get;
                     });
-      this.handle = this.handle[0].route.stack[1].handle;
+      this.handle = this.handle[0].route.stack[1].handle; // index 1 to by pass the authorization
     });
     it('should get user info', function(done) {
       var req = new FakeRequest({}, true, {accepts: ['json']});
