@@ -14,8 +14,8 @@ block content
         label(for="sidebar:title") Sidebar Title:
         input#wmd-input-title-sidebar.text-input.wmd-input-title(type="text", name="sidebar:title", placeholder="Enter a title here", value=settings.ApplicationSettings['sidebar:title'])
       #wmd-button-bar-sidebar.wmd-button-bar
-      #wmd-editor-sidebar.wmd-editor.tex2jax_ignore= settings.ApplicationSettings['sidebar:info']
-      textarea(name="sidebar:info")#wmd-input-sidebar.wmd-input
+      #wmd-editor-sidebar.wmd-editor.tex2jax_ignore!= settings.ApplicationSettings['sidebar:info']
+      textarea(name="sidebar:info")#wmd-input-sidebar.wmd-input!= settings.ApplicationSettings['sidebar:info']
       +settingsFieldSet('Sidebar Photo', 'sidebar:photoUrl', settings.ApplicationSettings['sidebar:photoUrl'], 'URL to photo')
       hr
       h2 Contact Information
@@ -31,14 +31,18 @@ block content
   script.
     var photoUrl = document.getElementById('application-settings-form').querySelector('input[name="sidebar:photoUrl"]');
     photoUrl.addEventListener('input', function(event) {
-      document.getElementById('sidebar-photo').src = this.value || '/images/default-profile.jpg';  
+      document.getElementById('sidebar-photo').src = this.value || '/images/default-profile.jpg';
     });
 
     var submitButton = document.querySelector('#application-settings-form .submit-button');
     var updateRequest = new XMLHttpRequest();
     updateRequest.responseType = 'json';
     updateRequest.addEventListener('load', function() {
-      flash('Application settings have been updated!', {reset: true, className: 'info'});
+      if (this.response.success) {
+        flash('Application settings have been updated!', {reset: true, className: 'info'});
+      } else {
+        flash(this.response.error, {reset: true, className: 'error'});
+      }
       submitButton.disabled = false;
     });
     submitButton.addEventListener('click', function() {
@@ -48,7 +52,19 @@ block content
       updateRequest.setRequestHeader('Accept', 'application/json');
       updateRequest.setRequestHeader('Content-Type', 'application/json');
       var data = {};
+      ['sidebar:info', 'sidebar:photoUrl', 'sidebar:title',
+       'contact:email', 'contact:facebook', 'contact:instagram', 'contact:twitter'].forEach(function(key) {
+        data[key] = getValue(key);
+      });
       updateRequest.send(JSON.stringify(data));
+      function getValue(name) {
+        if (name === 'sidebar:info') {
+          var textarea = document.querySelector('textarea[name="' + name + '"]');
+          return textarea.value;
+        }
+        var input = document.querySelector('input[name="' + name + '"]');
+        return input.value;        
+      }
     });
     submitButton.disabled = false;
   

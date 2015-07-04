@@ -78,7 +78,7 @@ if (app.get('env') === 'development') {
       error: err
     }
     if (req.accepts('html')) return res.render('error', locals);
-    if (req.accepts('json')) return res.json(locals);
+    if (req.accepts('json')) return res.json({error: err.message});
   });
 }
 
@@ -91,7 +91,7 @@ app.use(function(err, req, res, next) {
     error: {}
   }
   if (req.accepts('html')) return res.render('error', locals);
-  if (req.accepts('json')) return res.json(locals);
+  if (req.accepts('json')) return res.json({error: err.message});
 });
 
 

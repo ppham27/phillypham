@@ -2,6 +2,54 @@ var expect = require('chai').expect;
 var redisClient = require('../../lib/redisClient');
 var config = require('config');
 
+
+
+describe('application settings sync', function() {
+  beforeEach(function(done) {
+    var self = this;
+    redisClient.flushdb(function(err) {
+      self.ApplicationSettings = require('../../models/ApplicationSettings')(redisClient);      
+      done(err);
+    });
+  });
+
+  it('should sync with redis', function(done) {
+    var self = this;
+    redisClient.hmset('applicationSettings', {a: 1, b: 2, c: 3}, function() {
+      self.ApplicationSettings.sync()
+      .then(function() {
+        expect(self.ApplicationSettings.a).to.equal('1');
+        expect(self.ApplicationSettings.b).to.equal('2');
+        expect(self.ApplicationSettings.c).to.equal('3');
+        done();
+      });
+    });
+  });
+
+  it('should delete its old keys on sync', function(done) {
+    var ApplicationSettings = this.ApplicationSettings;
+    ApplicationSettings.set(config.applicationSettings);
+    ApplicationSettings.save()
+    .then(function() {
+      expect(ApplicationSettings.title).to.equal('PhillyPham');
+      redisClient.multi()
+      .del('applicationSettings')
+      .hmset('applicationSettings', {a: 1, b: 2, c: 3})
+      .exec(function() {
+        ApplicationSettings.sync()
+        .then(function(a) {       
+          expect(ApplicationSettings.a).to.equal('1');
+          expect(ApplicationSettings.b).to.equal('2');
+          expect(ApplicationSettings.c).to.equal('3');   
+          expect(ApplicationSettings.title).to.be.undefined;
+          done();
+        });
+      });
+    });
+  });
+});
+
+
 describe('application settings should stay in sync', function() {
   before(function(done) {
     this.redisClient1 = redisClient;

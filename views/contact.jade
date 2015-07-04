@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  ul.contact-list
+    if settings.ApplicationSettings['contact:email']
+      li
+        span.contact-label Email: 
+        a(target="_blank", href="mailto:" + settings.ApplicationSettings['contact:email'])= settings.ApplicationSettings['contact:email']
+    if settings.ApplicationSettings['contact:facebook']
+      li
+        span.contact-label Facebook: 
+        a(target="_blank", href="https://www.facebook.com/" + settings.ApplicationSettings['contact:facebook'])= settings.ApplicationSettings['contact:facebook']
+    if settings.ApplicationSettings['contact:instagram']
+      li
+        span.contact-label Instagram: 
+        a(target="_blank", href="https://instagram.com/" + settings.ApplicationSettings['contact:instagram'])= '@'+settings.ApplicationSettings['contact:instagram']
+    if settings.ApplicationSettings['contact:twitter']
+      li
+        span.contact-label Twitter: 
+        a(target="_blank", href="https://twitter.com/" + settings.ApplicationSettings['contact:twitter'])= '@'+settings.ApplicationSettings['contact:twitter']
+  
+

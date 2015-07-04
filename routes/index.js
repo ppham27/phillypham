@@ -5,6 +5,9 @@ var db = require('../models');
 
 
 router.use(require('./blog'));
+router.get('/contact', function(req, res, next) {
+  res.render('contact', { title: 'Contact Me' });
+});
 router.use('/login', require('./login'));
 router.use('/register', require('./register'));
 router.use('/logout', require('./logout'));

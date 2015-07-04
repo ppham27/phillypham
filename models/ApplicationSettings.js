@@ -44,8 +44,9 @@ module.exports = function(redisClient) {
   ApplicationSettings.reset = function(obj) {
     Object.keys(ApplicationSettings).forEach(function(key) {
       delete ApplicationSettings[key];
+      delete ApplicationSettings._data[key];
     });
-    data = ApplicationSettings._data = {};    
+    data = ApplicationSettings._data; 
   }
 
   ApplicationSettings.set = function(k, v) {
@@ -65,6 +66,8 @@ module.exports = function(redisClient) {
   }  
 
   ApplicationSettings.validate = function() {
+    if (!ApplicationSettings['sidebar:title']) 
+      return new TypeError('Sidebar title must be a nonempty string');
     if (!ApplicationSettings['sidebar:photoUrl']) 
       return new TypeError('Sidebar photo url must be a nonempty string');
     if (!ApplicationSettings['sidebar:info'] || !ApplicationSettings['sidebar:infoHtml'])
@@ -95,6 +98,19 @@ module.exports = function(redisClient) {
     }
   }
 
+  ApplicationSettings.sync = function() {
+    // sync with database
+    ApplicationSettings.reset();
+    return new Promise(function(resolve, reject) {
+                         redisClient.hgetall('applicationSettings', function(err, d) {
+                           if(err) reject(err);
+                           ApplicationSettings.set(d);
+                           for (var key in data) defineGetterAndSetter(key);
+                           resolve(ApplicationSettings);
+                         });
+                       });
+  }
+  
   subscriberClient.on('subscribe', function(channel) {
     /* do this first? i'm just not going to worry about race conditions
      * since this is a personal blog
@@ -129,7 +145,8 @@ module.exports = function(redisClient) {
                            build: {enumerable: false},
                            set: {enumerable: false},
                            reset: {enumerable: false},
-                           save: {enumerable: false}});
+                           save: {enumerable: false},
+                           sync: {enumerable: false}});
   function defineGetterAndSetter(k) {
     if (!(k in ApplicationSettings)) {
       Object.defineProperty(ApplicationSettings, k, {

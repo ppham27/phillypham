@@ -92,6 +92,7 @@ describe('ApplicationSettings on fresh database', function() {
     this.ApplicationSettings.set({defaultUserGroupId: 1,
                                   "sidebar:photoUrl": 'test.jpg',
                                   "sidebar:info": 'Hello, World!',
+                                  "sidebar:title": 'About Me',
                                   "sidebar:infoHtml": '<p>Hello, World!</p>'});
     var stub = sinon.stub(this.redisClient, 'hmset', 
                           function(key, obj, callback) {
@@ -130,6 +131,7 @@ describe('ApplicationSettings on existing database', function() {
                  setTimeout(callback, 300, undefined, {defaultUserGroupId: 1,
                                                        'sidebar:photoUrl': 'test.jpg',
                                                        'sidebar:info': 'Hello, World!',
+                                                       "sidebar:title": 'About Me',
                                                        "sidebar:infoHtml": '<p>Hello, World!</p>'});
                });
   });
