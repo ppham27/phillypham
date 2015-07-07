@@ -163,7 +163,7 @@ describe('Application Settings update routes', function() {
   
   it('should update the application settings', function(done) {
     var self = this;
-    var req = new FakeRequest(config.applicationSettings);
+    var req = new FakeRequest(config.applicationSettings, true, {is: ['json'], accepts: ['json']});
     expect(self.ApplicationSettings.title).to.equal('PhillyPham');
     expect(self.ApplicationSettings['sidebar:info']).to.equal('Hello, World!');
     req.body['title'] = 'new title';
@@ -187,7 +187,7 @@ describe('Application Settings update routes', function() {
   
   it('should deny updates when sidebar:title is empty', function() {
     var self = this;
-    var req = new FakeRequest(config.applicationSettings);
+    var req = new FakeRequest(config.applicationSettings, true, {is: ['json'], accepts: ['json']});
     expect(self.ApplicationSettings['sidebar:title']).to.equal('About Me');
     req.body['sidebar:title'] = '';
     var res = {json: function(json) {
@@ -199,7 +199,7 @@ describe('Application Settings update routes', function() {
 
   it('should deny updates when sidebar:info is empty', function() {
     var self = this;
-    var req = new FakeRequest(config.applicationSettings);
+    var req = new FakeRequest(config.applicationSettings, true, {is: ['json'], accepts: ['json']});
     expect(self.ApplicationSettings['sidebar:info']).to.equal('Hello, World!');
     req.body['sidebar:info'] = '';
     var res = {json: function(json) {

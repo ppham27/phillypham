@@ -22,8 +22,8 @@ module.exports = function(body, authorized, options)  {
   if (authorized) {
     this.isAuthorized = true;
     this.session.roles = {poster: true, commenter: true, editor: true, post_editor: true,
-                          user_manager: true, settings_manager: true};
-    this.user = {displayName: 'person', emailVerified: true};
+                          user_manager: true, settings_manager: true, project_manager: true};
+    this.user = {id: 1, displayName: 'person', emailVerified: true};
     this.params = {displayName: 'person'};
   }
   var res = {};

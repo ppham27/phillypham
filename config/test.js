@@ -41,6 +41,34 @@ config.fixtures.push({model: 'User', data: {displayName: 'not my real name', pas
 config.fixtures.push({model: 'User', data: {displayName: 'no name joe', password: 'somejunk', email: 'phillyphamtest2@gmail.com', 
                                             emailVerified: true, UserGroup: {name: 'standard'}}});
 
+config.fixtures.push({model: 'Project', 
+                      data: {title: 'First Project', 
+                             summary: 'My project summary',
+                             description: 'My project description',
+                             url: 'https://github.com/ppham27',
+                             published: true,
+                             User: {displayName: 'admin'}}});
+config.fixtures.push({model: 'Project', 
+                      data: {title: 'Second Project', 
+                             summary: 'Longer project summary. Longer project summary. Longer project summary. Longer project summary.',
+                             description: 'My project description. My project description. My project description.',
+                             url: 'https://github.com/ppham27',
+                             published: true,
+                             User: {displayName: 'admin'}}});
+
+config.fixtures.push({model: 'Project', 
+                      data: {title: 'Unpublished First Project', 
+                             summary: 'My project summary',
+                             description: 'My project description',
+                             url: 'https://github.com/ppham27',
+                             User: {displayName: 'admin'}}});
+config.fixtures.push({model: 'Project', 
+                      data: {title: 'Unpublished Second Project', 
+                             summary: 'Longer project summary. Longer project summary. Longer project summary. Longer project summary.',
+                             description: 'My project description. My project description. My project description.',
+                             url: 'https://github.com/ppham27',
+                             User: {displayName: 'admin'}}});
+
 // an array objects consisting of an email and password
 config.appKeys.google.testUsers = JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8')).testUsers;
 

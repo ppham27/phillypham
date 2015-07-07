@@ -51,17 +51,20 @@ describe('user routes', function() {
                    expect(json.email).to.equal('admin@admin.com');
                    done();
                  }};
+      res.format = function(f) { 
+        f.json();
+      }
       this.handle(req, res);
     });
 
     it('should get return an error', function(done) {
       var req = new FakeRequest({}, true, {accepts: ['json']});
       req.params.displayName = 'does not exist user';
-      var res = {json: function(json) {
-                   expect(json.error).to.match(/does not exist/);
-                   done();
-                 }};
-      this.handle(req, res);
+      var next = function(err) {
+        expect(err).to.be.instanceof(Error, /does not exist/);
+        done();
+      };
+      this.handle(req, undefined, next);
     });
   });
 

@@ -691,3 +691,11 @@ a.twitter-share-button {
   position: relative;
   top: -4px;
 }
+
+.project-list .footer .left, .project .footer .left {
+  display: inline-block;
+}
+
+.project-list .footer .right, .project .footer .right {
+  float: right;
+}

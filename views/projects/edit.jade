@@ -23,7 +23,7 @@ block content
     h3 Summary
     fieldset
       label(for="thumbnail") Thumbnail:
-      input.text-input(type="text", name="thumbnail", placeholder="Thumbnail URL", value=temporaryProject.thumbnail || '')
+      input.text-input(type="text", name="thumbnail", placeholder="Thumbnail URL", value=temporaryProject.thumbnail || '/images/Github-Mark.png')
     #wmd-button-bar-summary.wmd-button-bar
     #wmd-editor-summary.wmd-editor.wmd-editor.tex2jax_ignore!= temporaryProject.summary || ''
     textarea(name="summary")#wmd-input-summary.wmd-input!= temporaryProject.summary || ''
@@ -37,10 +37,10 @@ block content
     h3 Description
     fieldset
       label(for="photoUrl") Photo URL:
-      input.text-input(type="text", name="photoUrl", placeholder="Project photo URL", value=temporaryProject.photoUrl || '')
+      input.text-input(type="text", name="photoUrl", placeholder="Project photo URL", value=temporaryProject.photoUrl || '/images/Github-Mark.png')
     #wmd-button-bar-description.wmd-button-bar
     #wmd-editor-description.wmd-editor.wmd-editor.tex2jax_ignore!= temporaryProject.description || ''
-    textarea(name="summary")#wmd-input-description.wmd-input!= temporaryProject.description || ''    
+    textarea(name="description")#wmd-input-description.wmd-input!= temporaryProject.description || ''    
     .project.post
       h1.wmd-preview-title-summary.project-title= temporaryProject.title
       img.centered.project-img(src=temporaryProject.photoUrl || '/images/Github-Mark.png', alt='image not found')
@@ -59,20 +59,141 @@ block content
         button.submit-button.destroy(disabled=true, type="submit") Destroy
           .overlay
         if (temporaryProject.published)
-          button.submit-button.publish(disabled=true, type="submit") Unpublish
+          button.submit-button.unpublish(disabled=true, type="submit") Unpublish
             .overlay
         else
           button.submit-button.publish(disabled=true, type="submit") Publish
             .overlay
-append body 
+append body
+  script
+    include ../../public/javascripts/flash.js
   script.
     document.querySelector('input[name="thumbnail"]').addEventListener('input', function() {
-      document.querySelector('a.project-link img').src = this.value || '/images/Github-Mark.png';
+      document.querySelector('a.project-link img').src = this.value;
     });
     document.querySelector('input[name="photoUrl"]').addEventListener('input', function() {
-      document.querySelector('img.project-img').src = this.value || '/images/Github-Mark.png';
+      document.querySelector('img.project-img').src = this.value;
     });
     document.querySelector('input[name="url"]').addEventListener('input', function() {
       var projectUrl = document.querySelector('a.project-url');
       projectUrl.textContent = projectUrl.href = this.value;
     });
+    if (#{locals.update || false}) {
+      var saveButton = document.querySelector('button.submit-button.save');
+      var destroyButton = document.querySelector('button.submit-button.destroy');
+      var publishButton = document.querySelector('button.submit-button.publish') || document.querySelector('button.submit-button.unpublish');      
+      var putProject = new XMLHttpRequest();
+      var deleteProject = new XMLHttpRequest();
+      putProject.responseType = 'json';
+      deleteProject.responseType = 'json';
+      putProject.addEventListener('load', function() {
+        onRequestLoad(this.response);
+        saveButton.disabled = false;
+        destroyButton.disabled = false;
+        publishButton.disabled = false;
+      });
+      deleteProject.addEventListener('load', function() {
+        onRequestLoad(this.response);
+        saveButton.disabled = false;
+        destroyButton.disabled = false;
+        publishButton.disabled = false;
+      });
+      publishButton.addEventListener('click', function() {
+        saveButton.disabled = true;
+        destroyButton.disabled = true;
+        publishButton.disabled = true;
+        putProject.abort();
+        putProject.open('PUT', window.location.pathname);
+        putProject.setRequestHeader('Accept', 'application/json');
+        putProject.setRequestHeader('Content-Type', 'application/json');
+        var json = formToJSON(document.getElementById('project-form'));
+        json.published = document.querySelector('button.submit-button.publish') !== null;
+        putProject.send(JSON.stringify(json));
+        return false;
+      });
+      saveButton.addEventListener('click', function() {
+        saveButton.disabled = true;
+        destroyButton.disabled = true;
+        publishButton.disabled = true;
+        putProject.abort();
+        putProject.open('PUT', window.location.pathname);
+        putProject.setRequestHeader('Accept', 'application/json');
+        putProject.setRequestHeader('Content-Type', 'application/json');
+        putProject.send(JSON.stringify(formToJSON(document.getElementById('project-form'))));
+        return false;
+      });
+      destroyButton.addEventListener('click', function() {
+        saveButton.disabled = true;
+        destroyButton.disabled = true;
+        publishButton.disabled = true;
+        deleteProject.abort();
+        deleteProject.open('DELETE', window.location.pathname);
+        deleteProject.setRequestHeader('Accept', 'application/json');
+        deleteProject.setRequestHeader('Content-Type', 'application/json');
+        deleteProject.send();
+        return false;
+      });
+      saveButton.disabled = false;
+      destroyButton.disabled = false;
+      publishButton.disabled = false;
+    } else {
+      var publishButton = document.querySelector('button.submit-button.publish');
+      var saveButton = document.querySelector('button.submit-button.save');
+      var postProject = new XMLHttpRequest();
+      postProject.responseType = 'json';
+      postProject.addEventListener('load', function() {
+        onRequestLoad(this.response);        
+        publishButton.disabled = false;
+        saveButton.disabled = false;
+      });
+      publishButton.addEventListener('click', function() {
+        publishButton.disabled = true;
+        saveButton.disabled = true;
+        var json = formToJSON(document.getElementById('project-form'));
+        json.published = true;
+        postProject.abort();
+        postProject.open('POST', window.location.pathname);
+        postProject.setRequestHeader('Accept', 'application/json');
+        postProject.setRequestHeader('Content-Type', 'application/json');
+        postProject.send(JSON.stringify(json));
+        return false;
+      });
+      saveButton.addEventListener('click', function() {
+        publishButton.disabled = true;
+        saveButton.disabled = true;
+        var json = formToJSON(document.getElementById('project-form'));        
+        postProject.abort();
+        postProject.open('POST', window.location.pathname);
+        postProject.setRequestHeader('Accept', 'application/json');
+        postProject.setRequestHeader('Content-Type', 'application/json');
+        postProject.send(JSON.stringify(json));
+        return false;
+      });
+      publishButton.disabled = false;
+      saveButton.disabled = false;
+    }
+    function formToJSON(form) {
+      var json = {};
+      // inputs
+      ['title','url','thumbnail','photoUrl'].forEach(function(key) {
+        json[key] = form.querySelector('input[name="' + key + '"]').value;
+      });
+      // text areas
+      ['summary', 'description'].forEach(function(key) {
+        json[key] = form.querySelector('textarea[name="' + key + '"]').value;
+      });
+      return json;
+    }
+
+    function onRequestLoad(response) {
+      if (response.success) {
+        if (response.redirect) {
+          // expect redirect
+          window.location.href = response.redirectLink;
+        } else {
+          flash(response.message, {reset: true, className: 'info'});
+        }        
+      } else {
+        flash(response.error, {reset: true, className: 'error'});
+      }
+    }

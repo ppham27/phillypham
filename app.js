@@ -77,8 +77,14 @@ if (app.get('env') === 'development') {
       message: err.message,
       error: err
     }
-    if (req.accepts('html')) return res.render('error', locals);
-    if (req.accepts('json')) return res.json({error: err.message});
+    res.format({
+      html: function() {
+        res.render('error', locals);
+      },
+      json: function() {
+        res.json({error: err.message})
+      }
+    });   
   });
 }
 
@@ -90,8 +96,14 @@ app.use(function(err, req, res, next) {
     message: err.message,
     error: {}
   }
-  if (req.accepts('html')) return res.render('error', locals);
-  if (req.accepts('json')) return res.json({error: err.message});
+  res.format({
+    html: function() {
+      res.render('error', locals);
+    },
+    json: function() {
+      res.json({error: err.message})
+    }
+  });
 });
 
 

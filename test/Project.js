@@ -59,4 +59,20 @@ describe('Project', function() {
              done();
            });
   });
+
+  it('should update the html versions of summary and description', function(done) {
+    var Project = this.Project;
+    Project.create({title: 'project', 
+                    summary: 'summary', description: 'description', published: false})
+    .then(function(project) {
+      expect(project.summaryHtml).to.equal('<p>summary</p>');
+      expect(project.descriptionHtml).to.equal('<p>description</p>');
+      return project.update({summary: 'new summary', description: 'new description'});
+    })
+    .then(function(project) {
+      expect(project.summaryHtml).to.equal('<p>new summary</p>');
+      expect(project.descriptionHtml).to.equal('<p>new description</p>');
+      done();
+    });    
+  });
 });

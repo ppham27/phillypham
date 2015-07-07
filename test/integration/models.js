@@ -46,10 +46,14 @@ describe('associations', function() {
       .then(function(userGroup) {
         return userGroup.destroy();
       })
-      .catch(function(err) {
-               expect(err).to.be.instanceOf(Error, /must have no users/);
-               return db.UserGroup.findOne({where: {name: 'B'}});
+      .catch(function(err) {        
+               expect(err).to.be.instanceOf(Error);
+               return db.UserGroup.findOne({where: {name: 'A'}});
              })
+      .then(function(userGroup) {
+        expect(userGroup.name).to.equal('A');
+        return db.UserGroup.findOne({where: {name: 'B'}});
+      })
       .then(function(userGroup) {
         return userGroup.destroy();
       })

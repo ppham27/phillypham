@@ -12,25 +12,23 @@ var emailVerifier = require('../lib/emailVerifier');
 
 var config = require('config');
 
-
 router.get('/:displayName', authorize({userId: true, loggedIn: true}), function(req, res, next) {
   var displayName = req.params.displayName;
   db.User.findOne({where: { displayName: displayName}})
   .then(function(user) {
-    if (req.accepts('html')) {
-      if (user === null) {
-        res.render('error', {message: 'User does not exist', error: {}});
-      } else {
-        res.render('user/profile', {title: user.displayName, displayedUser: user});
-      }
-    } else if (req.accepts('json')) {
-      if (user === null) {
-        res.json({error: 'requested user does not exist.'});
-      } else {
-        res.json({displayName: user.displayName, email: user.email,
-                  givenName: user.givenName, familyName: user.familyName,
-                  middleName: user.middleName});
-      }
+    if (user === null) {
+      next(new Error('User does not exist'));
+    } else {
+      res.format({
+        html: function() {
+          res.render('user/profile', {title: user.displayName, displayedUser: user});
+        },
+        json: function() {
+          res.json({displayName: user.displayName, email: user.email,
+                    givenName: user.givenName, familyName: user.familyName,
+                    middleName: user.middleName});
+        }
+      });
     }
   });
 });

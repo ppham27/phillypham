@@ -16,6 +16,8 @@ block content
     .wmd-preview!= project.descriptionHtml
     hr
     .footer
-      +shareButtons(settings.config.siteUrl + '/projects/' + encodeURIComponent(project.title), project.title)
-      if (locals.user && roles['project_manager'])
-        +projectAdmin(project)
+      .left
+        +shareButtons(settings.config.siteUrl + '/projects/' + encodeURIComponent(project.title), project.title)
+      .right
+        if (locals.user && roles['project_manager'])
+          +projectAdmin(project)
