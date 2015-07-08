@@ -14,8 +14,8 @@ block content
         label(for="sidebar:title") Sidebar Title:
         input#wmd-input-title-sidebar.text-input.wmd-input-title(type="text", name="sidebar:title", placeholder="Enter a title here", value=settings.ApplicationSettings['sidebar:title'])
       #wmd-button-bar-sidebar.wmd-button-bar
-      #wmd-editor-sidebar.wmd-editor.tex2jax_ignore!= settings.ApplicationSettings['sidebar:info']
-      textarea(name="sidebar:info")#wmd-input-sidebar.wmd-input!= settings.ApplicationSettings['sidebar:info']
+      #wmd-editor-sidebar.wmd-editor.tex2jax_ignore= settings.ApplicationSettings['sidebar:info']
+      textarea(name="sidebar:info")#wmd-input-sidebar.wmd-input= settings.ApplicationSettings['sidebar:info']
       +settingsFieldSet('Sidebar Photo', 'sidebar:photoUrl', settings.ApplicationSettings['sidebar:photoUrl'], 'URL to photo')
       hr
       h2 Contact Information

@@ -25,8 +25,8 @@ block content
       label(for="thumbnail") Thumbnail:
       input.text-input(type="text", name="thumbnail", placeholder="Thumbnail URL", value=temporaryProject.thumbnail || '/images/GitHub-Mark.png')
     #wmd-button-bar-summary.wmd-button-bar
-    #wmd-editor-summary.wmd-editor.wmd-editor.tex2jax_ignore!= temporaryProject.summary || ''
-    textarea(name="summary")#wmd-input-summary.wmd-input!= temporaryProject.summary || ''
+    #wmd-editor-summary.wmd-editor.wmd-editor.tex2jax_ignore= temporaryProject.summary || ''
+    textarea(name="summary")#wmd-input-summary.wmd-input= temporaryProject.summary || ''
     .project-list
       .project-list-content
         h2.wmd-preview-title-summary.project-title= temporaryProject.title
@@ -39,8 +39,8 @@ block content
       label(for="photoUrl") Photo URL:
       input.text-input(type="text", name="photoUrl", placeholder="Project photo URL", value=temporaryProject.photoUrl || '/images/GitHub-Mark.png')
     #wmd-button-bar-description.wmd-button-bar
-    #wmd-editor-description.wmd-editor.wmd-editor.tex2jax_ignore!= temporaryProject.description || ''
-    textarea(name="description")#wmd-input-description.wmd-input!= temporaryProject.description || ''    
+    #wmd-editor-description.wmd-editor.wmd-editor.tex2jax_ignore= temporaryProject.description || ''
+    textarea(name="description")#wmd-input-description.wmd-input= temporaryProject.description || ''    
     .project.post
       h1.wmd-preview-title-summary.project-title= temporaryProject.title
       img.centered.project-img(src=temporaryProject.photoUrl || '/images/GitHub-Mark.png', alt='image not found')
