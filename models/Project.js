@@ -12,8 +12,8 @@ module.exports = function(sequelize, DataTypes) {
     descriptionHtml: {type: DataTypes.TEXT, allowNull: true, field: 'description_html'},
     url: {type: DataTypes.STRING, allowNull: true, defaultValue: null,
           validate: {isUrl: {args: true, msg: 'url is not properly formatted'}}},
-    photoUrl: {type: DataTypes.STRING, defaultValue: '/images/Github-Mark.png'},
-    thumbnail: {type: DataTypes.STRING, defaultValue: '/images/Github-Mark.png'},
+    photoUrl: {type: DataTypes.STRING, defaultValue: '/images/GitHub-Mark.png'},
+    thumbnail: {type: DataTypes.STRING, defaultValue: '/images/GitHub-Mark.png'},
     published: {type: DataTypes.BOOLEAN, defaultValue: false},
     publishedAt: {type: DataTypes.DATE, allowNull: true, field: 'published_at', defaultValue: null}
   },

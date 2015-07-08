@@ -8,7 +8,7 @@ block content
       each project in unpublishedProjects
         li
           a(href='/projects/edit/'+encodeURIComponent(project.title))= project.title
-  hr
+    hr
   form#project-form.wmd-panel    
     if (locals.update)
       h2= 'Edit ' + temporaryProject.title
@@ -23,7 +23,7 @@ block content
     h3 Summary
     fieldset
       label(for="thumbnail") Thumbnail:
-      input.text-input(type="text", name="thumbnail", placeholder="Thumbnail URL", value=temporaryProject.thumbnail || '/images/Github-Mark.png')
+      input.text-input(type="text", name="thumbnail", placeholder="Thumbnail URL", value=temporaryProject.thumbnail || '/images/GitHub-Mark.png')
     #wmd-button-bar-summary.wmd-button-bar
     #wmd-editor-summary.wmd-editor.wmd-editor.tex2jax_ignore!= temporaryProject.summary || ''
     textarea(name="summary")#wmd-input-summary.wmd-input!= temporaryProject.summary || ''
@@ -32,18 +32,18 @@ block content
         h2.wmd-preview-title-summary.project-title= temporaryProject.title
         .left-sidebar
           a.project-link
-            img(src=temporaryProject.thumbnail || '/images/Github-Mark.png', alt="image not found")  
+            img(src=temporaryProject.thumbnail || '/images/GitHub-Mark.png', alt="image not found")  
         #wmd-preview-summary.wmd-preview
     h3 Description
     fieldset
       label(for="photoUrl") Photo URL:
-      input.text-input(type="text", name="photoUrl", placeholder="Project photo URL", value=temporaryProject.photoUrl || '/images/Github-Mark.png')
+      input.text-input(type="text", name="photoUrl", placeholder="Project photo URL", value=temporaryProject.photoUrl || '/images/GitHub-Mark.png')
     #wmd-button-bar-description.wmd-button-bar
     #wmd-editor-description.wmd-editor.wmd-editor.tex2jax_ignore!= temporaryProject.description || ''
     textarea(name="description")#wmd-input-description.wmd-input!= temporaryProject.description || ''    
     .project.post
       h1.wmd-preview-title-summary.project-title= temporaryProject.title
-      img.centered.project-img(src=temporaryProject.photoUrl || '/images/Github-Mark.png', alt='image not found')
+      img.centered.project-img(src=temporaryProject.photoUrl || '/images/GitHub-Mark.png', alt='image not found')
       p
         strong URL: 
         a.project-url(href=temporaryProject.url, target="_blank")= temporaryProject.url
