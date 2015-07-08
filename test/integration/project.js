@@ -187,4 +187,91 @@ describe('project routes', function() {
       this.handle(req, undefined, next);
     });
   });  
+
+  describe('update', function() {
+    before(function() {
+      this.handle = projectRoutes.stack.filter(function(handle) {
+                      return handle.route.path === '/edit/:title' && handle.route.methods.put;
+                    });
+      this.handle = this.handle[0].route.stack[1].handle; // index 1 to by pass the authorization 
+    });
+    
+    it('should update a published project', function(done) {
+      var db = this.db;
+      var updates = {
+        title: 'new title',
+        url: 'http://google.com',
+        thumbnail: 'new_thumbnail.png  ',
+        photoUrl: '  new_photo.png',
+        summary: 'new summary',
+        description: 'new description'
+      }
+      var req =  new FakeRequest(updates, true, {accepts: ['json'], is: ['json']});
+      req.params.title = 'First Project';
+      var res = {json: function(json) {
+                   expect(json.success).to.be.true;
+                   expect(json.redirectLink).to.equal('/projects');
+                   db.Project.findOne({where: {title: 'new title'}})
+                   .then(function(project) {
+                     expect(project.summaryHtml).to.equal('<p>new summary</p>');
+                     expect(project.descriptionHtml).to.equal('<p>new description</p>');
+                     expect(project.url).to.equal('http://google.com');
+                     expect(project.thumbnail).to.equal('new_thumbnail.png');
+                     expect(project.photoUrl).to.equal('new_photo.png');                     
+                     done();
+                   });
+                 }};
+      this.handle(req, res);
+    });
+
+    it('should update a unpublished project', function(done) {
+      var db = this.db;
+      var updates = {
+        title: 'new title',
+        url: 'http://google.com',
+        thumbnail: 'new_thumbnail.png  ',
+        photoUrl: '  new_photo.png',
+        summary: 'new summary',
+        description: 'new description',
+        published: false
+      };
+      var req =  new FakeRequest(updates, true, {accepts: ['json'], is: ['json']});
+      req.params.title = 'First Project';
+      var res = {json: function(json) {
+                   expect(json.success).to.be.true;
+                   expect(json.redirectLink).to.equal('/projects/edit/' + encodeURIComponent('new title'));
+                   done();
+                 }};
+      this.handle(req, res);
+    });
+
+    it('should return an error on duplicate title', function(done) {
+      var db = this.db;
+      var updates = { title: 'Unpublished First Project' };
+      var req =  new FakeRequest(updates, true, {accepts: ['json'], is: ['json']});
+      req.params.title = 'First Project';
+      var res = {json: function(json) {
+                   expect(json.error).to.be.instanceof(Array);
+                   expect(json.error).to.include.something.that.matches(/title must be unique/);
+                   done();
+                 }};
+      this.handle(req, res);
+    });
+
+    it('should return an errors on missing title, summary, and description', function(done) {
+      var db = this.db;
+      var updates = {title: ' ',
+                     summary: '  ', description: '  '};
+      var req =  new FakeRequest(updates, true, {accepts: ['json'], is: ['json']});
+      req.params.title = 'First Project';
+      var res = {json: function(json) {
+                   expect(json.error).to.be.instanceof(Array);
+                   expect(json.error).to.include.something.that.matches(/title cannot be null/);
+                   expect(json.error).to.include.something.that.matches(/summary cannot be null/);
+                   expect(json.error).to.include.something.that.matches(/description cannot be null/);
+                   done();
+                 }};
+      this.handle(req, res);
+    });
+  });
 });

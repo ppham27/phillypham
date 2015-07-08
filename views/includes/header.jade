@@ -7,9 +7,11 @@ include ../mixins/headerLink.jade
       include ../../public/images/logo.svg    
   #header-menu
     +headerLink('Blog', '/')
-    +headerLink('DataViz', 'http://bl.ocks.org/ppham27')
+    if settings.ApplicationSettings['menu:dataViz']
+      +headerLink('DataViz', settings.ApplicationSettings['menu:dataViz'])
     +headerLink('Projects', '/projects')
-    +headerLink('Résumé', 'https://dl.dropboxusercontent.com/u/29552058/resume.pdf')
+    if settings.ApplicationSettings['menu:resume']
+      +headerLink('Résumé', settings.ApplicationSettings['menu:resume'])
     +headerLink('Contact Me', '/contact')
     
   

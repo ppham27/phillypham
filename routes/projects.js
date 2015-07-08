@@ -60,6 +60,7 @@ router.delete('/edit/:title', authorize({role: 'project_manager'}), function(req
 });
 
 router.put('/edit/:title', authorize({role: 'project_manager'}), function(req, res, next) {
+  if (!req.is('json')) return res.json({error: 'only json requests are accepted'});
   db.Project.findOne({where: {title: req.params.title}})
   .then(function(project) {
     if (project === null) {
@@ -68,7 +69,7 @@ router.put('/edit/:title', authorize({role: 'project_manager'}), function(req, r
       var updates = req.body;
       trimProject(updates);
       return project.update(updates);
-    }    
+    }
   })
   .then(function(project) {
     req.flash('info', req.params.title + ' was updated!');
@@ -79,8 +80,16 @@ router.put('/edit/:title', authorize({role: 'project_manager'}), function(req, r
               redirectLink: project.published ? '/projects' : '/projects/edit/' + encodeURIComponent(project.title) });
   })
   .catch(function(err) {
-    next(err);
-  });
+           var error = [];
+           if (err.errors) {
+             err.errors.forEach(function(err) {
+               error.push(err.message);
+             });
+           } else {
+             error.push(err.message);
+           }
+           res.json({error: error});           
+         });
 });
 
 router.get('/edit/:title', authorize({role: 'project_manager'}), function(req, res, next) {
@@ -109,7 +118,6 @@ router.get('/:title', function(req, res, next) {
     res.render('projects/view', {project: project});
   });
 })
-
 
 
 module.exports = router;

@@ -91,6 +91,29 @@ You will need to enable the Google+ API, and you will also need a `google.json` 
 }
 ```
 
+### Customization
+
+#### New Menubar Items
+
+To add a new menubar item, go to `config/default.js` and add a `menu:newItem` entry to application settings. Then, go to `views/includes/header` and add a header link. Then, to allow yourself to update the link to the new item, go to `views/settings.jade` and add an input field with the name `menu:newItem` and change:
+```javascript
+var data = {};
+['sidebar:info', 'sidebar:photoUrl', 'sidebar:title',
+ 'contact:email', 'contact:facebook', 'contact:instagram', 'contact:twitter',
+ 'menu:dataViz', 'menu:resume'].forEach(function(key) {
+  data[key] = getValue(key);
+});
+```
+to
+```javascript
+var data = {};
+['sidebar:info', 'sidebar:photoUrl', 'sidebar:title',
+ 'contact:email', 'contact:facebook', 'contact:instagram', 'contact:twitter',
+ 'menu:dataViz', 'menu:resume', 'menu:newItem'].forEach(function(key) {
+  data[key] = getValue(key);
+});
+```
+in order for the menu item to be part of the `PUT` request.
 
 ### Editor
 

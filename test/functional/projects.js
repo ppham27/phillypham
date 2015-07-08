@@ -1,4 +1,6 @@
-var expect = require('chai').expect;
+var chai = require('chai');
+chai.use(require('chai-things'));
+var expect = chai.expect;
 var http = require('http');
 var url = require('url');
 var config = require('config');
@@ -54,7 +56,7 @@ describe('projects', function() {
     });
   });
 
-  describe('create', function(done) {
+  describe('create', function() {
     beforeEach(function(done) {
       this.browser
       .click('a.topbar-link[href="/projects/create"]')
@@ -150,6 +152,141 @@ describe('projects', function() {
       .getText('#flash')
       .then(function(text) {
         expect(text).to.match(/title must be unique/);
+        done();
+      });
+    });
+  });
+
+  describe('delete', function() {
+     it('should delete published project and redirect to projects', function(done) {
+      var browser = this.browser;
+      var db = this.db;
+      browser
+      .click('.header-link[href="/projects"]')
+      .click('.footer .right a') // edit link, for second project
+      .click('button.submit-button.destroy')
+      .pause(2000)
+      .url()
+      .then(function(res) {
+        expect(url.parse(res.value).path).to.equal('/projects');     
+        return browser.getText('.project-title');
+      })
+      .then(function(text) {
+        expect(text).to.not.match(/Second Project/);
+        db.Project.findOne({where: {title: 'Second Project'}})
+        .then(function (project) {
+          expect(project).to.equal.null;
+          done();
+        });
+      });
+     });
+
+    it('should delete unpublished project and redirect to create page', function(done) {
+      var browser = this.browser;
+      var db = this.db;
+      browser
+      .click('a.topbar-link[href="/projects/create"]')
+      .click('a[href="/projects/edit/Unpublished%20First%20Project"]')
+      .click('button.submit-button.destroy')
+      .pause(2000)
+      .url()
+      .then(function(res) {
+        expect(url.parse(res.value).path).to.equal('/projects/create');     
+        return browser.getText('a');
+      })
+      .then(function(text) {
+        expect(text).to.not.include.something.that.matches(/Unpublished First Project/);
+        db.Project.findOne({where: {title: 'Unpublished First Project'}})
+        .then(function (project) {
+          expect(project).to.equal.null;
+          done();
+        });
+      });
+    });
+  });
+
+  describe('update', function() {
+    it('should update published project', function(done) {
+      var browser = this.browser;
+      var db = this.db;
+      browser
+      .click('.header-link[href="/projects"]')
+      .click('.footer .right a') // edit link, for second project
+      .setValue('input[name="title"]', 'New Project Title')
+      .setValue('input[name="url"]', 'http://google.com')
+      .setValue('input[name="thumbnail"]', 'thumbnail.png')
+      .setValue('input[name="photoUrl"]', 'photo.png')
+      .click('#wmd-editor-summary')
+      .keys('This is a new project summary')
+      .click('#wmd-editor-description')
+      .keys('This is a new project description')
+      .click('button.submit-button.save')
+      .pause(2000)
+      .url()
+      .then(function(res) {
+        expect(url.parse(res.value).path).to.equal('/projects');
+        return browser.getText('.wmd-preview');
+      })
+      .then(function(text) {
+        expect(text).to.include.something.that.matches(/This is a new project summary/);        
+        done();
+      });
+    });
+
+    it('should flash error messages on improper updates', function(done) {
+      var browser = this.browser;
+      var db = this.db;
+      browser
+      .click('.header-link[href="/projects"]')
+      .click('.footer .right a') // edit link, for second project
+      .setValue('input[name="title"]', '')
+      .click('button.submit-button.save')
+      .pause(2000)
+      .getText('#flash')
+      .then(function(text) {
+        expect(text).to.match(/title cannot be null/);
+        done();
+      });
+    });
+
+    it('should unpublish projects', function(done) {
+      var browser = this.browser;
+      var db = this.db;
+      browser
+      .click('.header-link[href="/projects"]')
+      .click('.footer .right a') // edit link, for second project
+      .setValue('input[name="title"]', 'New Project Title')
+      .click('button.submit-button.unpublish')
+      .pause(2000)
+      .url()
+      .then(function(res) {
+        expect(url.parse(res.value).path).to.equal('/projects/edit/' + encodeURIComponent('New Project Title'));        
+        return browser.getText('a');
+      })
+      .then(function(text) {        
+        // make sure one of the unpublished project links is a link to this project
+        expect(text).to.include.something.that.matches(/New Project Title/);
+        done();
+      });
+    });
+
+    it('should publish projects', function(done) {
+      var browser = this.browser;
+      var db = this.db;
+      browser
+      .click('.topbar-link[href="/projects/create"]')
+      .click('a[href="/projects/edit/Unpublished%20Second%20Project"]')
+      .setValue('input[name="title"]', 'Updated Project')
+      .click('button.submit-button.publish')
+      .pause(2000)
+      .url()
+      .then(function(res) {
+        expect(url.parse(res.value).path).to.equal('/projects');        
+        return browser.getText('.project-title');
+      })
+      .then(function(text) {        
+        // make sure one of the unpublished project links is a link to this project
+        expect(text).to.include.something.that.matches(/Updated Project/);
         done();
       });
     });

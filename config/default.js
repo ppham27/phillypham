@@ -56,7 +56,9 @@ var config = {
                          "contact:email": '',
                          "contact:facebook": '',
                          "contact:twitter": '',
-                         "contact:instagram": ''
+                         "contact:instagram": '',
+                         "menu:dataViz": '',
+                         "menu:resume": ''
                        },
   fixtures: [
     {model: 'Role', data: {name: 'poster', description: 'can post'}},

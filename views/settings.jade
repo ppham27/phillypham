@@ -23,9 +23,13 @@ block content
       +settingsFieldSet('Facebook', 'contact:facebook', settings.ApplicationSettings['contact:facebook'], 'Facebook username')
       +settingsFieldSet('Instagram', 'contact:instagram', settings.ApplicationSettings['contact:instagram'], 'Instagram username')
       +settingsFieldSet('Twitter', 'contact:twitter', settings.ApplicationSettings['contact:twitter'], 'Twitter username')
+      hr
+      h2 Menu
+      +settingsFieldSet('Data Viz', 'menu:dataViz', settings.ApplicationSettings['menu:dataViz'], 'URL to data visualizations')
+      +settingsFieldSet('Résumé', 'menu:resume', settings.ApplicationSettings['menu:resume'], 'URL to résumé')
     .wmd-panel.buttons
       button.submit-button(disabled=true, type="submit") Update
-        .overlay
+        .overlay      
 append body
   script
     include ../public/javascripts/flash.js
@@ -54,7 +58,8 @@ append body
       updateRequest.setRequestHeader('Content-Type', 'application/json');
       var data = {};
       ['sidebar:info', 'sidebar:photoUrl', 'sidebar:title',
-       'contact:email', 'contact:facebook', 'contact:instagram', 'contact:twitter'].forEach(function(key) {
+       'contact:email', 'contact:facebook', 'contact:instagram', 'contact:twitter',
+       'menu:dataViz', 'menu:resume'].forEach(function(key) {
         data[key] = getValue(key);
       });
       updateRequest.send(JSON.stringify(data));
