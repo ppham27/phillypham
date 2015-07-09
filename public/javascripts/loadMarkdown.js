@@ -14,7 +14,7 @@ if (makeEditor) {
   editors = editorDivs.map(function(div) {
               var postfix = div.id.substr(10); // get rid of wmd-editor
               var editor = new MarkdownAceEditor(markdown.Converter, postfix,
-                                                 {helpButton: editorHelp});
+                                                 {helpButton: editorHelp });
               pagedownExtra.hookEditor(editor);
               return editor;
             });
@@ -61,12 +61,18 @@ mathJaxConfigRequest.onerror = function(event) {
 hljs.initHighlightingOnLoad();
 mathJaxConfigRequest.send();  
 
-function editorHelp() {
+
+function editorHelp(options) {
+  var editor = options.editor;  // MarkdownAceEditor is passed as an option
+  if (!editor) {
+    console.error('Editor was not provided in options');
+    return false;
+  }
   if (document.querySelector('.' + this.id + '.help-tip') !== null) {
     // remove if already there
     return false;
   } else {    
-    var self = this;
+    var self = this;            //this context is the button
     var helpTip = document.createElement('div');
     var buttonBoundingClientRect = self.getBoundingClientRect();
     helpTip.className = this.id + ' help-tip wmd-preview wmd-panel';
@@ -103,3 +109,5 @@ function editorHelp() {
     return false;
   }
 }
+
+

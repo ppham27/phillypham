@@ -282,7 +282,8 @@ function MarkdownAceEditor(converter, idPostfix, options) {
     // extra attributes
     buttons.buttonElements.help.classList.add('wmd-help-button');
     buttons.buttonElements.help.style.right = '0px';
-    bindButtonToCommand(buttons.buttonElements.help, options.helpButton);    
+    bindButtonToCommand(buttons.buttonElements.help, options.helpButton,
+                        {editor: this});
     // undo to button collection
     buttons.buttonElements.help.style.left = null;
     buttons.xPosition -= 25;
