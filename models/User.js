@@ -32,6 +32,10 @@ module.exports = function(sequelize, DataTypes) {
                                                                  constraints: true, onDelete: 'RESTRICT'});
                                 db.User.hasMany(db.Project, {foreignKey: {fieldName: 'userId', field: 'user_id', allowNull: false}, 
                                                              constraints: true, onDelete: 'RESTRICT'});
+                                db.User.hasMany(db.Post, {foreignKey: {fieldName: 'userId', field: 'user_id', allowNull: false}, 
+                                                          constraints: true, onDelete: 'RESTRICT'});
+                                db.User.hasMany(db.Comment, {foreignKey: {fieldName: 'userId', field: 'user_id', allowNull: false}, 
+                                                             constraints: true, onDelete: 'CASCADE'});
                                 db.User.belongsToMany(db.Role, {through: db.UserRole});
                               },
                               authenticate: function(email, password) {
