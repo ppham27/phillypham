@@ -1,0 +1,38 @@
+include ./shareButtons.jade
+include ./postAdmin.jade
+
+  
+mixin postView(post, edit)
+  - post = post || {}
+  - post.User = locals.user || {}
+  - post.Tags = post.Tags || []
+  - post.Comments = post.Comments || []
+  .post.wmd-panel
+    h1.post-title
+      a(class=edit ? 'wmd-preview-title' : null, href='/blog/' + encodeURIComponent(post.title))= post.title
+    a(href=post.photoUrl || null, target='_blank')
+      img.centered.post-img(src=post.photoUrl, alt='Photo URL is broken', style=post.photoUrl ? null : 'display: none')
+    .wmd-preview(id=edit ? 'wmd-preview' : null)!= post.bodyHtml  
+    p
+      span.post-meta Tags: 
+      span.post-meta.tags #{post.Tags.map(function(d) { return d.name; }).join(', ')}
+    .footer.meta
+      .left
+        span.post-meta By #{post.User.displayName}
+      .right
+        span.post-meta Published on #{post.publishedAt || new Date()}
+    .footer
+      .left
+        +shareButtons(settings.config.siteUrl + '/blog/' + encodeURIComponent(post.title), post.title)
+    .footer
+      .left
+        a(href=settings.config.siteUrl + '/blog/' + encodeURIComponent(post.title) + '#comments') #{post.Comments.filter(function(d) { return d.published; }).length} Comments
+      .right
+        if (locals.user && (locals.user.id === post.User.id || roles['post_editor']))
+          +postAdmin(post)
+
+  
+
+
+    
+  

@@ -30,7 +30,7 @@ if (!locals.update)
 .wmd-panel
 h2 Describe Yourself
 #wmd-button-bar.wmd-button-bar
-#wmd-editor.wmd-editor.wmd-panel.tex2jax_ignore= temporaryUser.biography
+#wmd-editor.wmd-editor.wmd-panel.tex2jax_ignore= temporaryUser.biography || ''
 textarea(name="biography")#wmd-input.wmd-input= temporaryUser.biography || ''
 .wmd-panel 
   img.profile-preview(src=temporaryUser.photoUrl || "/images/default-profile.jpg", alt="Your picture URL is broken")

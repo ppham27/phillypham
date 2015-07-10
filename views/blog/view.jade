@@ -1,0 +1,17 @@
+include ../mixins/postView.jade
+  
+extends ../layout
+
+block content
+  +postView(temporaryPost)
+
+append head
+  meta(property="fb:app_id", content=settings.config.appKeys.facebook.clientID)
+  meta(property="og:title", content=temporaryPost.title)
+  meta(property="og:site_name", content=settings.ApplicationSettings.title)
+  meta(property="og:url", content=settings.config.siteUrl + '/' + encodeURIComponent(temporaryPost.title))
+  meta(property="og:description", content=temporaryPost.body.substr(0, 600))
+  meta(property="og:type", content="article")
+  meta(property="article:author", content=temporaryPost.User.displayName) 
+  if (temporaryPost.photoUrl)
+    meta(property="og:image", content=temporaryPost.photoUrl[0] === '/' ? settings.config.siteUrl + temporaryPost.photoUrl : temporaryPost.photoUrl)

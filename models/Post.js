@@ -18,7 +18,7 @@ module.exports = function(sequelize, DataTypes) {
                             tableName: 'posts',
                             classMethods: {
                               associate: function(db) {
-                                db.Post.belongsTo(db.User, {foreignKey: {fieldName: 'userId', field: 'user_id', allowNull: false}, 
+                                db.Post.belongsTo(db.User, {foreignKey: {fieldName: 'user_id', field: 'user_id', allowNull: false}, 
                                                             constraints: true, onDelete: 'RESTRICT'});
                                 db.Post.hasMany(db.Comment, {foreignKey: {fieldName: 'postId', field: 'post_id', allowNull: false}, 
                                                              constraints: true, onDelete: 'CASCADE'});

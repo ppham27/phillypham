@@ -397,13 +397,9 @@ span.field-sublabel.success {
 
 
 #post-form .text-input, #application-settings-form .text-input, #project-form .text-input {
-  width: 90%;
+  width: 85%;
   font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
   font-size: 100%;
-}
-
-#project-form .text-input {
-  width: 85%;
 }
 
 #application-settings-form .text-input {
@@ -649,12 +645,12 @@ hr {
   max-width: 160px;  
 }
 
-.project-title a {
+.project-title a, .post-title a {
   text-decoration: none;    
   color: #003b52;
 }
 
-.project-title a:hover {
+.project-title a:hover, .post-title a:hover {
   text-decoration: underline;
   color: #003b52;
 }
@@ -667,7 +663,7 @@ hr {
   height: 125px;
 }
 
-img.project-img {
+img.project-img, img.post-img {
   margin-top: 20px;
   margin-bottom: 20px;
   max-width: 650px;  
@@ -692,10 +688,20 @@ a.twitter-share-button {
   top: -4px;
 }
 
-.project-list .footer .left, .project .footer .left {
+.project-list .footer .left, .project .footer .left, .post .footer .left {
   display: inline-block;
 }
 
-.project-list .footer .right, .project .footer .right {
+.project-list .footer .right, .project .footer .right, .post .footer .right {
   float: right;
+}
+
+.post-meta {
+  font-size: 90%;
+  color: #888;
+  font-style: italic;
+}
+
+.post .footer.meta {
+  margin-bottom: 3px;
 }

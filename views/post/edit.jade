@@ -1,21 +1,27 @@
+include ../mixins/postView.jade
+
 extends ../layout
-  
+
 block content
+  - var temporaryPost = locals.temporaryPost || {}
+  - var tags = temporaryPost.Tags || []
+  - tags = tags.map(function(tag) { return tag.name; })
   form#post-form(method="POST", action="/post")
     .wmd-panel
       fieldset
         label(for="title") Title:
-        input#wmd-input-title.text-input.wmd-input-title(type="text", name="title", placeholder="Enter a title here")
+        input#wmd-input-title.text-input.wmd-input-title(type="text", name="title", placeholder="Enter a title here", value=temporaryPost.title || '')
+      fieldset
+        label(for="photoUrl") Photo URL:
+        input.text-input(type="text", name="photoUrl", placeholder="Enter photo URL here", value=temporaryPost.photoUrl || '')
       #wmd-button-bar.wmd-button-bar
-      #wmd-editor.wmd-editor.tex2jax_ignore
-      textarea(name="body")#wmd-input.wmd-input
-    .post
-      h2.wmd-preview-title
-      #wmd-preview.wmd-panel.wmd-preview
+      #wmd-editor.wmd-editor.tex2jax_ignore= temporaryPost.body || ''
+      textarea(name="body")#wmd-input.wmd-input= temporaryPost.body || ''
+    +postView(temporaryPost, true)
     .wmd-panel
       fieldset
         label(for="tags") Tags:
-        input.text-input(type="text", name="tags", placeholder="Enter tags here separated by commas")
+        input.text-input(type="text", name="tags", placeholder="Enter tags here separated by commas", value=tags.join(', '))
       button.submit-button(type="submit") Post
         .overlay
 append body  
@@ -23,3 +29,18 @@ append body
     document.querySelector('#post-form input[name="title"]').addEventListener('keydown', disableEnterSubmit, false);
     document.querySelector('#post-form input[name="tags"]').addEventListener('keydown', disableEnterSubmit, false);
     function disableEnterSubmit(event) { if (event.keyCode === 13) event.preventDefault(); }
+    document.querySelector('#post-form input[name="photoUrl"]')
+    .addEventListener('input', function() {
+      var img = document.querySelector('.post-img');
+      if (this.value) {
+        img.src = this.value;
+        img.style.display = 'block';
+      } else {
+        img.style.display = 'none';
+      }
+    });
+    document.querySelector('#post-form input[name="tags"]')
+    .addEventListener('input', function() {
+      console.log(this.value);
+      document.querySelector('.post-meta.tags').textContent = this.value.split(',').map(function(tag) { return tag.trim(); }).join(', ');
+    });

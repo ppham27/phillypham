@@ -72,14 +72,15 @@ config.fixtures.push({model: 'Post',
                              photoUrl: 'https://dl.dropboxusercontent.com/u/29552058/2012-12-10%2020.42.39.jpg',
                              published: true,
                              User: {displayName: 'admin'},
-                             Tag: [{name: 'life'}, {name: 'jesus'}]}});
+                             Tags: [{name: 'life'}, {name: 'jesus'}]
+                            }});
 
 config.fixtures.push({model: 'Post',
                       data: {title: 'Second Post',
                              body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque imperdiet mauris vitae ipsum ornare, sed convallis justo mattis. Ut dapibus bibendum mauris egestas iaculis. Vivamus condimentum vel orci tincidunt volutpat. Integer dapibus nibh eros, id rutrum ante ornare et. Integer sapien velit, malesuada ac egestas in, aliquam nec urna. In eleifend viverra felis sed blandit. Donec consectetur iaculis tortor quis iaculis. Nulla lacinia laoreet faucibus. Donec scelerisque at eros vel sagittis. Vivamus felis ex, pellentesque non neque eget, dictum egestas ex. Vivamus efficitur sem a nibh lacinia pulvinar. Praesent at dictum orci. Etiam eget bibendum turpis. Donec sollicitudin eros in iaculis interdum.\n\nNam aliquet dolor ac enim venenatis rutrum. Proin ut lacus id tellus molestie tristique. Maecenas maximus, quam nec efficitur ultricies, nisi justo lacinia dui, in molestie sem risus eu nisi. Quisque pharetra commodo mi, ac faucibus dui condimentum et. Aenean a sapien vel ligula fringilla egestas ac laoreet lacus. Vestibulum erat neque, congue vel aliquam eu, sagittis id nibh. Maecenas fringilla egestas eros non consectetur. Integer auctor auctor orci nec interdum. Fusce sagittis pretium ultrices. Curabitur posuere nibh at diam mattis, ut aliquam dui dignissim. Morbi scelerisque accumsan odio, vel pretium dolor semper venenatis. Nam congue gravida pellentesque. Cras nec neque vitae eros ornare mattis sed sit amet dui. Nullam ullamcorper mi a est fermentum, in gravida nulla imperdiet. Curabitur pulvinar ex vitae lectus pellentesque, nec porta erat posuere. Nunc imperdiet augue et viverra varius.',
                              published: true,
                              User: {displayName: 'admin'},
-                             Tag: [{name: 'tennis'}, {name: 'computer science'}]}});
+                             Tags: [{name: 'tennis'}, {name: 'computer science'}]}});
 
 config.fixtures.push({model: 'Post',
                       data: {title: 'Third Post',
@@ -87,7 +88,7 @@ config.fixtures.push({model: 'Post',
                              photoUrl: 'https://dl.dropboxusercontent.com/u/29552058/20131219_152823.jpg',
                              published: true,
                              User: {displayName: 'admin'},
-                             Tag: [{name: 'math'}]}});
+                             Tags: [{name: 'math'}]}});
                              
 config.fixtures.push({model: 'Comment',
                       data: {body: 'comment',
@@ -141,14 +142,14 @@ config.fixtures.push({model: 'Post',
                              body: 'unpublished post',
                              published: false,
                              User: {displayName: 'admin'},
-                             Tag: [{name: 'math'}]}});
+                             Tags: [{name: 'math'}]}});
 
 config.fixtures.push({model: 'Post',
                       data: {title: 'Power Unpublished Title',
                              body: 'Power unpublished post',
                              published: false,
                              User: {displayName: 'power'},
-                             Tag: [{name: 'math'}]}});
+                             Tags: [{name: 'math'}]}});
 
 
 module.exports = config;
