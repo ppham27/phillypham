@@ -9,42 +9,7 @@ append body
     include ../../public/javascripts/encryptPasswordBundle-min.js
   script
     include ../../public/javascripts/flash.js
-  script.
-    // user existence
-    var currentDisplayName = '#{temporaryUser.displayName}';
-    var displayNameInput = document.querySelector('input[name="displayName"]');
-    var displayNameField = displayNameInput.parentNode;
-    var displayNameLabel = displayNameField.querySelector('span.field-sublabel');
-    var userExistsRequest = new XMLHttpRequest();
-    userExistsRequest.responseType = 'json';
-    userExistsRequest.addEventListener('load', function(event) {
-      if (userExistsRequest.response.error) {
-        displayNameLabel.textContent = 'this username is available';
-        displayNameLabel.classList.remove('error');
-        displayNameLabel.classList.add('success');
-      } else if (userExistsRequest.response.displayName === currentDisplayName) {
-        displayNameLabel.textContent = 'required, must be from 1 to 64 characters';
-        displayNameLabel.classList.remove('success');
-        displayNameLabel.classList.remove('error');
-      } else {
-        displayNameLabel.textContent = 'this username is already taken';
-        displayNameLabel.classList.remove('success');
-        displayNameLabel.classList.add('error');
-      }
-    }, false);
-    displayNameInput.addEventListener('input', function(event) {
-      if (this.value) {
-        userExistsRequest.abort();
-        userExistsRequest.open('GET', '/user/' + this.value);
-        userExistsRequest.setRequestHeader('Accept', 'application/json');
-        userExistsRequest.send();        
-      } else {
-        displayNameLabel.textContent = 'required, must be from 1 to 64 characters';
-        displayNameLabel.classList.remove('success');
-        displayNameLabel.classList.remove('error');
-      }
-    });
-    
+  script.        
     // updating
     var submitButton = document.querySelector('.submit-button');
     var updateRequest = new XMLHttpRequest();

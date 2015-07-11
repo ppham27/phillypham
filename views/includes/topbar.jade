@@ -8,6 +8,8 @@ include ../mixins/topbarLink.jade
       if locals.user
         if roles['poster']
           +topbarLink('Post', '/post')
+        if roles['poster'] || roles['post_editor']
+          +topbarLink('Post List', '/post/list')
         if roles['project_manager']
           +topbarLink('New Project', '/projects/create')
         if roles['user_manager']

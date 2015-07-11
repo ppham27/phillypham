@@ -1,0 +1,20 @@
+extends ../layout
+
+block content
+  .wmd-preview
+    table
+      tr
+        th Title
+        th User
+        th Published
+        th Created At
+        th Edit Link
+      each post in posts
+        tr
+          td
+            a(href='/blog/' + encodeURIComponent(post.title))= post.title
+          td= post.User.displayName
+          td(align='middle')= post.published
+          td= post.created_at.toUTCString()
+          td(align='middle')
+            a(href='/post/' + post.id) Edit

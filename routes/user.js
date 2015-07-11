@@ -12,27 +12,6 @@ var emailVerifier = require('../lib/emailVerifier');
 
 var config = require('config');
 
-router.get('/:displayName', authorize({userId: true, loggedIn: true}), function(req, res, next) {
-  var displayName = req.params.displayName;
-  db.User.findOne({where: { displayName: displayName}})
-  .then(function(user) {
-    if (user === null) {
-      next(new Error('User does not exist'));
-    } else {
-      res.format({
-        html: function() {
-          res.render('user/profile', {title: user.displayName, displayedUser: user});
-        },
-        json: function() {
-          res.json({displayName: user.displayName, email: user.email,
-                    givenName: user.givenName, familyName: user.familyName,
-                    middleName: user.middleName});
-        }
-      });
-    }
-  });
-});
-
 router.get('/edit/:displayName', authorize({userId: true, role: 'user_manager'}), function(req, res, next) {
   var displayName = req.params.displayName;
   db.User.findOne({where: { displayName: displayName}})
@@ -191,6 +170,27 @@ router.post('/verify/:displayName', authorize({userId: true, role: 'user_manager
                       res.json({success: true, message: 'Email address has been updated and verification email has been sent.'});
                     });
            });    
+  });
+});
+
+router.get('/:displayName', function(req, res, next) {
+  var displayName = req.params.displayName;
+  db.User.findOne({where: { displayName: displayName}})
+  .then(function(user) {
+    if (user === null) {
+      next(new Error('User does not exist'));
+    } else {
+      res.format({
+        html: function() {
+          res.render('user/profile', {title: user.displayName, displayedUser: user});
+        },
+        json: function() {
+          res.json({displayName: user.displayName, email: user.email,
+                    givenName: user.givenName, familyName: user.familyName,
+                    middleName: user.middleName});
+        }
+      });
+    }
   });
 });
 

@@ -47,7 +47,42 @@ append body
     photoUrl.addEventListener('input', function(event) {
       document.querySelector('img.profile-preview').src = this.value || '/images/default-profile.jpg';  
     });
+    // user existence
+    var currentDisplayName = '#{temporaryUser.displayName || ''}';
+    var displayNameInput = document.querySelector('input[name="displayName"]');
+    var displayNameField = displayNameInput.parentNode;
+    var displayNameLabel = displayNameField.querySelector('span.field-sublabel');
+    var userExistsRequest = new XMLHttpRequest();
+    userExistsRequest.responseType = 'json';
+    userExistsRequest.addEventListener('load', function(event) {
+      if (userExistsRequest.response.error) {
+        displayNameLabel.textContent = 'this username is available';
+        displayNameLabel.classList.remove('error');
+        displayNameLabel.classList.add('success');
+      } else if (userExistsRequest.response.displayName === currentDisplayName) {
+        displayNameLabel.textContent = 'required, must be from 1 to 64 characters';
+        displayNameLabel.classList.remove('success');
+        displayNameLabel.classList.remove('error');
+      } else {
+        displayNameLabel.textContent = 'this username is already taken';
+        displayNameLabel.classList.remove('success');
+        displayNameLabel.classList.add('error');
+      }
+    }, false);
+    displayNameInput.addEventListener('input', function(event) {
+      if (this.value) {
+        userExistsRequest.abort();
+        userExistsRequest.open('GET', '/user/' + this.value);
+        userExistsRequest.setRequestHeader('Accept', 'application/json');
+        userExistsRequest.send();        
+      } else {
+        displayNameLabel.textContent = 'required, must be from 1 to 64 characters';
+        displayNameLabel.classList.remove('success');
+        displayNameLabel.classList.remove('error');
+      }
+    });
     function notImplemented() {
       alert('This feature is not yet implemented. Contact me if you need this feature.');
       return false;
     }
+    
