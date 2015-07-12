@@ -29,5 +29,4 @@ router.get('/:title', function(req, res, next) {
   });  
 });
 
-
 module.exports = router;
