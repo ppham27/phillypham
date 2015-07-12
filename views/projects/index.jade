@@ -11,7 +11,7 @@ block content
         h2.project-title  
           a(href='/projects/' + encodeURIComponent(project.title))= project.title        
         .left-sidebar
-          a.project-link(href=project.url)
+          a.project-link(href=project.url, target="_blank")
             img(src=project.thumbnail)
         .wmd-preview!=project.summaryHtml
       .footer

@@ -8,7 +8,7 @@ include ../mixins/headerLink.jade
   #header-menu
     +headerLink('Blog', '/')
     if settings.ApplicationSettings['menu:dataViz']
-      +headerLink('DataViz', settings.ApplicationSettings['menu:dataViz'])
+      +headerLink('Data Viz', settings.ApplicationSettings['menu:dataViz'])
     +headerLink('Projects', '/projects')
     if settings.ApplicationSettings['menu:resume']
       +headerLink('Résumé', settings.ApplicationSettings['menu:resume'])

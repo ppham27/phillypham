@@ -1,7 +1,7 @@
 h1.wmd-preview-title-sidebar= settings.ApplicationSettings['sidebar:title']
 
 #sidebar-photo-div
-  a(href="#{settings.ApplicationSettings['sidebar:photoUrl']}")
+  a(href="#{settings.ApplicationSettings['sidebar:photoUrl']}", target="_blank")
     img#sidebar-photo(src="#{settings.ApplicationSettings['sidebar:photoUrl']}", alt="Photo URL is broken")
 
 #wmd-preview-sidebar.wmd-preview!= settings.ApplicationSettings['sidebar:infoHtml']

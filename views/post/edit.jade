@@ -22,8 +22,20 @@ block content
       fieldset
         label(for="tags") Tags:
         input.text-input(type="text", name="tags", placeholder="Enter tags here separated by commas", value=tags.join(', '))
-      button.submit-button(type="submit") Post
+      button.submit-button.save(type="submit", disabled=true) Save
         .overlay
+      if locals.edit
+        if temporaryPost.published
+          button.submit-button.unpublish(type="submit", disabled=true) Unpublish
+            .overlay
+        else
+          button.submit-button.publish(type="submit", disabled=true) Post
+            .overlay
+        button.submit-button.destroy(type="submit", disabled=true) Destroy
+          .overlay
+      else
+        button.submit-button.publish(type="submit", disabled=true) Post
+          .overlay
 append body  
   script.
     document.querySelector('#post-form input[name="title"]').addEventListener('keydown', disableEnterSubmit, false);
@@ -42,5 +54,107 @@ append body
     document.querySelector('#post-form input[name="tags"]')
     .addEventListener('input', function() {
       console.log(this.value);
-      document.querySelector('.post-meta.tags').textContent = this.value.split(',').map(function(tag) { return tag.trim(); }).join(', ');
+      document.querySelector('.post-meta.tags').textContent = this.value.split(',').map(function(tag) { return tag.toLowerCase().trim(); }).join(', ');
     });
+    function formToJSON(form) {
+      var json = {};
+      // inputs
+      ['title', 'photoUrl', 'tags'].forEach(function(key) {
+        if (key === 'tags') {
+          var tags = form.querySelector('input[name="' + key + '"]').value;
+          json[key] = tags.split(',').map(function(tag) { return tag.toLowerCase().trim(); });
+        } else {
+          json[key] = form.querySelector('input[name="' + key + '"]').value;
+        }
+      });
+      // text areas
+      ['body'].forEach(function(key) {
+        json[key] = form.querySelector('textarea[name="' + key + '"]').value;
+      });
+      return json;
+    }
+    function onRequestLoad(response) {
+      if (response.success) {
+        if (response.redirect) {
+          window.location.href = response.redirectLink;
+        } else {
+          flash(response.message, {reset: true, className: 'info'});
+        }        
+      } else {
+        flash(response.error, {reset: true, className: 'error'});
+      }
+    }
+  script
+    include ../../public/javascripts/flash.js
+  if locals.edit
+    script.
+      var saveButton = document.querySelector('.submit-button.save');
+      var publishButton = document.querySelector('.submit-button.publish') || document.querySelector('.submit-button.unpublish');
+      var destroyButton = document.querySelector('.submit-button.destroy');
+      var putRequest = new XMLHttpRequest();
+      var deleteRequest = new XMLHttpRequest();
+      putRequest.responseType = 'json';
+      deleteRequest.responseType = 'json';
+      putRequest.addEventListener('load', function() {
+        onRequestLoad(this.response);
+        saveButton.disabled = false;
+        destroyButton.disabled = false;
+        publishButton.disabled = false;
+      });
+      deleteRequest.addEventListener('load', function() {
+        onRequestLoad(this.response);
+        saveButton.disabled = false;
+        destroyButton.disabled = false;
+        publishButton.disabled = false;
+      });
+      saveButton.addEventListener('click', function() {
+        saveButton.disabled = true;
+        destroyButton.disabled = true;
+        publishButton.disabled = true;
+        putRequest.abort();
+        putRequest.open('PUT', window.location.pathname);
+        putRequest.setRequestHeader('Accept', 'application/json');
+        putRequest.setRequestHeader('Content-Type', 'application/json');        
+        putRequest.send(JSON.stringify(formToJSON(document.getElementById('post-form'))));
+        return false;
+      });
+      publishButton.addEventListener('click', function() {
+        saveButton.disabled = true;
+        destroyButton.disabled = true;
+        publishButton.disabled = true;
+        putRequest.abort();
+        putRequest.open('PUT', window.location.pathname);
+        putRequest.setRequestHeader('Accept', 'application/json');
+        putRequest.setRequestHeader('Content-Type', 'application/json');
+        var json = formToJSON(document.getElementById('post-form'));
+        json.published = document.querySelector('button.submit-button.publish') !== null;
+        putRequest.send(JSON.stringify(json));
+        return false;
+      });
+      destroyButton.addEventListener('click', function() {
+        saveButton.disabled = true;
+        destroyButton.disabled = true;
+        publishButton.disabled = true;
+        deleteRequest.abort();
+        deleteRequest.open('DELETE', window.location.pathname);
+        deleteRequest.setRequestHeader('Accept', 'application/json');
+        deleteRequest.setRequestHeader('Content-Type', 'application/json');
+        deleteRequest.send();
+        return false;
+      });
+      saveButton.disabled = false;
+      destroyButton.disabled = false;
+      publishButton.disabled = false;
+  else
+    script.
+      var saveButton = document.querySelector('.submit-button.save');
+      var publishButton = document.querySelector('.submit-button.publish');
+      var postRequest = new XMLHttpRequest();
+      postRequest.responseType = 'json';
+      postRequest.addEventListener('load', function() {
+        onRequestLoad(this.response);
+        saveButton.disabled = false;
+        publishButton.disabled = false;
+      });
+      saveButton.disabled = true;
+      publishButton.disabled = true;

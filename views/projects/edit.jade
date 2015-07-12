@@ -55,15 +55,15 @@ block content
       if (!locals.update)
         button.submit-button.publish(disabled=true, type="submit") Publish
           .overlay
-      else 
-        button.submit-button.destroy(disabled=true, type="submit") Destroy
-          .overlay
+      else         
         if (temporaryProject.published)
           button.submit-button.unpublish(disabled=true, type="submit") Unpublish
             .overlay
         else
           button.submit-button.publish(disabled=true, type="submit") Publish
             .overlay
+        button.submit-button.destroy(disabled=true, type="submit") Destroy
+          .overlay
 append body
   script
     include ../../public/javascripts/flash.js

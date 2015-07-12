@@ -12,10 +12,11 @@ mixin postView(post, edit)
       a(class=edit ? 'wmd-preview-title' : null, href='/blog/' + encodeURIComponent(post.title))= post.title
     a(href=post.photoUrl || null, target='_blank')
       img.centered.post-img(src=post.photoUrl, alt='Photo URL is broken', style=post.photoUrl ? null : 'display: none')
-    .wmd-preview(id=edit ? 'wmd-preview' : null)!= post.bodyHtml  
-    p
-      span.post-meta Tags: 
-      span.post-meta.tags #{post.Tags.map(function(d) { return d.name; }).join(', ')}
+    .wmd-preview(id=edit ? 'wmd-preview' : null)!= post.bodyHtml
+    if (post.Tags.length) 
+      p
+        span.post-meta Tags: 
+        span.post-meta.tags #{post.Tags.map(function(d) { return d.name; }).join(', ')}
     .footer.meta
       .left
         span.post-meta By #{post.User.displayName}
