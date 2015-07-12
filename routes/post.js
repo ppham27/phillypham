@@ -24,7 +24,49 @@ router.get('/', function(req, res, next) {
 });
 
 // create a new post
-router.post('/', function(req, res, next) {
+router.post('/', authorize({role: 'poster'}), function(req, res, next) {
+  if (!req.is('json')) return res.json({error: 'only json requests are accepted'});
+  var post = req.body;
+  trimPost(post);
+  post.user_id = req.user.id;
+  var tags = post.tags || [];
+  delete post.tags;
+  db.Post.create(post)
+  .then(function(post) {
+    var tagPromises = tags.filter(function(tag) {
+                        return tag.trim() !== '';
+                      }).map(function(tagName) {
+                        return db.Tag.findOrCreateByName(tagName)
+                               .spread(function(post, created) {
+                                 return post;
+                               });
+                      });
+    return Promise.join(post, Promise.all(tagPromises));
+  })
+  .spread(function(post, tags) {
+    return Promise.join(post, post.setTags(tags));
+  })
+  .spread(function(post, tags) {    
+    req.flash('info', 'Post was successfully created!');
+    if (post.published) {
+      res.json({success: true, redirect: true, redirectLink: '/blog/' + encodeURIComponent(post.title)});
+    } else {
+      res.json({success: true, redirect: true, redirectLink: '/post/' + post.id});
+    }
+  })
+  .catch(function(err) {
+           var error = [];
+           if (err.errors) {
+             err.errors.forEach(function(err) {
+               error.push(err.message);
+             });
+           } else {
+             error.push(err.message);
+           }
+           res.json({error: error});
+         });
+
+  
 });
 
 
@@ -74,8 +116,15 @@ router.put('/:id', authorize({failureSilent: true, role: 'post_editor'}), functi
   .spread(function(post, newTags) {
     return Promise.join(post.update(updates), post.setTags(newTags));
   })
-  .then(function() {
-    res.json({success: true, message: 'Post has been updated!'});
+  .spread(function(post, tags) {
+    if (post.published) {
+      req.flash('info', 'Post has been updated!');
+      res.json({success: true, redirect: true, redirectLink: '/blog/' + encodeURIComponent(post.title)});
+    } else {
+      var message = ['Post has been updated!']
+      if (!post.published && updates.published === false) message.push('Post was unpublished.');
+      res.json({success: true, message: message});
+    }
   })
   .catch(function(err) {
            var error = [];
@@ -120,7 +169,7 @@ module.exports = router;
 function trimPost(post) {  
   post.title = post.title.trim();
   post.body.trim();
-  if (post.photoUrl) post.photoUrl = post.photoUrl.trim() || null;
+  if (typeof post.photoUrl === 'string') post.photoUrl = post.photoUrl.trim() || null;
   if (typeof post.tags === 'string') {
     post.tags = post.tags.split(',');
   }

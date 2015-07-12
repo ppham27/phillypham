@@ -53,8 +53,13 @@ append body
     });
     document.querySelector('#post-form input[name="tags"]')
     .addEventListener('input', function() {
-      console.log(this.value);
-      document.querySelector('.post-meta.tags').textContent = this.value.split(',').map(function(tag) { return tag.toLowerCase().trim(); }).join(', ');
+      var tagMeta = document.querySelector('.post-meta.tags');
+      if (!this.value) {
+        tagMeta.parentNode.style.display = 'none';
+      } else {
+        tagMeta.parentNode.style.display = 'block';
+        tagMeta.textContent = this.value.split(',').map(function(tag) { return tag.toLowerCase().trim(); }).join(', ');
+      }
     });
     function formToJSON(form) {
       var json = {};
@@ -67,7 +72,7 @@ append body
           json[key] = form.querySelector('input[name="' + key + '"]').value;
         }
       });
-      // text areas
+      // textareas
       ['body'].forEach(function(key) {
         json[key] = form.querySelector('textarea[name="' + key + '"]').value;
       });
@@ -156,5 +161,27 @@ append body
         saveButton.disabled = false;
         publishButton.disabled = false;
       });
-      saveButton.disabled = true;
-      publishButton.disabled = true;
+      saveButton.addEventListener('click', function() {
+        saveButton.disabled = true;
+        publishButton.disabled = true;
+        postRequest.abort();
+        postRequest.open('POST', window.location.pathname);
+        postRequest.setRequestHeader('Accept', 'application/json');
+        postRequest.setRequestHeader('Content-Type', 'application/json');        
+        postRequest.send(JSON.stringify(formToJSON(document.getElementById('post-form'))));
+        return false;
+      });
+      publishButton.addEventListener('click', function() {
+        saveButton.disabled = true;
+        publishButton.disabled = true;
+        postRequest.abort();
+        postRequest.open('POST', window.location.pathname);
+        postRequest.setRequestHeader('Accept', 'application/json');
+        postRequest.setRequestHeader('Content-Type', 'application/json');
+        var json = formToJSON(document.getElementById('post-form'));
+        json.published = true;
+        postRequest.send(JSON.stringify(json));
+        return false;
+      });
+      saveButton.disabled = false;
+      publishButton.disabled = false;

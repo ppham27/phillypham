@@ -13,8 +13,8 @@ mixin postView(post, edit)
     a(href=post.photoUrl || null, target='_blank')
       img.centered.post-img(src=post.photoUrl, alt='Photo URL is broken', style=post.photoUrl ? null : 'display: none')
     .wmd-preview(id=edit ? 'wmd-preview' : null)!= post.bodyHtml
-    if (post.Tags.length) 
-      p
+    if (edit || post.Tags.length) 
+      p(style = post.Tags.length ? null : 'display: none')
         span.post-meta Tags: 
         span.post-meta.tags #{post.Tags.map(function(d) { return d.name; }).join(', ')}
     .footer.meta
