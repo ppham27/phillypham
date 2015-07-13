@@ -5,13 +5,13 @@ with some minor modifcations by me, Philip Pham
 */
 
 .hljs {
-  font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono", "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New", monospace;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 14px;
   display: block;
   overflow-x: auto;
   padding: 5px;
   padding-left: 28px;
   color: #222;
-  font-size: 100%;
   -webkit-text-size-adjust: none;
 }
 
