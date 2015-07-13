@@ -213,5 +213,200 @@ describe('post routes', function() {
         });
       });
     });
+    
+    describe('put', function() {
+      before(function() {
+        this.handle = postRoutes.stack.filter(function(handle) {
+                        return handle.route.path === '/:id' && handle.route.methods.put;
+                      });
+        this.handle = this.handle[0].route.stack[1].handle;
+      });
+      
+      it('should update published post', function(done) {
+        var req = new FakeRequest({title: 'New Post',
+                                   body: 'New Post Body',
+                                   photoUrl: 'http://example.com/picture.png', 
+                                   tags: ['jesus', 'new tags', 'something']},
+                                  true, {accepts: ['json'], is: ['json']});
+        var db = this.db;
+        req.params.id = 1;
+        var res = {json: function(json) {
+                     expect(json.success).to.be.true;
+                     expect(json.redirect).to.be.true;
+                     expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('New Post'));
+                     db.Post.findById(1,
+                                      {include: [db.Tag]})
+                     .then(function(post) {
+                       expect(post.title).to.equal('New Post');
+                       expect(post.body).to.equal('New Post Body');
+                       expect(post.photoUrl).to.equal('http://example.com/picture.png');
+                       expect(post.Tags.length).to.equal(3);
+                       expect(post.Tags).to.include.something.that.has.property('name', 'jesus');
+                       expect(post.Tags).to.include.something.that.has.property('name', 'new tag');
+                       expect(post.Tags).to.include.something.that.has.property('name', 'something');
+                       done();
+                     });
+                   }};
+        this.handle(req, res);
+      });
+
+      it('publish a post', function(done) {
+        var req = new FakeRequest({title: 'New Post',
+                                   body: 'New Post Body',
+                                   photoUrl: 'http://example.com/picture.png', 
+                                   tags: ['jesus', 'new tags', 'something'],
+                                   published: true},
+                                  true, {accepts: ['json'], is: ['json']});
+        var self = this;
+        var db = this.db;
+        db.Post.findOne({where: {title: 'Unpublished Title'}})
+        .then(function(post) {
+          expect(post.published).to.be.false;
+          req.params.id = post.id;
+          var res = {json: function(json) {
+                       expect(json.success).to.be.true;
+                       expect(json.redirect).to.be.true;
+                       expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('New Post'));
+                       db.Post.findById(post.id)
+                       .then(function(post) {
+                         expect(post.published).to.be.true;
+                         done();
+                       });
+                     }};
+          self.handle(req, res);
+        });
+      });
+
+      it('unpublish a post', function(done) {
+        var req = new FakeRequest({title: 'New Post',
+                                   body: 'New Post Body',
+                                   photoUrl: 'http://example.com/picture.png', 
+                                   tags: ['jesus', 'new tags', 'something'],
+                                   published: false},
+                                  true, {accepts: ['json'], is: ['json']});
+        var self = this;
+        var db = this.db;
+        db.Post.findOne({where: {title: 'First Post'}})
+        .then(function(post) {
+          expect(post.published).to.be.true
+          req.params.id = post.id;
+          var res = {json: function(json) {
+                       expect(json.success).to.be.true;
+                       expect(json.redirect).to.be.undefined;
+                       db.Post.findById(post.id)
+                       .then(function(post) {
+                         expect(post.published).to.be.false;
+                         done();
+                       });
+                     }};
+          self.handle(req, res);
+        });
+      });
+
+      it('make errors messages on bad updates', function(done) {
+        var req = new FakeRequest({title: '',
+                                   body: '',
+                                   photoUrl: 'not a url', 
+                                   tags: ['jesus', 'new tags', 'something'],
+                                   published: false},
+                                  true, {accepts: ['json'], is: ['json']});
+        var self = this;
+        var db = this.db;
+        db.Post.findOne({where: {title: 'First Post'}})
+        .then(function(post) {
+          req.params.id = post.id;
+          var res = {json: function(json) {
+                       expect(json.error).to.include.something.that.matches(/not properly formatted/);
+                       expect(json.error).to.include.something.that.matches(/title cannot be empty/);
+                       expect(json.error).to.include.something.that.matches(/body cannot be empty/);
+                       done();
+                     }};
+          self.handle(req, res);
+        });
+      });
+    });
+    
+    describe('create', function() {
+      before(function() {    
+        this.handle = postRoutes.stack.filter(function(handle) {
+                        return handle.route.path === '/' && handle.route.methods.post;
+                      });
+        this.handle = this.handle[0].route.stack[1].handle;
+      });     
+        
+      it('should create a post', function(done) {
+        var req = new FakeRequest({title: 'New Post',
+                                   body: 'New Post Body',
+                                   photoUrl: 'http://example.com/picture.png', 
+                                   tags: ['jesus', 'life','new tag', 'something'],
+                                   published: true},
+                                  true, {accepts: ['json'], is: ['json']});
+        
+        var res = {json: function(json) {
+                     expect(json.success).to.be.true;
+                     expect(json.redirect).to.be.true;
+                     expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('New Post'));
+                     done();
+                   }};
+        this.handle(req, res);
+      });
+
+      it('should create a post and redirect to edit', function(done) {
+        var req = new FakeRequest({title: 'New Post',
+                                   body: 'New Post Body',
+                                   photoUrl: 'http://example.com/picture.png', 
+                                   tags: ['jesus', 'life','new tags', 'something'],
+                                   published: false},
+                                  true, {accepts: ['json'], is: ['json']});
+        var db = this.db;
+        var res = {json: function(json) {
+                     db.Post.findOne({where: {title: 'New Post'},
+                                      include: [db.Tag]})
+                     .then(function(post) {
+                       expect(json.success).to.be.true;
+                       expect(json.redirect).to.be.true;
+                       expect(json.redirectLink).to.equal('/post/' + post.id);
+                       expect(post.Tags.length).to.equal(4);
+                       expect(post.Tags).to.include.something.that.has.property('name', 'jesus');
+                       expect(post.Tags).to.include.something.that.has.property('name', 'life');
+                       expect(post.Tags).to.include.something.that.has.property('name', 'new tag');
+                       expect(post.Tags).to.include.something.that.has.property('name', 'something');
+                       done();
+                     });
+                   }};
+        this.handle(req, res);
+      });
+
+      it('should error on bad photo url', function(done) {
+        var req = new FakeRequest({title: 'New Post',
+                                   body: 'New Post Body',
+                                   photoUrl: 'not a url', 
+                                   tags: ['jesus', 'life','new tag', 'something'],
+                                   published: true},
+                                  true, {accepts: ['json'], is: ['json']});
+        var db = this.db;
+        var res = {json: function(json) {
+                     expect(json.error).to.include.something.that.matches(/not properly formatted/);
+                     done();                     
+                   }};
+        this.handle(req, res);
+      });
+
+      it('should error on missing title and body', function(done) {
+        var req = new FakeRequest({title: '',
+                                   body: '',
+                                   photoUrl: 'not a url', 
+                                   tags: ['jesus', 'life','new tag', 'something'],
+                                   published: true},
+                                  true, {accepts: ['json'], is: ['json']});
+        var db = this.db;
+        var res = {json: function(json) {
+                     expect(json.error).to.include.something.that.matches(/title cannot be empty/);
+                     expect(json.error).to.include.something.that.matches(/body cannot be empty/);
+                     done();                     
+                   }};
+        this.handle(req, res);
+      });
+    });
   });
 });
