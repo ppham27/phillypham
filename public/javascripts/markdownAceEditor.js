@@ -6,28 +6,7 @@
 var Markdown = require('../../lib/markdown.js');
 var cookie = require('cookie');
 
-var ace = require('brace');
-
-var Range = ace.acequire('ace/range').Range;
-
-require('brace/mode/c_cpp');
-require('brace/mode/css');
-require('brace/mode/html');
-require('brace/mode/java');
-require('brace/mode/javascript');
-require('brace/mode/json');
-require('brace/mode/latex');
-require('brace/mode/markdown');
-require('brace/mode/plain_text');
-require('brace/mode/python');
-require('brace/mode/r');
-require('brace/mode/ruby');
-require('brace/mode/sql');
-require('brace/mode/svg');
-require('brace/theme/xcode');
-require('brace/keybinding/emacs');
-require('brace/keybinding/vim');
-
+var Range = ace.require('ace/range').Range; // include ace beforehand
 
 var keybindings = {'Ace': false,
                    'Emacs': 'ace/keyboard/emacs',
@@ -127,11 +106,11 @@ function setEditorOptions(editor, options) {
   // this width applies to 785px at font size 100%?
   var width;
   if (!options.gutter) {
-    width = 88;
+    width = 92;
   } else if (options.gutter && options.lineNumbers) {
-    width = 83;
+    width = 87;
   } else if (options.gutter && !options.lineNumbers) {
-    width = 85;
+    width = 89;
   }
   editor.getSession().setWrapLimitRange(width, width);
   editor.setPrintMarginColumn(width);
