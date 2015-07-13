@@ -26,7 +26,6 @@
     "bcrypt": "~0.8.3",
     "bluebird": "~2.9.30",
     "body-parser": "~1.13.1",
-    "brace": "git+https://github.com/ppham27/brace.git",
     "browserify": "~10.2.4",
     "cheerio": "^0.19.0",
     "closurecompiler": "~1.5.2",
