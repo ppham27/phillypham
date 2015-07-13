@@ -269,12 +269,14 @@ describe('middleware', function() {
                                                   function(err, res, body) {
                                                     var message = JSON.parse(body);
                                                     expect(message.success).to.be.true;
-                                                    cb(err, message);
+                                                    setTimeout(function() {
+                                                      cb(err, message);
+                                                    }, 500);
                                                   });
                                     }
                                     return deleteUserRequest;
                                   });
-        async.parallel(asyncDeleteRequests,
+        async.series(asyncDeleteRequests,
                        function(err, results) {                         
                          done(err);
                        });

@@ -77,6 +77,7 @@ router.post('/', authorize({role: 'poster'}), function(req, res, next) {
 
 // edit view
 router.get('/:id', authorize({failureSilent: true, role: 'post_editor'}), function(req, res, next) {
+  if (isNaN(req.params.id)) return res.json({error: req.params.id.toString() + ' is not an integer'});
   db.Post.findById(req.params.id,
                    {attributes: ['id', 'title', 'body', 'bodyHtml', 'photoUrl', 'published', 'publishedAt', 'user_id'],
                     include: [{model: db.User, attributes: ['id', 'displayName']},
@@ -95,6 +96,7 @@ router.get('/:id', authorize({failureSilent: true, role: 'post_editor'}), functi
 // editing an existing post
 router.put('/:id', authorize({failureSilent: true, role: 'post_editor'}), function(req, res, next) {
   if (!req.is('json')) return res.json({error: 'only json requests are accepted'});
+  if (isNaN(req.params.id)) return res.json({error: req.params.id.toString() + ' is not an integer'});
   var updates = req.body;
   db.Post.findById(req.params.id)
   .then(function(post) {
@@ -144,6 +146,7 @@ router.put('/:id', authorize({failureSilent: true, role: 'post_editor'}), functi
 
 // delete a post
 router.delete('/:id', authorize({failureSilent: true, role: 'post_editor'}), function(req, res, next) {
+  if (isNaN(req.params.id)) return res.json({error: req.params.id.toString() + ' is not an integer'});
   var postTitle;
   var isPublished;
   db.Post.findById(req.params.id)
