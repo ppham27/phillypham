@@ -730,8 +730,23 @@ a.twitter-share-button {
   margin-left: 190px
 }
 
-.comment .reply-expander {
+.comment .reply-expander .reply {
   cursor: pointer; 
   text-decoration: underline;
   color: #145d8a;
+}
+
+.comment .reply-expander.expanded .reply, .comment .reply-expander.expanded .bullet {
+  color: #d02027;
+}
+
+.comment .reply-expander .bullet {
+  display: inline-block;
+  font-size: 110%;
+  margin-right: 0.25em;
+  transition: all 0.25s ease;
+}
+
+.comment .reply-expander.expanded .bullet {
+  transform: rotate(90deg);
 }

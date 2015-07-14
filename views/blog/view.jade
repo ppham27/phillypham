@@ -2,7 +2,7 @@ include ../mixins/postView.jade
 
 mixin commentView(comment, offset)
   - var children = comments.filter(function(child) { return comment.id === child.commentId; })
-  .comment(class="comment-" + comment.id, style="margin-left: " + offset*30 + "px;")
+  .comment(class="comment-" + comment.id, style={'margin-left': offset ? 30 + "px" : "0px"})
     .comment-content
       a.user-link(href='/user/' + encodeURIComponent(comment.User.displayName), target="_blank")
         img(src=comment.User.photoUrl)
@@ -11,13 +11,15 @@ mixin commentView(comment, offset)
     .footer
       .left                        
         span.reply-expander&attributes({"data-comment-id": "comment-" + comment.id})
-          span= children.length === 1 ? '1 reply' : children.length + ' replies'
+          div.bullet
+            span &#8227; 
+          span.reply= children.length === 1 ? '1 reply' : children.length + ' replies'
         .share-div.spacer
         button(type="button") Reply
       .right
         button(type="button") Edit    
     hr
-    .children(style={display: 'none'}, class="comment-" + comment.id)
+    .children(style={display: 'none', 'margin-left': 30 + "px"}, class="comment-" + comment.id)
       each child in children
         +commentView(child, 1)
   
@@ -76,5 +78,12 @@ append body
       replyExpander.addEventListener('click', expandReplies);
     });
     function expandReplies() {
-      document.querySelector('.children.' + this.dataset.commentId).style.display = 'block';
+      var children = document.querySelector('.children.' + this.dataset.commentId);
+      if (children.style.display === 'none') {
+        this.classList.add('expanded');
+        children.style.display = 'block';
+      } else {
+        this.classList.remove('expanded');
+        children.style.display = 'none';
+      }
     }
