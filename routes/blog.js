@@ -21,11 +21,12 @@ router.get('/:title', function(req, res, next) {
                    attributes: ['id', 'title', 'body', 'bodyHtml', 'photoUrl', 'published', 'publishedAt', 'user_id'],
                    include: [{model: db.User, attributes: ['id', 'displayName']},
                              {model: db.Tag, attributes: ['name']},
-                             {model: db.Comment, attributes: ['published']}]})
+                             {model: db.Comment, attributes: ['id', 'body', 'bodyHtml', 'published', 'publishedAt', 'post_id', 'commentId'],
+                              include: [{model: db.User, attributes: ['id', 'displayName', 'photoUrl']}]}]})
   .then(function(post) {
     if (post === null) return next(new Error('Post does not exist'));
     if (!post.published && (!req.user || (!req.session.roles.post_editor && req.user.id !== post.user_id))) return next(new Error('Not authorized. You can only view your own unpublished posts.'));
-    res.render('blog/view', {temporaryPost: post});
+    res.render('blog/view', {temporaryPost: post, user: req.user});
   });  
 });
 

@@ -30,7 +30,10 @@ mixin postView(post, edit)
           +shareButtons(settings.config.siteUrl, settings.ApplicationSettings.title)
     .footer
       .left
-        a(href=settings.config.siteUrl + '/' + encodeURIComponent(post.title) + '#comments') #{post.Comments.filter(function(d) { return d.published; }).length} Comments
+        - var numComments = post.Comments.filter(function(d) { return d.published; }).length
+        a(href=settings.config.siteUrl + '/' + encodeURIComponent(post.title) + '#comments')= numComments === 1 ? '1 comment' : numComments + ' comments'
+        .share-div.spacer
+        button.comment-button(type="button") Comment
       .right
         if (locals.user && (locals.user.id === post.User.id || roles['post_editor']))
           +postAdmin(post)

@@ -1,9 +1,55 @@
 include ../mixins/postView.jade
+
+mixin commentView(comment, offset)
+  - var children = comments.filter(function(child) { return comment.id === child.commentId; })
+  .comment(class="comment-" + comment.id, style="margin-left: " + offset*30 + "px;")
+    .comment-content
+      a.user-link(href='/user/' + encodeURIComponent(comment.User.displayName), target="_blank")
+        img(src=comment.User.photoUrl)
+        div= comment.User.displayName
+      .wmd-preview!= comment.bodyHtml
+    .footer
+      .left                        
+        span.reply-expander&attributes({"data-comment-id": "comment-" + comment.id})
+          span= children.length === 1 ? '1 reply' : children.length + ' replies'
+        .share-div.spacer
+        button(type="button") Reply
+      .right
+        button(type="button") Edit    
+    hr
+    .children(style={display: 'none'}, class="comment-" + comment.id)
+      each child in children
+        +commentView(child, 1)
+  
   
 extends ../layout
 
 block content
   +postView(temporaryPost)
+  hr
+  .comments
+    h2
+      a(name="new_comment") New Comment
+    form.comment-editor(action="POST", onsubmit="return false;")     
+      #wmd-button-bar-comment.wmd-button-bar
+      #wmd-editor-comment.wmd-editor
+      textarea#wmd-input-comment.wmd-input
+      .comment
+        .comment-content
+          a.user-link(href=locals.user ? '/user/' + encodeURIComponent(user.displayName) : '/login')
+            img(src=locals.user ? user.photoUrl : '/images/default-profile.jpg' )
+            div!= locals.user ? user.displayName : 'Please log in'
+          #wmd-preview-comment.wmd-preview
+      button.submit-button Post Comment
+        .overlay
+      hr    
+    h2
+      a(name="comments") Comments
+    - var comments = temporaryPost.Comments.filter(function(comment) { return comment.published; }).sort(function(a, b) { return a.publishedAt - b.publishedAt; })
+    if (comments.length === 0)
+      p No comments have been posted yet. You can be the first!
+    each comment in comments.filter(function(comment) { return comment.commentId === null; })
+      +commentView(comment, 0)
 
 append head
   meta(property="fb:app_id", content=settings.config.appKeys.facebook.clientID)
@@ -23,3 +69,12 @@ append head
     if (temporaryPost.photoUrl)
       meta(name="twitter:image", content=temporaryPost.photoUrl[0] === '/' ? settings.config.siteUrl + temporaryPost.photoUrl : temporaryPost.photoUrl)
 
+append body
+  script.
+    Array.prototype.slice.call(document.querySelectorAll('.reply-expander'))
+    .forEach(function(replyExpander) {
+      replyExpander.addEventListener('click', expandReplies);
+    });
+    function expandReplies() {
+      document.querySelector('.children.' + this.dataset.commentId).style.display = 'block';
+    }
