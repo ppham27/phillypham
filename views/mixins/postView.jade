@@ -24,10 +24,13 @@ mixin postView(post, edit)
         span.post-meta Published on #{post.publishedAt || new Date()}
     .footer
       .left
-        +shareButtons(settings.config.siteUrl + '/blog/' + encodeURIComponent(post.title), post.title)
+        if (post.title) 
+          +shareButtons(settings.config.siteUrl + '/' + encodeURIComponent(post.title), post.title)
+        else
+          +shareButtons(settings.config.siteUrl, settings.ApplicationSettings.title)
     .footer
       .left
-        a(href=settings.config.siteUrl + '/blog/' + encodeURIComponent(post.title) + '#comments') #{post.Comments.filter(function(d) { return d.published; }).length} Comments
+        a(href=settings.config.siteUrl + '/' + encodeURIComponent(post.title) + '#comments') #{post.Comments.filter(function(d) { return d.published; }).length} Comments
       .right
         if (locals.user && (locals.user.id === post.User.id || roles['post_editor']))
           +postAdmin(post)

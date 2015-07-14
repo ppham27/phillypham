@@ -158,7 +158,7 @@ describe('middleware', function() {
     });
 
     describe('google', function() {
-      it ('should login a user', function (done) {
+      it('should login a user', function (done) {
         var user = config.appKeys.google.testUsers[0];
         var browser = this.browser;
         var db = this.db;
@@ -184,7 +184,7 @@ describe('middleware', function() {
         });
       });
 
-      it ('should merge user with existing user', function (done) {
+      it('should merge user with existing user', function (done) {
         var user = config.appKeys.google.testUsers[1];
         var browser = this.browser;
         var db = this.db;

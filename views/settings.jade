@@ -3,7 +3,6 @@ mixin settingsFieldSet(label, name, value, placeholder)
     label(for=name)= label + ':'
     input.text-input(type="text", name=name, value=value, placeholder=placeholder)
 
-
 extends layout
 
 block content
@@ -40,13 +39,13 @@ append body
     });
 
     var submitButton = document.querySelector('#application-settings-form .submit-button');
-    var updateRequest = new XMLHttpRequest();
-    updateRequest.responseType = 'json';
+    var updateRequest = new XMLHttpRequest();    
     updateRequest.addEventListener('load', function() {
-      if (this.response.success) {
+      var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
+      if (response.success) {
         flash('Application settings have been updated!', {reset: true, className: 'info'});
       } else {
-        flash(this.response.error, {reset: true, className: 'error'});
+        flash(response.error, {reset: true, className: 'error'});
       }
       submitButton.disabled = false;
     });
@@ -56,6 +55,7 @@ append body
       updateRequest.open('PUT', window.location.pathname);
       updateRequest.setRequestHeader('Accept', 'application/json');
       updateRequest.setRequestHeader('Content-Type', 'application/json');
+      updateRequest.responseType = 'json';
       var data = {};
       ['sidebar:info', 'sidebar:photoUrl', 'sidebar:title',
        'contact:email', 'contact:facebook', 'contact:instagram', 'contact:twitter',

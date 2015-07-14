@@ -53,13 +53,13 @@ append body
     var displayNameField = displayNameInput.parentNode;
     var displayNameLabel = displayNameField.querySelector('span.field-sublabel');
     var userExistsRequest = new XMLHttpRequest();
-    userExistsRequest.responseType = 'json';
     userExistsRequest.addEventListener('load', function(event) {
-      if (userExistsRequest.response.error) {
+      var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
+      if (response.error) {
         displayNameLabel.textContent = 'this username is available';
         displayNameLabel.classList.remove('error');
         displayNameLabel.classList.add('success');
-      } else if (userExistsRequest.response.displayName === currentDisplayName) {
+      } else if (response.displayName === currentDisplayName) {
         displayNameLabel.textContent = 'required, must be from 1 to 64 characters';
         displayNameLabel.classList.remove('success');
         displayNameLabel.classList.remove('error');
@@ -74,6 +74,7 @@ append body
         userExistsRequest.abort();
         userExistsRequest.open('GET', '/user/' + this.value);
         userExistsRequest.setRequestHeader('Accept', 'application/json');
+        userExistsRequest.responseType = 'json';
         userExistsRequest.send();        
       } else {
         displayNameLabel.textContent = 'required, must be from 1 to 64 characters';

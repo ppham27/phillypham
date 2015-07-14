@@ -15,3 +15,11 @@ append head
   meta(property="article:author", content=temporaryPost.User.displayName) 
   if (temporaryPost.photoUrl)
     meta(property="og:image", content=temporaryPost.photoUrl[0] === '/' ? settings.config.siteUrl + temporaryPost.photoUrl : temporaryPost.photoUrl)
+  if (settings.ApplicationSettings['contact:twitter'])
+    meta(name="twitter:card", content="summary_large_image")
+    meta(name="twitter:site", content="@" + settings.ApplicationSettings['contact:twitter'])
+    meta(name="twitter:title", content=temporaryPost.title)
+    meta(name="twitter:description", content=temporaryPost.body.substr(0, 600))
+    if (temporaryPost.photoUrl)
+      meta(name="twitter:image", content=temporaryPost.photoUrl[0] === '/' ? settings.config.siteUrl + temporaryPost.photoUrl : temporaryPost.photoUrl)
+

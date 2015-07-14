@@ -97,17 +97,17 @@ append body
       var publishButton = document.querySelector('.submit-button.publish') || document.querySelector('.submit-button.unpublish');
       var destroyButton = document.querySelector('.submit-button.destroy');
       var putRequest = new XMLHttpRequest();
-      var deleteRequest = new XMLHttpRequest();
-      putRequest.responseType = 'json';
-      deleteRequest.responseType = 'json';
+      var deleteRequest = new XMLHttpRequest();      
       putRequest.addEventListener('load', function() {
-        onRequestLoad(this.response);
+        var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
+        onRequestLoad(response);
         saveButton.disabled = false;
         destroyButton.disabled = false;
         publishButton.disabled = false;
       });
       deleteRequest.addEventListener('load', function() {
-        onRequestLoad(this.response);
+        var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
+        onRequestLoad(response);
         saveButton.disabled = false;
         destroyButton.disabled = false;
         publishButton.disabled = false;
@@ -119,7 +119,8 @@ append body
         putRequest.abort();
         putRequest.open('PUT', window.location.pathname);
         putRequest.setRequestHeader('Accept', 'application/json');
-        putRequest.setRequestHeader('Content-Type', 'application/json');        
+        putRequest.setRequestHeader('Content-Type', 'application/json');
+        putRequest.responseType = 'json';
         putRequest.send(JSON.stringify(formToJSON(document.getElementById('post-form'))));
         return false;
       });
@@ -131,6 +132,7 @@ append body
         putRequest.open('PUT', window.location.pathname);
         putRequest.setRequestHeader('Accept', 'application/json');
         putRequest.setRequestHeader('Content-Type', 'application/json');
+        putRequest.responseType = 'json';
         var json = formToJSON(document.getElementById('post-form'));
         json.published = document.querySelector('button.submit-button.publish') !== null;
         putRequest.send(JSON.stringify(json));
@@ -144,6 +146,7 @@ append body
         deleteRequest.open('DELETE', window.location.pathname);
         deleteRequest.setRequestHeader('Accept', 'application/json');
         deleteRequest.setRequestHeader('Content-Type', 'application/json');
+        deleteRequest.responseType = 'json';
         deleteRequest.send();
         return false;
       });
@@ -154,10 +157,10 @@ append body
     script.
       var saveButton = document.querySelector('.submit-button.save');
       var publishButton = document.querySelector('.submit-button.publish');
-      var postRequest = new XMLHttpRequest();
-      postRequest.responseType = 'json';
+      var postRequest = new XMLHttpRequest();      
       postRequest.addEventListener('load', function() {
-        onRequestLoad(this.response);
+        var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
+        onRequestLoad(response);
         saveButton.disabled = false;
         publishButton.disabled = false;
       });
@@ -167,7 +170,8 @@ append body
         postRequest.abort();
         postRequest.open('POST', window.location.pathname);
         postRequest.setRequestHeader('Accept', 'application/json');
-        postRequest.setRequestHeader('Content-Type', 'application/json');        
+        postRequest.setRequestHeader('Content-Type', 'application/json');
+        postRequest.responseType = 'json';
         postRequest.send(JSON.stringify(formToJSON(document.getElementById('post-form'))));
         return false;
       });
@@ -178,6 +182,7 @@ append body
         postRequest.open('POST', window.location.pathname);
         postRequest.setRequestHeader('Accept', 'application/json');
         postRequest.setRequestHeader('Content-Type', 'application/json');
+        postRequest.responseType = 'json';
         var json = formToJSON(document.getElementById('post-form'));
         json.published = true;
         postRequest.send(JSON.stringify(json));

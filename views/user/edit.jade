@@ -12,16 +12,16 @@ append body
   script.        
     // updating
     var submitButton = document.querySelector('.submit-button');
-    var updateRequest = new XMLHttpRequest();
-    updateRequest.responseType = 'json';
+    var updateRequest = new XMLHttpRequest();    
     updateRequest.addEventListener('load', function() {
-      if (this.response.error) {
-        flash(this.response.error, {reset: true, className: 'error'});
-      } else if (this.response.success) {
-        if (this.response.message) flash(this.response.message, {reset: true, className: 'info'});
+      var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
+      if (response.error) {
+        flash(response.error, {reset: true, className: 'error'});
+      } else if (response.success) {
+        if (response.message) flash(response.message, {reset: true, className: 'info'});
       }
-      submitButton.disabled = false;
-      if (this.response.redirect) window.location.href = this.response.redirectLink;
+      submitButton.removeAttribute('disabled');
+      if (response.redirect) window.location.href = response.redirectLink;
     });
     submitButton.addEventListener('click', function() {
       submitButton.disabled = true;
@@ -29,6 +29,7 @@ append body
       updateRequest.open('PUT', window.location.pathname);
       updateRequest.setRequestHeader('Accept', 'application/json');
       updateRequest.setRequestHeader('Content-Type', 'application/json');
+      updateRequest.responseType = 'json';
       encryptPassword(document.getElementById('registration-form'));
       var data = {};
       ['givenName', 'middleName', 'familyName', 'displayName', 'email',
@@ -66,13 +67,13 @@ append body
     var emailField = emailInput.parentNode;
     var emailLabel = emailField.querySelector('span.field-sublabel');
     var emailButton = emailLabel.querySelector('button');
-    var emailVerifyRequest = new XMLHttpRequest();
-    emailVerifyRequest.responseType = 'json';
+    var emailVerifyRequest = new XMLHttpRequest();    
     emailVerifyRequest.addEventListener('load', function() {
-      if (this.response.error) {
-        flash(this.response.error, {reset: true, className: 'error'});
-      } else if (this.response.success) {
-        flash(this.response.message, {reset: true, className: 'info'});
+      var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
+      if (response.error) {
+        flash(response.error, {reset: true, className: 'error'});
+      } else if (response.success) {
+        flash(response.message, {reset: true, className: 'info'});
       }
       emailButton.disabled = false;
     });
@@ -83,6 +84,7 @@ append body
         emailVerifyRequest.open('POST', '/user/verify/' + encodeURIComponent(currentDisplayName));
         emailVerifyRequest.setRequestHeader('Accept', 'application/json');
         emailVerifyRequest.setRequestHeader('Content-Type', 'application/json');
+        emailVerifyRequest.responseType = 'json';
         emailVerifyRequest.send(JSON.stringify({email: emailInput.value}));
       }
     });
