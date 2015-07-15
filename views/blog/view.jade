@@ -3,6 +3,7 @@ include ../mixins/postView.jade
 mixin commentView(comment, offset)
   - var children = comments.filter(function(child) { return comment.id === child.commentId; })
   .comment(class="comment-" + comment.id, style={'margin-left': offset ? 30 + "px" : "0px"})
+    a(name="comment-" + comment.id, style={height: '0px'})
     .comment-content
       a.user-link(href='/user/' + encodeURIComponent(comment.User.displayName), target="_blank")
         .photo
@@ -113,11 +114,19 @@ append body
     .forEach(function(editButton) {
       editButton.addEventListener('click', editHandle);
     });
+    if (window.location.hash) {
+      if (window.location.hash.substr(0, 9) === '#comment-') {
+        var hashedComment = document.querySelector('.' + window.location.hash.substr(1));
+        expandParent(hashedComment);
+        window.location.href = window.location.hash; 
+      }
+    }
     function replyHandle() {
       var commentReply = document.getElementById('comment-reply');
       if (this.dataset.commentId) {
         var clonedComment = document.querySelector('.comment-' + this.dataset.commentId).cloneNode(true);
-        clonedComment.removeChild(clonedComment.querySelector('.children'));        
+        var children = clonedComment.querySelector('.children');
+        if (children !== null) clonedComment.removeChild(children);
         commentReply.innerHTML = "<h3>Replying to...</h3>";
         commentReply.appendChild(clonedComment);
       } else {
@@ -127,6 +136,14 @@ append body
       return false;
     }
     function editHandle() {    
+    }
+    function expandParent(node) {
+      if (node.classList.contains('comments')) return;
+      if (node.classList.contains('children')) {
+        node.parentNode.querySelector('.reply-expander').classList.add('expanded');
+        node.classList.add('expanded');
+      }
+      expandParent(node.parentNode);
     }
     function expandReplies() {
       var children = document.querySelector('.children.comment-' + this.dataset.commentId);
