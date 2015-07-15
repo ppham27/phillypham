@@ -18,7 +18,8 @@ mixin commentView(comment, offset)
         .share-div.spacer
         button.reply(type="button")&attributes({"data-comment-id": comment.id}) Reply
       .right
-        button.edit(type="button")&attributes({"data-comment-id": comment.id}) Edit    
+        if (locals.user && (comment.User.id === user.id || roles['comment_editor']))        
+          button.edit(type="button")&attributes({"data-comment-id": comment.id}) Edit    
     hr
     .children(style={'margin-left': 30 + "px"}, class="comment-" + comment.id)
       each child in children
@@ -31,6 +32,25 @@ block content
   +postView(temporaryPost)
   hr
   .comments
+    - var unpublishedComments = temporaryPost.Comments.filter(function(comment) { return !comment.published && (locals.user && (roles['comment_editor'] || comment.User.id === locals.user.id)); }).sort(function(a, b) { return a.created_at - b.created_at; })
+    if (unpublishedComments.length)
+      h2 Unpublished Comments
+      .wmd-preview
+        table
+          tr
+            th ID
+            th User
+            th Created At            
+            th Edit
+          each comment in unpublishedComments
+            tr
+              td= comment.id
+              td= comment.User.displayName
+              td= comment.created_at.toUTCString()
+              td
+                button(type="button").edit Edit
+              
+      hr
     h2
       a(name="new_comment") New Comment
     form.comment-editor(action="POST", onsubmit="return false;")
@@ -46,9 +66,11 @@ block content
             .display-name!= locals.user ? user.displayName : 'Please log in'
           #wmd-preview-comment.wmd-preview
       .buttons
-        button.submit-button.save Save
+        button.submit-button(disabled=true) Save
           .overlay
-        button.submit-button.publish Comment
+        button.submit-button(disabled=true) Comment
+          .overlay
+        button.submit-button(disabled=true, style={display: 'none'}) Destroy
           .overlay
       hr    
     h2

@@ -769,3 +769,7 @@ a.twitter-share-button {
 .comment .reply-expander.expanded .bullet {
   transform: rotate(90deg);
 }
+
+.comments h2 a {
+  color: #003b52;  
+}
