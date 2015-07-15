@@ -701,12 +701,7 @@ a.twitter-share-button {
 
 
 .comment-content {
-  min-height: 190px;
-}
-
-.comment .user-link img {
-  max-width: 160px; 
-  max-height: 160px; 
+  min-height: 200px;
 }
 
 .comment .user-link {
@@ -714,11 +709,34 @@ a.twitter-share-button {
   display: block;
   float: left;
   width: 160px;
+  height: 190px;
+  text-decoration: none;
+}
+
+.comment .photo {
+  line-height: 155px;
+  width: 160px;
+  height: 160px;
+}
+
+.comment .user-link img {
+  max-width: 160px; 
+  max-height: 160px; 
+  vertical-align: middle; 
 }
 
 .comment .children {
   border-left: 2px solid #888;
-  margin-left: 30px;
+  height: 0;
+  opacity: 0; 
+  overflow: hidden;
+  transition: all 0.5s ease;
+}
+
+.comment .children.expanded {
+  border-left: 2px solid #888;
+  opacity: 1;
+  height: auto;
 }
 
 #wmd-editor-comment {
@@ -734,17 +752,18 @@ a.twitter-share-button {
   cursor: pointer; 
   text-decoration: underline;
   color: #145d8a;
+  transition: all 0.5s ease;
 }
 
 .comment .reply-expander.expanded .reply, .comment .reply-expander.expanded .bullet {
-  color: #d02027;
+  color: #D02027;
 }
 
 .comment .reply-expander .bullet {
   display: inline-block;
   font-size: 110%;
   margin-right: 0.25em;
-  transition: all 0.25s ease;
+  transition: all 0.5s ease;
 }
 
 .comment .reply-expander.expanded .bullet {

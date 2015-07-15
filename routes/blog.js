@@ -15,6 +15,7 @@ router.get('/', function(req, res, next) {
   });  
 });
 
+router.use('/:title/comment', require('./comment'));
 
 router.get('/:title', function(req, res, next) {
   db.Post.findOne({where: {title: req.params.title}, 
