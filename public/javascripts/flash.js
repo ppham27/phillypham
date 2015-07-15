@@ -3,7 +3,8 @@ function flash(messages, options) {
   var reset = options.reset || false;
   var className = options.className || false;
   var flashBox = document.getElementById('flash');
-  if (!flashBox) {
+  if (reset && flashBox) flashBox.parentNode.removeChild(flashBox);
+  if (reset || !flashBox) {
     flashBox = document.createElement('div');
     flashBox.id = 'flash';
     var mainbar = document.getElementById('mainbar'); 

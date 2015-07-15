@@ -23,7 +23,8 @@ mixin commentView(comment, offset)
         button.reply(type="button")&attributes({"data-comment-id": comment.id}) Reply
       .right
         if (locals.user && (comment.User.id === user.id || roles['comment_editor']))        
-          button.edit(type="button")&attributes({"data-comment-id": comment.id}) Edit    
+          button.edit(type="button")&attributes({"data-comment-id": comment.id}) Edit
+          button.destroy(type="button")&attributes({"data-comment-id": comment.id}) Destroy
     hr
     .children(style={'margin-left': 30 + "px"}, class="comment-" + comment.id)
       .inner-children
@@ -47,6 +48,7 @@ block content
             th User
             th Created At            
             th Edit
+            th Destroy
           each comment in unpublishedComments
             tr
               td= comment.id
@@ -54,6 +56,8 @@ block content
               td= comment.created_at.toUTCString()
               td
                 button.edit(type="button")&attributes({"data-comment-id": comment.id}) Edit
+              td
+                button.destroy(type="button")&attributes({"data-comment-id": comment.id}) Destroy
               
       hr
     h2
@@ -63,7 +67,7 @@ block content
       #wmd-button-bar-comment.wmd-button-bar
       #wmd-editor-comment.wmd-editor
       textarea#wmd-input-comment.wmd-input(name="body")
-      .comment
+      .comment.new-comment
         .comment-content
           a.user-link(href=locals.user ? '/user/' + encodeURIComponent(user.displayName) : '/login')
             .photo
@@ -83,8 +87,9 @@ block content
     - var comments = temporaryPost.Comments.filter(function(comment) { return comment.published; }).sort(function(a, b) { return a.publishedAt - b.publishedAt; })
     if (comments.length === 0)
       p No comments have been posted yet. You can be the first!
-    each comment in comments.filter(function(comment) { return comment.commentId === null; })
-      +commentView(comment, 0)
+    .posted-comments
+      each comment in comments.filter(function(comment) { return comment.commentId === null; })
+        +commentView(comment, 0)
 
 append head
   meta(property="fb:app_id", content=settings.config.appKeys.facebook.clientID)
@@ -109,6 +114,7 @@ append body
     include ../../public/javascripts/flash.js
   script.
     var replyId = null;
+    var mode = 'create';
     Array.prototype.slice.call(document.querySelectorAll('.reply-expander'))
     .forEach(function(replyExpander) {
       replyExpander.addEventListener('click', expandReplies);
@@ -120,20 +126,16 @@ append body
     Array.prototype.slice.call(document.querySelectorAll('button.edit'))
     .forEach(function(editButton) {
       editButton.addEventListener('click', editHandle);
-    });
-    if (window.location.hash) {
-      if (window.location.hash.substr(0, 9) === '#comment-') {
-        var hashedComment = document.querySelector('.' + window.location.hash.substr(1));
-        expandParent(hashedComment);
-        window.location.href = window.location.hash;        
-      }
-      setupCreate();
-    } else {
-      setupCreate();
-    }
+    });    
     var postRequest = new XMLHttpRequest();
     var putRequest = new XMLHttpRequest();
     var editGetRequest = new XMLHttpRequest();
+    putRequest.addEventListener('load', function() {
+      var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
+      console.log(response);
+      onRequestLoad(response);
+      toggleButtons(false);
+    });
     postRequest.addEventListener('load', function() {
       var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
       onRequestLoad(response);
@@ -141,11 +143,40 @@ append body
     });
     editGetRequest.addEventListener('load', function() {
       var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
-      window.location.hash = '#edit-comment-' + response.id;
-      document.querySelector('a[name="new_comment"]').scrollIntoView();
+      if (response.error) {
+        flash(response.error, {reset: true, className: 'error'});
+      } else {
+        fillReplyPreview(response.commentId);
+        fillCommentPreview(response);
+        setupEdit(response.id, response.published);
+      }
+      setTimeout(function() {
+        document.querySelector('a[name="new_comment"]').scrollIntoView();
+        editors[0].editor.focus();
+      }, 250);
       console.log(response);
     });
-    toggleButtons(false);  
+    if (window.location.hash) {
+      if (window.location.hash.substr(0, 9) === '#comment-') {
+        var hashedComment = document.querySelector('.' + window.location.hash.substr(1));
+        expandParent(hashedComment);
+        window.location.href = window.location.hash;
+        setupCreate();
+      } else if (window.location.hash.substr(0, 14) === '#edit-comment-') {
+        editComment(window.location.hash.slice(14));
+      }  
+    } else {
+      setupCreate();
+    }
+    toggleButtons(false);
+    function editComment(id) {
+      if (document.querySelector('.posted-comments .comment-' + id)) expandParent(document.querySelector('.posted-comments .comment-' + id));
+      editGetRequest.abort();
+      editGetRequest.open('GET', window.location.pathname + '/comment/' + id);
+      editGetRequest.setRequestHeader('Accept', 'application/json');
+      editGetRequest.responseType = 'json';
+      editGetRequest.send();      
+    }
     function postComment(options, event) {
       toggleButtons(true);
       var request = postRequest;
@@ -160,42 +191,80 @@ append body
       request.send(JSON.stringify(json));
       return false;      
     }
-    function setupEdit() {
+    function putComment(options, event) {
+      toggleButtons(true);
+      var id = options.id;
+      var published = options.published;
+      var request = putRequest;
+      request.abort();
+      request.open('PUT', window.location.pathname + '/comment/' + id);
+      request.setRequestHeader('Content-Type', 'application/json');
+      request.responseType = 'json';
+      var json = { commentId: options.replyId || replyId,
+                   body: getCommentBody() };
+      if (options.published !== undefined) json.published = options.published;
+      request.send(JSON.stringify(json));
+      return false;
+    }
+    function setupEdit(id, published) {
+      mode = 'edit';
+      var buttons = document.querySelectorAll('form.comment-editor .buttons button.submit-button');
+      if (!published) {
+        buttons[0].innerHTML = 'Save<div class="overlay"></div>';
+        buttons[0].onclick = putComment.bind(buttons[0], { id: id });
+        buttons[1].innerHTML = 'Publish<div class="overlay"></div>';
+        buttons[2].innerHTML = 'Destroy<div class="overlay"></div>';      
+        buttons[2].style.display = null;
+      } else {
+        buttons[0].innerHTML = 'Save<div class="overlay"></div>';
+        buttons[0].onclick = putComment.bind(buttons[0], { id: id });
+        buttons[1].innerHTML = 'Destroy<div class="overlay"></div>';
+        buttons[2].style.display = 'none';
+        buttons[2].onclick = function() { return false; }
+      }
     }
     function setupCreate() {
+      mode = 'create';
       var buttons = document.querySelectorAll('form.comment-editor .buttons button.submit-button');
-      buttons[0].textContent = 'Save Draft';
+      buttons[0].innerHTML = 'Save Draft<div class="overlay"></div>';
       buttons[0].onclick = postComment.bind(buttons[0], {published: false});
-      buttons[1].textContent = 'Comment';
+      buttons[1].innerHTML = 'Comment<div class="overlay"></div>';
       buttons[1].onclick = postComment.bind(buttons[0], {published: true});
       buttons[2].style.display = 'none';
       buttons[2].onclick = function() { return false; }
     }
-    function replyHandle() {
+    function fillCommentPreview(comment) {
+      editors[0].editor.setValue(comment.body);
+      document.querySelector('.comment-editor .comment.new-comment .photo img').src = comment.User.photoUrl;
+      document.querySelector('.comment-editor .comment.new-comment .user-link .display-name').textContent = comment.User.displayName;
+    }
+    function fillReplyPreview(id) {
       var commentReply = document.getElementById('comment-reply');
-      if (this.dataset.commentId) {
-        var clonedComment = document.querySelector('.comment-' + this.dataset.commentId).cloneNode(true);
+      if (id) {
+        var clonedComment = document.querySelector('.comment-' + id).cloneNode(true);
+        clonedComment.style.marginLeft = null;
         var children = clonedComment.querySelector('.children');
         if (children !== null) clonedComment.removeChild(children);
         var footer = clonedComment.querySelector('.footer');
         if (footer !== null) clonedComment.removeChild(footer);
         commentReply.innerHTML = "<h3>Replying to...</h3>";
         commentReply.appendChild(clonedComment);
-        replyId = parseInt(this.dataset.commentId);
+        replyId = parseInt(id);
       } else {
         commentReply.innerHTML = null;
         replyId = null;
       }
+    }
+    function replyHandle() {
+      fillReplyPreview(this.dataset.commentId);      
       window.location.href = '#new_comment';
+      editors[0].editor.focus();
       return false;
     }
     function editHandle() {
       var id = this.dataset.commentId;
-      editGetRequest.abort();
-      editGetRequest.open('GET', window.location.pathname + '/comment/' + id);
-      editGetRequest.setRequestHeader('Accept', 'application/json');
-      editGetRequest.responseType = 'json';
-      editGetRequest.send();
+      window.location.hash = '#edit-comment-' + id;
+      editComment(id);      
     }
     function expandParent(node) {
       if (node.classList.contains('comments')) return;
@@ -240,7 +309,9 @@ append body
       if (response.success) {
         if (response.redirect) {
           window.location.href = response.redirectLink;
-          if (response.redirectLink.indexOf('#') !== -1) window.location.reload();
+          setTimeout(function() {
+            if (response.redirectLink.indexOf('#') !== -1) window.location.reload();
+          }, 250);
         } else {
           flash(response.message, {reset: true, className: 'info'});
         }        

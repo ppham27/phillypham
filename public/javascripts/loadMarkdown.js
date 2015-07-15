@@ -8,16 +8,16 @@ var inputTitles = document.querySelectorAll('.wmd-input-title');
 var editorDivs = document.querySelectorAll('.wmd-editor');
 var makeTitle = inputTitles.length !== 0;
 var makeEditor = editorDivs.length !== 0;
-var editors;
+global.editors = [];
 if (makeEditor) {
   editorDivs = Array.prototype.slice.call(editorDivs);
-  editors = editorDivs.map(function(div) {
-              var postfix = div.id.substr(10); // get rid of wmd-editor
-              var editor = new MarkdownAceEditor(markdown.Converter, postfix,
-                                                 {helpButton: editorHelp });
-              pagedownExtra.hookEditor(editor);
-              return editor;
-            });
+  editorDivs.forEach(function(div) {
+    var postfix = div.id.substr(10); // get rid of wmd-editor
+    var editor = new MarkdownAceEditor(markdown.Converter, postfix,
+                                       {helpButton: editorHelp });
+    pagedownExtra.hookEditor(editor);
+    editors.push(editor);
+  });
 }
 var mathJaxConfig = document.createElement('script');
 mathJaxConfig.type = 'text/x-mathjax-config';
