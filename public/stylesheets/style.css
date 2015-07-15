@@ -701,6 +701,7 @@ a.twitter-share-button {
 
 
 .comment-content {
+  margin-top: 10px;
   min-height: 200px;
 }
 
@@ -714,15 +715,17 @@ a.twitter-share-button {
 }
 
 .comment .photo {
-  line-height: 155px;
+  line-height: 160px;
   width: 160px;
   height: 160px;
+  margin-bottom: 5px;
 }
 
 .comment .user-link img {
   max-width: 160px; 
   max-height: 160px; 
   vertical-align: middle; 
+  border: 1px solid #888;
 }
 
 .comment .children {

@@ -1,5 +1,8 @@
 include ../mixins/postView.jade
 
+mixin imgFallback(src)
+  img(src=src, onerror="this.src = '/images/default-profile.jpg';")
+
 mixin commentView(comment, offset)
   - var children = comments.filter(function(child) { return comment.id === child.commentId; })
   .comment(class="comment-" + comment.id, style={'margin-left': offset ? 30 + "px" : "0px"})
@@ -7,7 +10,7 @@ mixin commentView(comment, offset)
     .comment-content
       a.user-link(href='/user/' + encodeURIComponent(comment.User.displayName), target="_blank")
         .photo
-          img(src=comment.User.photoUrl)
+          +imgFallback(comment.User.photoUrl)
         div= comment.User.displayName
       .wmd-preview!= comment.bodyHtml
     .footer
@@ -23,8 +26,9 @@ mixin commentView(comment, offset)
           button.edit(type="button")&attributes({"data-comment-id": comment.id}) Edit    
     hr
     .children(style={'margin-left': 30 + "px"}, class="comment-" + comment.id)
-      each child in children
-        +commentView(child, 1)
+      .inner-children
+        each child in children
+          +commentView(child, 1)
   
   
 extends ../layout
@@ -49,25 +53,25 @@ block content
               td= comment.User.displayName
               td= comment.created_at.toUTCString()
               td
-                button(type="button").edit Edit
+                button.edit(type="button")&attributes({"data-comment-id": comment.id}) Edit
               
       hr
     h2
       a(name="new_comment") New Comment
-    form.comment-editor(action="POST", onsubmit="return false;")
+    form.comment-editor(method="POST", action="comment", onsubmit="return false;")
       #comment-reply
       #wmd-button-bar-comment.wmd-button-bar
       #wmd-editor-comment.wmd-editor
-      textarea#wmd-input-comment.wmd-input
+      textarea#wmd-input-comment.wmd-input(name="body")
       .comment
         .comment-content
           a.user-link(href=locals.user ? '/user/' + encodeURIComponent(user.displayName) : '/login')
             .photo
-              img(src=locals.user ? user.photoUrl : '/images/default-profile.jpg' )
+              +imgFallback(locals.user ? user.photoUrl : '/images/default-profile.jpg')
             .display-name!= locals.user ? user.displayName : 'Please log in'
           #wmd-preview-comment.wmd-preview
       .buttons
-        button.submit-button(disabled=true) Save
+        button.submit-button(disabled=true) Save Draft
           .overlay
         button.submit-button(disabled=true) Comment
           .overlay
@@ -101,7 +105,10 @@ append head
       meta(name="twitter:image", content=temporaryPost.photoUrl[0] === '/' ? settings.config.siteUrl + temporaryPost.photoUrl : temporaryPost.photoUrl)
 
 append body
+  script
+    include ../../public/javascripts/flash.js
   script.
+    var replyId = null;
     Array.prototype.slice.call(document.querySelectorAll('.reply-expander'))
     .forEach(function(replyExpander) {
       replyExpander.addEventListener('click', expandReplies);
@@ -118,8 +125,51 @@ append body
       if (window.location.hash.substr(0, 9) === '#comment-') {
         var hashedComment = document.querySelector('.' + window.location.hash.substr(1));
         expandParent(hashedComment);
-        window.location.href = window.location.hash; 
+        window.location.href = window.location.hash;        
       }
+      setupCreate();
+    } else {
+      setupCreate();
+    }
+    var postRequest = new XMLHttpRequest();
+    var putRequest = new XMLHttpRequest();
+    var editGetRequest = new XMLHttpRequest();
+    postRequest.addEventListener('load', function() {
+      var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
+      onRequestLoad(response);
+      toggleButtons(false);
+    });
+    editGetRequest.addEventListener('load', function() {
+      var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
+      window.location.hash = '#edit-comment-' + response.id;
+      document.querySelector('a[name="new_comment"]').scrollIntoView();
+      console.log(response);
+    });
+    toggleButtons(false);  
+    function postComment(options, event) {
+      toggleButtons(true);
+      var request = postRequest;
+      request.abort();
+      request.open('POST', window.location.pathname + '/comment');
+      request.setRequestHeader('Accept', 'application/json');
+      request.setRequestHeader('Content-Type', 'application/json');
+      request.responseType = 'json';
+      var json = { published: options.published || null,
+                   commentId: options.replyId || replyId,
+                   body: getCommentBody()};
+      request.send(JSON.stringify(json));
+      return false;      
+    }
+    function setupEdit() {
+    }
+    function setupCreate() {
+      var buttons = document.querySelectorAll('form.comment-editor .buttons button.submit-button');
+      buttons[0].textContent = 'Save Draft';
+      buttons[0].onclick = postComment.bind(buttons[0], {published: false});
+      buttons[1].textContent = 'Comment';
+      buttons[1].onclick = postComment.bind(buttons[0], {published: true});
+      buttons[2].style.display = 'none';
+      buttons[2].onclick = function() { return false; }
     }
     function replyHandle() {
       var commentReply = document.getElementById('comment-reply');
@@ -127,15 +177,25 @@ append body
         var clonedComment = document.querySelector('.comment-' + this.dataset.commentId).cloneNode(true);
         var children = clonedComment.querySelector('.children');
         if (children !== null) clonedComment.removeChild(children);
+        var footer = clonedComment.querySelector('.footer');
+        if (footer !== null) clonedComment.removeChild(footer);
         commentReply.innerHTML = "<h3>Replying to...</h3>";
         commentReply.appendChild(clonedComment);
+        replyId = parseInt(this.dataset.commentId);
       } else {
         commentReply.innerHTML = null;
+        replyId = null;
       }
       window.location.href = '#new_comment';
       return false;
     }
-    function editHandle() {    
+    function editHandle() {
+      var id = this.dataset.commentId;
+      editGetRequest.abort();
+      editGetRequest.open('GET', window.location.pathname + '/comment/' + id);
+      editGetRequest.setRequestHeader('Accept', 'application/json');
+      editGetRequest.responseType = 'json';
+      editGetRequest.send();
     }
     function expandParent(node) {
       if (node.classList.contains('comments')) return;
@@ -147,6 +207,44 @@ append body
     }
     function expandReplies() {
       var children = document.querySelector('.children.comment-' + this.dataset.commentId);
-      this.classList.toggle('expanded');
-      children.classList.toggle('expanded');
+      if (this.classList.contains('expanded')) {
+        children.style.height = children.getBoundingClientRect().height + 'px';        
+        setTimeout(function() { children.style.height = null; }, 0);
+        this.classList.remove('expanded');
+        children.classList.remove('expanded');
+      } else {
+        children.style.height = '0px';
+        setTimeout(function() {
+          var height = children.querySelector('.inner-children').getBoundingClientRect().height;
+          children.style.height = height + 'px';
+          setTimeout(function() {
+            children.style.height = null;
+          }, 250);
+        }, 0)
+        this.classList.add('expanded');
+        children.classList.add('expanded');
+      }
+    }
+    function toggleButtons(disabled) {
+       Array.prototype.slice.call(document.querySelectorAll('form.comment-editor .buttons button.submit-button'))
+       .forEach(function(button) {
+         button.disabled = disabled;
+       });  
+    }
+
+    function getCommentBody() {
+      return document.getElementById('wmd-input-comment').value;
+    }
+
+    function onRequestLoad(response) {
+      if (response.success) {
+        if (response.redirect) {
+          window.location.href = response.redirectLink;
+          if (response.redirectLink.indexOf('#') !== -1) window.location.reload();
+        } else {
+          flash(response.message, {reset: true, className: 'info'});
+        }        
+      } else {
+        flash(response.error, {reset: true, className: 'error'});
+      }
     }

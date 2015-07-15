@@ -6,8 +6,10 @@ function flash(messages, options) {
   if (!flashBox) {
     flashBox = document.createElement('div');
     flashBox.id = 'flash';
-    var mainbar = document.getElementById('mainbar');        
-    mainbar.insertBefore(flashBox, mainbar.querySelector('form'));        
+    var mainbar = document.getElementById('mainbar'); 
+    var form = mainbar.querySelector('form');
+    var parent = form.parentNode;
+    parent.insertBefore(flashBox, form);        
   }
   if (reset) flashBox.innerHTML = '';
   var messageList = flashBox.querySelector('li') || document.createElement('ul');

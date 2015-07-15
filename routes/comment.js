@@ -8,15 +8,16 @@ var authorize = require('../lib/middleware/authorize');
 var db = require('../models');
 
 router.post('/', authorize({role: 'commenter'}), function(req, res, next) {
+  if (!req.is('json')) return res.json({error: 'only json requests are accepted'});
   Promise.join(db.Post.findOne({where: {title: req.params.title}}), 
-               req.body.commentId ? db.Comment.findById(req.body.commentId, {attributes: ['id', 'published', 'post_id']}) : Promise.resolve(null))
+               req.body.commentId ? db.Comment.findById(req.body.commentId, {attributes: ['id', 'published', 'postId']}) : Promise.resolve(null))
   .spread(function(post, comment) {    
     var newComment = {};
     newComment.userId = req.user.id;
     if (post === null) throw new Error('post not found');
-    if (!post.published) throw new Error('you cannot comment on an unpublished post');
+    if (!post.published) throw new Error('you cannot comment on an unpublished post');    
     if (comment) {
-      if (comment.Post.id !== post.id) throw new Error('post ids do not match');
+      if (comment.postId !== post.id) throw new Error('post ids do not match');
       newComment.commentId = comment.id;
     } else {
       newComment.commentId = null;
@@ -26,7 +27,7 @@ router.post('/', authorize({role: 'commenter'}), function(req, res, next) {
     return post.createComment(newComment);
   })
   .then(function(newComment) {
-    req.flash('info', 'Comment was successfully posted!');
+    req.flash('info', 'Comment was successfully created!');
     if (newComment.published) {
       return res.json({success: true, redirect: true,
                        redirectLink: '/blog/' + encodeURIComponent(req.params.title) + '#comment-' + newComment.id});
@@ -51,7 +52,8 @@ router.post('/', authorize({role: 'commenter'}), function(req, res, next) {
 router.get('/:commentId', function(req, res, next) {
   db.Comment.findById(req.params.commentId,
                       {attributes: ['id', 'body', 'published'],
-                       include: {model: db.Post, attributes: ['id', 'title', 'published']}})
+                       include: [{model: db.Post, attributes: ['id', 'title', 'published']},
+                                 {model: db.User, attributes: ['id', 'displayName', 'photoUrl']}]})
   .then(function(comment) {
     if (!comment.Post.published) return next(new Error('you cannot comment on unpublished post'));
     if (req.params.title !== comment.Post.title) return next(new Error('comment does not belong to post'));

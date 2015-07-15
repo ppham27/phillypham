@@ -9,11 +9,11 @@ block content
         li
           a(href='/projects/edit/'+encodeURIComponent(project.title))= project.title
     hr
+  if (locals.update)
+    h2= 'Edit ' + temporaryProject.title
+  else
+    h2 New Project
   form#project-form.wmd-panel    
-    if (locals.update)
-      h2= 'Edit ' + temporaryProject.title
-    else
-      h2 New Project
     fieldset
       label(for="title") Title:
       input#wmd-input-title-summary.text-input.wmd-input-title(type="text", name="title", placeholder="Enter a title here", value=temporaryProject.title || '')
