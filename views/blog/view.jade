@@ -162,8 +162,8 @@ append body
       }
       setTimeout(function() {
         document.querySelector('a[name="new-comment"]').scrollIntoView();        
-        editors[0].editor.focus();
-        editors[0].editor.clearSelection();
+        editors['-comment'].editor.focus();
+        editors['-comment'].editor.clearSelection();
       }, 500);
     });
     if (window.location.hash) {
@@ -176,7 +176,7 @@ append body
         editComment(window.location.hash.slice(14));
       } else if (window.location.hash === '#new-comment') {
         setupCreate();
-        editors[0].editor.focus();
+        editors['-comment'].editor.focus();
       } else {
         setupCreate();
       }
@@ -258,7 +258,7 @@ append body
       buttons[3].onclick = function() { return false; }
     }
     function fillCommentPreview(comment) {
-      editors[0].editor.setValue(comment.body);
+      editors['-comment'].editor.setValue(comment.body);
       document.querySelector('.comment-editor .comment.new-comment .photo img').src = comment.User.photoUrl;
       document.querySelector('.comment-editor .comment.new-comment .user-link').href = '/user/' + encodeURIComponent(comment.User.displayName);
       document.querySelector('.comment-editor .comment.new-comment .user-link .display-name').textContent = comment.User.displayName;
@@ -283,7 +283,7 @@ append body
     function replyHandle() {
       fillReplyPreview(this.dataset.commentId);      
       window.location.href = '#new-comment';
-      editors[0].editor.focus();
+      editors['-comment'].editor.focus();
       return false;
     }
     function editHandle() {
@@ -371,7 +371,7 @@ append body
             flashBox.parentNode.removeChild(flashBox);
           }, 500);          
         }, 2000);
-        editors[0].editor.focus();
+        editors['-comment'].editor.focus();
       }
     }
 
@@ -396,5 +396,5 @@ append body
         document.querySelector('.comment-editor .comment.new-comment .user-link').target = '_self';
       }      
       window.location.href = '#new-comment';
-      editors[0].editor.focus();
+      editors['-comment'].editor.focus();
     }

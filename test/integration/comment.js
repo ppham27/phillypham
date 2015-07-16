@@ -164,6 +164,179 @@ describe('comment routes', function() {
     });
   });
 
+  describe('create', function() {
+    before(function() {
+      this.handle = commentRoutes.stack.filter(function(handle) {
+                      return handle.route.path === '/' && handle.route.methods.post;
+                    });
+      this.handle = this.handle[0].route.stack[1].handle;
+    });
+    describe('errors', function() {
+      it('should fail when post does not exist', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly drafted comment', published: 'truthy value'}, 
+                                    true, {is: ['json'], accepts: ['json']});      
+          req.user = user;
+          req.params.title = 'non existent post'; 
+          var res = {json: function(json) {
+                       expect(json.error).to.include.something.that.matches(/post not found/);
+                       done();
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
+
+      it('should fail when post is unpublished', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly drafted comment', published: 'truthy value'}, 
+                                    true, {is: ['json'], accepts: ['json']});      
+          req.user = user;
+          req.params.title = 'Unpublished Title'; 
+          var res = {json: function(json) {
+                       expect(json.error).to.include.something.that.matches(/unpublished post/);
+                       done();
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
+
+      it('should fail when comment is unpublished', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly drafted comment', published: true, commentId: 7}, 
+                                    true, {is: ['json'], accepts: ['json']});      
+          req.user = user;
+          req.params.title = 'First Post'; 
+          var res = {json: function(json) {
+                       expect(json.error).to.include.something.that.matches(/unpublished comment/);
+                       done();
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
+      
+      it('should fail when replied to comment does not belong to post', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly drafted comment', published: true, commentId: 4}, 
+                                    true, {is: ['json'], accepts: ['json']});      
+          req.user = user;
+          req.params.title = 'Second Post'; 
+          var res = {json: function(json) {
+                       expect(json.error).to.include.something.that.matches(/post ids do not match/);
+                       done();
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
+    });
+
+    describe('successes', function() {
+      it('should create a comment draft', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly drafted comment', published: 'truthy value'}, 
+                                    true, {is: ['json'], accepts: ['json']});      
+          req.user = user;
+          req.params.title = 'Second Post'; 
+          var res = {json: function(json) {
+                       expect(json.success).to.be.true;
+                       db.Comment.findOne({where: {body: 'newly drafted comment'}})
+                       .then(function(comment) {
+                         expect(comment.published).to.be.false;
+                         expect(comment.commentId).to.be.null;
+                         expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('Second Post') + '#edit-comment-' + comment.id);
+                         done();
+                       });
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
+
+      it('should create a published comment', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly published comment ', published: true}, 
+                                    true, {is: ['json'], accepts: ['json']});
+          req.user = user;
+          req.params.title = 'Second Post'; 
+          var res = {json: function(json) {
+                       expect(json.success).to.be.true;
+                       db.Comment.findOne({where: {body: 'newly published comment'}})
+                       .then(function(comment) {
+                         expect(comment.published).to.be.true;
+                         expect(comment.commentId).to.be.null;
+                         expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('Second Post') + '#comment-' + comment.id);
+                         done();
+                       });
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
+
+      it('should reply to comment', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly published reply comment ', published: true, commentId: 4}, 
+                                    true, {is: ['json'], accepts: ['json']});
+          req.user = user;
+          req.params.title = 'First Post'; 
+          var res = {json: function(json) {
+                       expect(json.success).to.be.true;
+                       db.Comment.findOne({where: {body: 'newly published reply comment'}})
+                       .then(function(comment) {
+                         expect(comment.published).to.be.true;
+                         expect(comment.commentId).to.equal(4);                       
+                         expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('First Post') + '#comment-' + comment.id);
+                         done();
+                       });
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
+    });
+  });
+
+
+  describe('put', function() {
+    before(function() {
+      this.handle = commentRoutes.stack.filter(function(handle) {
+                      return handle.route.path === '/:commentId' && handle.route.methods.put;
+                    });
+      this.handle = this.handle[0].route.stack[1].handle;
+    });
+
+    describe('successes', function() {
+      
+    });
+
+    describe('errors', function() {
+      
+    });
+  });
 
   
   describe('delete', function() {

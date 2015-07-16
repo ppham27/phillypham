@@ -8,7 +8,7 @@ var inputTitles = document.querySelectorAll('.wmd-input-title');
 var editorDivs = document.querySelectorAll('.wmd-editor');
 var makeTitle = inputTitles.length !== 0;
 var makeEditor = editorDivs.length !== 0;
-global.editors = [];
+global.editors = {};
 if (makeEditor) {
   editorDivs = Array.prototype.slice.call(editorDivs);
   editorDivs.forEach(function(div) {
@@ -16,7 +16,7 @@ if (makeEditor) {
     var editor = new MarkdownAceEditor(markdown.Converter, postfix,
                                        {helpButton: editorHelp });
     pagedownExtra.hookEditor(editor);
-    editors.push(editor);
+    editors[postfix] = editor;
   });
 }
 var mathJaxConfig = document.createElement('script');
@@ -31,9 +31,9 @@ mathJaxConfigRequest.onload = function(event) {
   mathJaxCDN.onload = function() {      
     mathJax.initialize(MathJax);
     if (makeEditor) {
-      editors.forEach(function(editor) {
-        mathJax.hookEditor(editor);
-        editor.run();
+      Object.keys(editors).forEach(function(key) {
+        mathJax.hookEditor(editors[key]);
+        editors[key].run();
       });
     }
     if (makeTitle) {
@@ -50,7 +50,6 @@ mathJaxConfigRequest.onload = function(event) {
         inputTitle
         .addEventListener('input', mathJax.run);        
       });
-      //editor.editor.focus();
     }
   }
   document.head.appendChild(mathJaxCDN);

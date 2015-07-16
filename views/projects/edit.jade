@@ -16,7 +16,7 @@ block content
   form#project-form.wmd-panel    
     fieldset
       label(for="title") Title:
-      input#wmd-input-title-summary.text-input.wmd-input-title(type="text", name="title", placeholder="Enter a title here", value=temporaryProject.title || '')
+      input#wmd-input-title-summary.text-input.wmd-input-title(type="text", name="title", placeholder="Enter a title here", value=temporaryProject.title || '', autofocus=true)
     fieldset
       label(for="url") URL:
       input.text-input(type="text", name="url", placeholder="URL to project", value=temporaryProject.url || '')

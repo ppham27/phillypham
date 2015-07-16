@@ -18,12 +18,13 @@ router.post('/', authorize({role: 'commenter'}), function(req, res, next) {
     if (!post.published) throw new Error('you cannot comment on an unpublished post');    
     if (comment) {
       if (comment.postId !== post.id) throw new Error('post ids do not match');
+      if (!comment.published) throw new Error('you cannot reply to an unpublished comment');
       newComment.commentId = comment.id;
     } else {
       newComment.commentId = null;
     }
     newComment.body = req.body.body;
-    newComment.published = req.body.published || false;
+    if (req.body.published === true) newComment.published = true;
     trimComment(newComment);
     return post.createComment(newComment);
   })
