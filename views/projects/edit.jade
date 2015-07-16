@@ -201,4 +201,6 @@ append body
       } else {
         flash(response.error, {reset: true, className: 'error'});
       }
+      var flashBox = document.getElementById('flash');
+      if (flashBox) flashBox.scrollIntoView();
     }

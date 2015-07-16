@@ -115,7 +115,7 @@ router.get('/:title', function(req, res, next) {
   .then(function(project) {
     if (!project) return next(new Error('Project does not exist'));
     if (!project.published && (!req.user || !req.session.roles['project_manager'])) return next(new Error('Project is not published'));
-    res.render('projects/view', {project: project});
+    res.render('projects/view', {title: project.title, project: project});
   });
 })
 

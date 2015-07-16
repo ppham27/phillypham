@@ -3,6 +3,7 @@ include ../mixins/postView.jade
 extends ../layout
 
 block content
+  h1= title
   - var temporaryPost = locals.temporaryPost || {}
   - var tags = temporaryPost.Tags || []
   - tags = tags.map(function(tag) { return tag.name; })
@@ -88,6 +89,8 @@ append body
       } else {
         flash(response.error, {reset: true, className: 'error'});
       }
+      var flashBox = document.getElementById('flash');
+      if (flashBox) flashBox.scrollIntoView();
     }
   script
     include ../../public/javascripts/flash.js

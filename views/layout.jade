@@ -17,9 +17,7 @@ html
         #content
           #right-sidebar
             include ./includes/rightSidebar.jade
-          #mainbar
-            if locals.title
-              h1= title
+          #mainbar            
             include ./includes/flash.jade
             block content
       script(src="/javascripts/ace/ace.js")

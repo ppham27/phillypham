@@ -20,6 +20,8 @@ append body
       } else if (response.success) {
         if (response.message) flash(response.message, {reset: true, className: 'info'});
       }
+      var flashBox = document.getElementById('flash');
+      if (flashBox) flashBox.scrollIntoView();
       submitButton.removeAttribute('disabled');
       if (response.redirect) window.location.href = response.redirectLink;
     });

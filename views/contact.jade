@@ -1,6 +1,7 @@
 extends layout
 
 block content
+  h1= title
   ul.contact-list
     if settings.ApplicationSettings['contact:email']
       li

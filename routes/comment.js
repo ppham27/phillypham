@@ -104,6 +104,36 @@ router.get('/:commentId', authorize({failureSilent: true, role: 'comment_editor'
   });
 });
 
+router.delete('/:commentId', authorize({failureSilent: true, role: 'comment_editor'}), function(req, res, next) {
+  db.Comment.findById(req.params.commentId,
+                      {attributes: ['id', 'userId'],
+                       include: [{model: db.Post, attributes: ['id', 'title', 'published']}]})
+  .then(function(comment) {
+    var authorized = authorizeComment(req, comment);
+    if (authorized === true) {
+      return comment.destroy();
+    } else {
+      throw authorized;
+    }
+  })
+  .then(function() {    
+    req.flash('info', 'Comment was successfully deleted!');
+    res.json({success: true, redirect: true,
+              redirectLink: '/blog/' + encodeURIComponent(req.params.title)});
+  })
+  .catch(function(err) {
+    var error = [];
+    if (err.errors) {
+      err.errors.forEach(function(err) {
+        error.push(err.message);
+      });
+    } else {
+      error.push(err.message);
+    }
+    res.json({error: error});           
+  });  
+});
+
 module.exports = router;
 
 function authorizeComment(req, comment) {

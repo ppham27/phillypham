@@ -6,6 +6,7 @@ mixin settingsFieldSet(label, name, value, placeholder)
 extends layout
 
 block content
+  h1= title
   form#application-settings-form(action="POST", onsubmit="return false;")
     .wmd-panel
       h2 Sidebar Content
@@ -47,6 +48,8 @@ append body
       } else {
         flash(response.error, {reset: true, className: 'error'});
       }
+      var flashBox = document.getElementById('flash');
+      if (flashBox) flashBox.scrollIntoView();
       submitButton.disabled = false;
     });
     submitButton.addEventListener('click', function() {
