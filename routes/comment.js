@@ -138,7 +138,7 @@ module.exports = router;
 
 function authorizeComment(req, comment) {
   if (comment === null) {
-    return new Error('Post does not exist');
+    return new Error('comment does not exist');
   } else if (!comment.Post.published) {
     return new Error('you cannot comment on unpublished post');
   } else if (req.params.title !== comment.Post.title) {

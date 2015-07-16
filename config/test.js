@@ -105,46 +105,46 @@ config.fixtures.push({model: 'Post',
                              published: true,
                              User: {displayName: 'admin'},
                              Tags: [{name: 'math'}]}});
-                             
+// 1
 config.fixtures.push({model: 'Comment',
                       data: {body: 'comment',
                              published: true,
                              User: {displayName: 'moderator'},
                              Post: {title: 'First Post'}}});
-
+// 2
 config.fixtures.push({model: 'Comment',
                       data: {body: 'second comment',
                              published: true,
                              User: {displayName: 'moderator'},
                              Post: {title: 'First Post'}}});
-
+// 3
 config.fixtures.push({model: 'Comment',
                       data: {body: 'reply comment',
                              published: true,
                              User: {displayName: 'power'},
                              Post: {title: 'First Post'},
                              Comment: {id: 1}}});
-
+// 4
 config.fixtures.push({model: 'Comment',
                       data: {body: 'super nested comment',
                              published: true,
                              User: {displayName: 'standard'},
                              Post: {title: 'First Post'},
                              Comment: {id: 3}}});
-
+// 5
 config.fixtures.push({model: 'Comment',
                       data: {body: 'other reply comment',
                              published: true,
                              User: {displayName: 'power'},
                              Post: {title: 'First Post'},
                              Comment: {id: 1}}});
-
+// 6
 config.fixtures.push({model: 'Comment',
                       data: {body: 'unpublished comment',
                              published: false,
                              User: {displayName: 'standard'},
                              Post: {title: 'First Post'}}});
-
+// 7
 config.fixtures.push({model: 'Comment',
                       data: {body: 'nested unpublished comment',
                              published: false,
@@ -159,6 +159,12 @@ config.fixtures.push({model: 'Post',
                              published: false,
                              User: {displayName: 'admin'},
                              Tags: [{name: 'math'}]}});
+// 8
+config.fixtures.push({model: 'Comment',
+                      data: {body: 'comment of unpublished post',
+                             published: true,
+                             User: {displayName: 'power'},
+                             Post: {title: 'Unpublished Title'}}});
 
 config.fixtures.push({model: 'Post',
                       data: {title: 'Power Unpublished Title',

@@ -2,7 +2,7 @@ include ./shareButtons.jade
 include ./postAdmin.jade
 
   
-mixin postView(post, edit)
+mixin postView(post, edit, view)
   - post = post || {}
   - if (edit) post.User = locals.user || {}
   - post.Tags = post.Tags || []
@@ -32,7 +32,7 @@ mixin postView(post, edit)
       .left
         - var numComments = post.Comments.filter(function(d) { return d.published; }).length
         a(href=settings.config.siteUrl + '/' + encodeURIComponent(post.title) + '#comments')= numComments === 1 ? '1 comment' : numComments + ' comments'
-        if (locals.view)
+        if (view)
           .share-div.spacer
           button.reply(type="button") Comment
       .right

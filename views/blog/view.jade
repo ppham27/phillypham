@@ -35,7 +35,7 @@ mixin commentView(comment, offset)
 extends ../layout
 
 block content
-  +postView(temporaryPost)
+  +postView(temporaryPost, false, true)
   hr
   .comments
     - var unpublishedComments = temporaryPost.Comments.filter(function(comment) { return !comment.published && (locals.user && (roles['comment_editor'] || comment.User.id === locals.user.id)); }).sort(function(a, b) { return a.created_at - b.created_at; })
@@ -69,7 +69,7 @@ block content
       textarea#wmd-input-comment.wmd-input(name="body")
       .comment.new-comment
         .comment-content
-          a.user-link(href=locals.user ? '/user/' + encodeURIComponent(user.displayName) : '/login', target="_blank")
+          a.user-link(href=locals.user ? '/user/' + encodeURIComponent(user.displayName) : '/login', target=locals.user ? "_blank" : "_self")
             .photo
               +imgFallback(locals.user ? user.photoUrl : '/images/default-profile.jpg')
             .display-name!= locals.user ? user.displayName : 'Please log in'
@@ -282,7 +282,7 @@ append body
     }
     function replyHandle() {
       fillReplyPreview(this.dataset.commentId);      
-      window.location.href = '#new_comment';
+      window.location.href = '#new-comment';
       editors[0].editor.focus();
       return false;
     }
@@ -387,11 +387,13 @@ append body
         comment.User.displayName = '#{(locals.user && locals.user.displayName) || ''}';
         comment.User.photoUrl = '#{(locals.user && locals.user.photoUrl) || ''}';
         fillCommentPreview(comment);
+        document.querySelector('.comment-editor .comment.new-comment .user-link').target = '_blank';
       } else {
         comment.User.displayName = 'Please log in';
         comment.User.photoUrl = '/images/default-profile.jpg';
         fillCommentPreview(comment);
         document.querySelector('.comment-editor .comment.new-comment .user-link').href = '/login';
+        document.querySelector('.comment-editor .comment.new-comment .user-link').target = '_self';
       }      
       window.location.href = '#new-comment';
       editors[0].editor.focus();

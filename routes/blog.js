@@ -27,7 +27,7 @@ router.get('/:title', function(req, res, next) {
   .then(function(post) {
     if (post === null) return next(new Error('Post does not exist'));
     if (!post.published && (!req.user || (!req.session.roles.post_editor && req.user.id !== post.user_id))) return next(new Error('Not authorized. You can only view your own unpublished posts.'));
-    res.render('blog/view', {title: post.title, temporaryPost: post, view: true});
+    res.render('blog/view', {title: post.title, temporaryPost: post});
   });  
 });
 

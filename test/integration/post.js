@@ -1,4 +1,3 @@
-/*global done */
 var chai = require('chai');
 chai.use(require('chai-things'));
 var expect = chai.expect;
