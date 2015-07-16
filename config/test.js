@@ -166,6 +166,13 @@ config.fixtures.push({model: 'Comment',
                              User: {displayName: 'power'},
                              Post: {title: 'Unpublished Title'}}});
 
+// 9
+config.fixtures.push({model: 'Comment',
+                      data: {body: 'comment on second post',
+                             published: true,
+                             User: {displayName: 'power'},
+                             Post: {title: 'Second Post'}}});
+
 config.fixtures.push({model: 'Post',
                       data: {title: 'Power Unpublished Title',
                              body: 'Power unpublished post',

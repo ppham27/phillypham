@@ -16,7 +16,7 @@ router.post('/', authorize({role: 'commenter'}), function(req, res, next) {
     newComment.userId = req.user.id;
     if (post === null) throw new Error('post not found');
     if (!post.published) throw new Error('you cannot comment on an unpublished post');    
-    if (comment) {
+    if (comment) {      
       if (comment.postId !== post.id) throw new Error('post ids do not match');
       if (!comment.published) throw new Error('you cannot reply to an unpublished comment');
       newComment.commentId = comment.id;
@@ -53,14 +53,22 @@ router.post('/', authorize({role: 'commenter'}), function(req, res, next) {
 
 router.put('/:commentId', authorize({failureSilent: true, role: 'comment_editor'}), function(req, res, next) {
   if (!req.is('json')) return res.json({error: 'only json requests are accepted'});
-  db.Comment.findById(req.params.commentId,
-                      {attributes: ['id', 'body', 'published', 'userId'],
-                       include: [{model: db.Post, attributes: ['id', 'title', 'published']}]})
-  .then(function(comment) {
+  var promise = Promise.join(db.Comment.findById(req.params.commentId,
+                                                 {attributes: ['id', 'body', 'published', 'userId', 'postId'],
+                                                  include: [{model: db.Post, attributes: ['id', 'title', 'published']}]}),
+                             req.body.commentId ? db.Comment.findById(req.body.commentId, {attributes: ['id', 'published', 'postId', 'commentId']}) : Promise.resolve(null));
+  promise
+  .spread(function(comment, replyComment) {
     var authorized = authorizeComment(req, comment);
     if (authorized === true) {
       var updates = {body: req.body.body || ''};
-      if (req.body.commentId) updates.commentId = parseInt(req.body.commentId) || null;
+      if (replyComment !== null) {
+        if (comment.postId !== replyComment.postId) throw new Error('post ids do not match');
+        if (!replyComment.published) throw new Error('you cannot reply to an unpublished comment');
+        updates.commentId = replyComment.id;
+      } else if (req.body.commentId && replyComment === null) {
+        throw new Error(req.body.commentId.toString() + ' is not a comment id');
+      }
       if (req.body.published === true) updates.published = true;
       trimComment(updates);
       return comment.update(updates);

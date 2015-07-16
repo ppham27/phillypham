@@ -330,11 +330,209 @@ describe('comment routes', function() {
     });
 
     describe('successes', function() {
-      
+      it('should update a published subcomment', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly updated comment'},
+                                    true, {is: ['json'], accepts: ['json']});
+          req.user = user;
+          req.params.title = 'First Post'; 
+          req.params.commentId = 4; 
+          var res = {json: function(json) {
+                       expect(json.success).to.be.true;
+                       expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('First Post') + '#comment-' + 4);
+                       db.Comment.findOne({where: {body: 'newly updated comment'}})
+                       .then(function(comment) {
+                         expect(comment.commentId).to.equal(3);
+                         expect(comment.published).to.be.true;
+                         done();                         
+                       });
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
+
+      it('should update a published comment', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly updated comment'},
+                                    true, {is: ['json'], accepts: ['json']});
+          req.user = user;
+          req.params.title = 'First Post'; 
+          req.params.commentId = 2; 
+          var res = {json: function(json) {
+                       expect(json.success).to.be.true;
+                       expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('First Post') + '#comment-' + 2);
+                       db.Comment.findOne({where: {body: 'newly updated comment'}})
+                       .then(function(comment) {
+                         expect(comment.commentId).to.be.null;
+                         expect(comment.published).to.be.true;
+                         done();                         
+                       });
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
+
+      it('should update a published comment as a subcomment', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly updated comment', commentId: 4},
+                                    true, {is: ['json'], accepts: ['json']});
+          req.user = user;
+          req.params.title = 'First Post'; 
+          req.params.commentId = 2; 
+          var res = {json: function(json) {
+                       expect(json.success).to.be.true;
+                       expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('First Post') + '#comment-' + 2);
+                       db.Comment.findOne({where: {body: 'newly updated comment'}})
+                       .then(function(comment) {
+                         expect(comment.commentId).to.equal(4);
+                         expect(comment.published).to.be.true;
+                         done();                         
+                       });
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
+
+      it('should publish a comment', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly updated comment', published: true},
+                                    true, {is: ['json'], accepts: ['json']});
+          req.user = user;
+          req.params.title = 'First Post'; 
+          req.params.commentId = 6;
+          var res = {json: function(json) {
+                       expect(json.success).to.be.true;
+                       expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('First Post') + '#comment-' + 6);
+                       db.Comment.findOne({where: {body: 'newly updated comment'}})
+                       .then(function(comment) {
+                         expect(comment.commentId).to.be.null;;
+                         expect(comment.published).to.be.true;
+                         done();                         
+                       });
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
+
+      it('should save an unpublished comment and not redirect', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly updated comment'},
+                                    true, {is: ['json'], accepts: ['json']});
+          req.user = user;
+          req.params.title = 'First Post'; 
+          req.params.commentId = 7;
+          var res = {json: function(json) {
+                       expect(json.success).to.be.true;
+                       expect(json.redirect).to.be.undefined;
+                       expect(json.message).to.match(/comment was updated/i);
+                       db.Comment.findOne({where: {body: 'newly updated comment'}})
+                       .then(function(comment) {
+                         expect(comment.commentId).to.equal(3);;
+                         expect(comment.published).to.be.false;
+                         done();                         
+                       });
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });
+      });
     });
 
     describe('errors', function() {
-      
+      it('should reject empty updates', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: ''},
+                                    true, {is: ['json'], accepts: ['json']});
+          req.user = user;
+          req.params.title = 'First Post'; 
+          req.params.commentId = 3;
+          var res = {json: function(json) {
+                       expect(json.error).to.include.something.that.matches(/body cannot be empty/);
+                       done();
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });      
+      });
+
+      it('should reject updates where reply comment does not exist', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly updated comment', commentId: 500},
+                                    true, {is: ['json'], accepts: ['json']});
+          req.user = user;
+          req.params.title = 'First Post'; 
+          req.params.commentId = 3;
+          var res = {json: function(json) {
+                       expect(json.error).to.include.something.that.matches(/not a comment id/);
+                       done();
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });      
+      });
+
+      it('should reject updates where reply comment is not published', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly updated comment', commentId: 7},
+                                    true, {is: ['json'], accepts: ['json']});
+          req.user = user;
+          req.params.title = 'First Post'; 
+          req.params.commentId = 3;
+          var res = {json: function(json) {
+                       expect(json.error).to.include.something.that.matches(/you cannot reply to an unpublished comment/);
+                       done();
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });      
+      });
+
+      it('should reject updates where reply comment belongs to a different post', function(done) {
+        var db = this.db;
+        var handle = this.handle;
+        db.User.findOne({where: {displayName: 'admin'}})
+        .then(function(user) {
+          var req = new FakeRequest({body: 'newly updated comment', commentId: 7},
+                                    true, {is: ['json'], accepts: ['json']});
+          req.user = user;
+          req.params.title = 'Second Post'; 
+          req.params.commentId = 9;
+          var res = {json: function(json) {
+                       expect(json.error).to.include.something.that.matches(/post ids do not match/);
+                       done();
+                     }};
+          var next = {};
+          handle(req, res, next);
+        });      
+      });
     });
   });
 

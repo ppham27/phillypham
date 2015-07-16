@@ -241,6 +241,7 @@ append body
         buttons[1].onclick = destroyHandle.bind({dataset: {commentId: id}});
         setButtonLabel(buttons[2], 'Reset');
         buttons[2].onclick = resetCommentEditor;
+        setButtonLabel(buttons[3], 'Hidden');
         buttons[3].style.display = 'none';
         buttons[3].onclick = function() { return false; }
       }
@@ -254,6 +255,7 @@ append body
       buttons[1].onclick = postComment.bind(buttons[0], {published: true});
       setButtonLabel(buttons[2], 'Reset');
       buttons[2].onclick = resetCommentEditor;
+      setButtonLabel(buttons[3], 'Hidden');
       buttons[3].style.display = 'none';
       buttons[3].onclick = function() { return false; }
     }
@@ -377,6 +379,7 @@ append body
 
     function setButtonLabel(button, label) {
       button.innerHTML = label + '<div class="overlay"></div>';
+      button.className = 'submit-button ' + label.toLowerCase().replace(/\s/g, '-');
       return true;
     }
 
