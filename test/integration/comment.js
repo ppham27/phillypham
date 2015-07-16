@@ -261,7 +261,7 @@ describe('comment routes', function() {
                        .then(function(comment) {
                          expect(comment.published).to.be.false;
                          expect(comment.commentId).to.be.null;
-                         expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('Second Post') + '#edit-comment-' + comment.id);
+                         expect(json.redirectLink).to.equal('/' + encodeURIComponent('Second Post') + '#edit-comment-' + comment.id);
                          done();
                        });
                      }};
@@ -285,7 +285,7 @@ describe('comment routes', function() {
                        .then(function(comment) {
                          expect(comment.published).to.be.true;
                          expect(comment.commentId).to.be.null;
-                         expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('Second Post') + '#comment-' + comment.id);
+                         expect(json.redirectLink).to.equal('/' + encodeURIComponent('Second Post') + '#comment-' + comment.id);
                          done();
                        });
                      }};
@@ -309,7 +309,7 @@ describe('comment routes', function() {
                        .then(function(comment) {
                          expect(comment.published).to.be.true;
                          expect(comment.commentId).to.equal(4);                       
-                         expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('First Post') + '#comment-' + comment.id);
+                         expect(json.redirectLink).to.equal('/' + encodeURIComponent('First Post') + '#comment-' + comment.id);
                          done();
                        });
                      }};
@@ -342,7 +342,7 @@ describe('comment routes', function() {
           req.params.commentId = 4; 
           var res = {json: function(json) {
                        expect(json.success).to.be.true;
-                       expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('First Post') + '#comment-' + 4);
+                       expect(json.redirectLink).to.equal('/' + encodeURIComponent('First Post') + '#comment-' + 4);
                        db.Comment.findOne({where: {body: 'newly updated comment'}})
                        .then(function(comment) {
                          expect(comment.commentId).to.equal(3);
@@ -367,7 +367,7 @@ describe('comment routes', function() {
           req.params.commentId = 2; 
           var res = {json: function(json) {
                        expect(json.success).to.be.true;
-                       expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('First Post') + '#comment-' + 2);
+                       expect(json.redirectLink).to.equal('/' + encodeURIComponent('First Post') + '#comment-' + 2);
                        db.Comment.findOne({where: {body: 'newly updated comment'}})
                        .then(function(comment) {
                          expect(comment.commentId).to.be.null;
@@ -392,7 +392,7 @@ describe('comment routes', function() {
           req.params.commentId = 2; 
           var res = {json: function(json) {
                        expect(json.success).to.be.true;
-                       expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('First Post') + '#comment-' + 2);
+                       expect(json.redirectLink).to.equal('/' + encodeURIComponent('First Post') + '#comment-' + 2);
                        db.Comment.findOne({where: {body: 'newly updated comment'}})
                        .then(function(comment) {
                          expect(comment.commentId).to.equal(4);
@@ -417,7 +417,7 @@ describe('comment routes', function() {
           req.params.commentId = 6;
           var res = {json: function(json) {
                        expect(json.success).to.be.true;
-                       expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('First Post') + '#comment-' + 6);
+                       expect(json.redirectLink).to.equal('/' + encodeURIComponent('First Post') + '#comment-' + 6);
                        db.Comment.findOne({where: {body: 'newly updated comment'}})
                        .then(function(comment) {
                          expect(comment.commentId).to.be.null;;
@@ -551,7 +551,7 @@ describe('comment routes', function() {
       req.params.title = 'First Post';
       var res = {json: function(json) {
                    expect(json.success).to.be.true;
-                   expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('First Post'));
+                   expect(json.redirectLink).to.equal('/' + encodeURIComponent('First Post'));
                    db.Comment.findById(1)
                    .then(function(comment) {
                      expect(comment).to.be.null;

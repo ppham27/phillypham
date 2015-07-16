@@ -6,7 +6,7 @@ var url = require('url');
 var config = require('config');
 
 
-describe('projects', function() {
+describe('posts', function() {
   before(function(done) {
     this.siteUrl = 'http://localhost:8888';
     this.app = require('../../app')
@@ -67,7 +67,7 @@ describe('projects', function() {
     .pause(2000)
     .url()
     .then(function(res) {
-      return expect(url.parse(res.value).path).to.equal('/blog/' + encodeURIComponent('New Post'));      
+      return expect(url.parse(res.value).path).to.equal('/' + encodeURIComponent('New Post'));      
     })
     .getText('h1')
     .then(function(text) {
@@ -98,7 +98,7 @@ describe('projects', function() {
           return expect(text).to.not.include.something.that.equals('New Post'); 
         })
         .click('a.topbar-link[href="/post/list"]')
-        .isExisting('a[href="/blog/' + encodeURIComponent('New Post') + '"]')
+        .isExisting('a[href="/' + encodeURIComponent('New Post') + '"]')
         .then(function(isExisting) {
           expect(isExisting).to.be.true;
           done();
@@ -145,7 +145,7 @@ describe('projects', function() {
           return expect(text).to.not.include.something.that.equals('New Post'); 
         })
         .click('a.topbar-link[href="/post/list"]')
-        .isExisting('a[href="/blog/' + encodeURIComponent('New Post') + '"]')
+        .isExisting('a[href="/' + encodeURIComponent('New Post') + '"]')
         .then(function(isExisting) {
           expect(isExisting).to.be.true;
           done();
@@ -167,7 +167,7 @@ describe('projects', function() {
     .pause(2000)
     .url()
     .then(function(res) {
-      return expect(url.parse(res.value).path).to.equal('/blog/' + encodeURIComponent('Updated Post'));      
+      return expect(url.parse(res.value).path).to.equal('/' + encodeURIComponent('Updated Post'));      
     })
     .getText('.post .wmd-preview p')
     .then(function(text) {

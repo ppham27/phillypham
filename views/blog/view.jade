@@ -41,7 +41,7 @@ block content
     - var unpublishedComments = temporaryPost.Comments.filter(function(comment) { return !comment.published && (locals.user && (roles['comment_editor'] || comment.User.id === locals.user.id)); }).sort(function(a, b) { return a.created_at - b.created_at; })
     if (unpublishedComments.length)
       h2 Unpublished Comments
-      .wmd-preview
+      .wmd-preview.unposted-comments
         table
           tr
             th ID
@@ -65,7 +65,7 @@ block content
     form.comment-editor(method="POST", action="comment", onsubmit="return false;")
       #comment-reply
       #wmd-button-bar-comment.wmd-button-bar
-      #wmd-editor-comment.wmd-editor
+      #wmd-editor-comment.wmd-editor.tex2jax_ignore
       textarea#wmd-input-comment.wmd-input(name="body")
       .comment.new-comment
         .comment-content
@@ -155,6 +155,8 @@ append body
       var response = typeof this.response === 'string' ? JSON.parse(this.response) : this.response;
       if (response.error) {
         flash(response.error, {reset: true, className: 'error'});
+        removeFlash();
+        resetCommentEditor({keepHash: true});
       } else {
         fillReplyPreview(response.commentId);
         fillCommentPreview(response);
@@ -358,32 +360,35 @@ append body
         cleanUp();
       }
       function cleanUp() {
-        setTimeout(function() {
-          var flashBox = document.getElementById('flash');
-          flashBox.style.height = window.getComputedStyle(flashBox).getPropertyValue('height');
-          flashBox.style.opacity = 1;
-          setTimeout(function() {
-            flashBox.style.height = '0px';
-            flashBox.style.padding = '0px';
-            flashBox.style.marginTop = '0px';
-            flashBox.style.marginBottom = '0px';
-            flashBox.style.opacity = 0;  
-          }, 0);
-          setTimeout(function() {
-            flashBox.parentNode.removeChild(flashBox);
-          }, 500);          
-        }, 2000);
+        removeFlash();
         editors['-comment'].editor.focus();
       }
     }
-
+    function removeFlash() {
+      setTimeout(function() {
+        var flashBox = document.getElementById('flash');
+        flashBox.style.height = window.getComputedStyle(flashBox).getPropertyValue('height');
+        flashBox.style.opacity = 1;
+        setTimeout(function() {
+          flashBox.style.height = '0px';
+          flashBox.style.padding = '0px';
+          flashBox.style.marginTop = '0px';
+          flashBox.style.marginBottom = '0px';
+          flashBox.style.opacity = 0;  
+        }, 0);
+        setTimeout(function() {
+          flashBox.parentNode.removeChild(flashBox);
+        }, 1000);          
+      }, 2000);
+    }
     function setButtonLabel(button, label) {
       button.innerHTML = label + '<div class="overlay"></div>';
       button.className = 'submit-button ' + label.toLowerCase().replace(/\s/g, '-');
       return true;
     }
 
-    function resetCommentEditor() {      
+    function resetCommentEditor(options) {
+      options = options || {};
       setupCreate();
       var comment = {body: '', User: {}};
       if (#{!!locals.user}) {
@@ -398,6 +403,6 @@ append body
         document.querySelector('.comment-editor .comment.new-comment .user-link').href = '/login';
         document.querySelector('.comment-editor .comment.new-comment .user-link').target = '_self';
       }      
-      window.location.href = '#new-comment';
+      if (!options.keepHash) window.location.href = '#new-comment';
       editors['-comment'].editor.focus();
     }

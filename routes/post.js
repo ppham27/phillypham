@@ -54,7 +54,7 @@ router.post('/', authorize({role: 'poster'}), function(req, res, next) {
   .spread(function(post, tags) {    
     req.flash('info', 'Post was successfully created!');
     if (post.published) {
-      res.json({success: true, redirect: true, redirectLink: '/blog/' + encodeURIComponent(post.title)});
+      res.json({success: true, redirect: true, redirectLink: '/' + encodeURIComponent(post.title)});
     } else {
       res.json({success: true, redirect: true, redirectLink: '/post/' + post.id});
     }
@@ -124,7 +124,7 @@ router.put('/:id', authorize({failureSilent: true, role: 'post_editor'}), functi
   .spread(function(post, tags) {
     if (post.published) {
       req.flash('info', 'Post has been updated!');
-      res.json({success: true, redirect: true, redirectLink: '/blog/' + encodeURIComponent(post.title)});
+      res.json({success: true, redirect: true, redirectLink: '/' + encodeURIComponent(post.title)});
     } else {
       var message = ['Post has been updated!']
       if (!post.published && updates.published === false) message.push('Post was unpublished.');

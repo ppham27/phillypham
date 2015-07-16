@@ -15,9 +15,6 @@ router.use('/blog', require('./blog'));
 router.use('/post', require('./post'));
 router.use('/projects', require('./projects'));
 router.use('/settings', require('./settings'));
-router.get('/test', function(req, res, next) {
-  res.redirect('/First%20Post#new-comment');
-});
 router.use(require('./blog'));
 
 

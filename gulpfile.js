@@ -113,7 +113,7 @@ gulp.task('test:unit', function(done) {
 });
 
 gulp.task('test:integration', function(done) {
-  var mocha = child_process.spawn('mocha', ['test/integration', '-t', '5000']);
+  var mocha = child_process.spawn('mocha', ['test/integration', '-t', '10000']);
   mocha.stdout.pipe(process.stdout);
   mocha.stderr.pipe(process.stdout);
   mocha.on('exit', function() {

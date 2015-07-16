@@ -3,5 +3,5 @@ if locals.flash && flash.length
   #flash
     ul
       while message = flash.shift()
-        li(class="#{message.type}")= message.message
+        li(class="#{message.type}")!= message.message
   

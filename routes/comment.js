@@ -32,10 +32,10 @@ router.post('/', authorize({role: 'commenter'}), function(req, res, next) {
     req.flash('info', 'Comment was successfully created!');
     if (newComment.published) {
       return res.json({success: true, redirect: true,
-                       redirectLink: '/blog/' + encodeURIComponent(req.params.title) + '#comment-' + newComment.id});
+                       redirectLink: '/' + encodeURIComponent(req.params.title) + '#comment-' + newComment.id});
     } else {
       return res.json({success: true, redirect: true,
-                       redirectLink: '/blog/' + encodeURIComponent(req.params.title) + '#edit-comment-' + newComment.id});
+                       redirectLink: '/' + encodeURIComponent(req.params.title) + '#edit-comment-' + newComment.id});
     }
   })
   .catch(function(err) {
@@ -80,7 +80,7 @@ router.put('/:commentId', authorize({failureSilent: true, role: 'comment_editor'
     if (comment.published) {      
       req.flash('info', 'Comment was successfully updated!');
       res.json({success: true, redirect: true,
-                redirectLink: '/blog/' + encodeURIComponent(req.params.title) + '#comment-' + comment.id});
+                redirectLink: '/' + encodeURIComponent(req.params.title) + '#comment-' + comment.id});
     } else {
       res.json({success: true, message: 'Comment was updated!'});
     }
@@ -128,7 +128,7 @@ router.delete('/:commentId', authorize({failureSilent: true, role: 'comment_edit
   .then(function() {    
     req.flash('info', 'Comment was successfully deleted!');
     res.json({success: true, redirect: true,
-              redirectLink: '/blog/' + encodeURIComponent(req.params.title)});
+              redirectLink: '/' + encodeURIComponent(req.params.title)});
   })
   .catch(function(err) {
     var error = [];

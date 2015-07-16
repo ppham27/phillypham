@@ -9,7 +9,7 @@ mixin postView(post, edit, view)
   - post.Comments = post.Comments || []
   .post.wmd-panel
     h1.post-title
-      a(class=edit ? 'wmd-preview-title' : null, href='/blog/' + encodeURIComponent(post.title))= post.title
+      a(class=edit ? 'wmd-preview-title' : null, href='/' + encodeURIComponent(post.title))= post.title
     a(href=post.photoUrl || null, target='_blank')
       img.centered.post-img(src=post.photoUrl, alt='Photo URL is broken', style=post.photoUrl ? null : 'display: none')
     .wmd-preview(id=edit ? 'wmd-preview' : null)!= post.bodyHtml
@@ -31,7 +31,7 @@ mixin postView(post, edit, view)
     .footer
       .left
         - var numComments = post.Comments.filter(function(d) { return d.published; }).length
-        a(href=settings.config.siteUrl + '/' + encodeURIComponent(post.title) + '#comments')= numComments === 1 ? '1 comment' : numComments + ' comments'
+        a(href='/' + encodeURIComponent(post.title) + '#comments')= numComments === 1 ? '1 comment' : numComments + ' comments'
         if (view)
           .share-div.spacer
           button.reply(type="button") Comment

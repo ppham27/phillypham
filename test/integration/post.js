@@ -32,7 +32,7 @@ describe('post routes', function() {
     describe('view', function() {
       before(function() {
         this.handle = blogRoutes.stack.filter(function(handle) {
-                        return handle.route.path === '/:title' && handle.route.methods.get;
+                        return handle.route && handle.route.path === '/:title' && handle.route.methods.get;
                       });
         this.handle = this.handle[0].route.stack[0].handle;
       });
@@ -232,7 +232,7 @@ describe('post routes', function() {
         var res = {json: function(json) {
                      expect(json.success).to.be.true;
                      expect(json.redirect).to.be.true;
-                     expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('New Post'));
+                     expect(json.redirectLink).to.equal('/' + encodeURIComponent('New Post'));
                      db.Post.findById(1,
                                       {include: [db.Tag]})
                      .then(function(post) {
@@ -265,7 +265,7 @@ describe('post routes', function() {
           var res = {json: function(json) {
                        expect(json.success).to.be.true;
                        expect(json.redirect).to.be.true;
-                       expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('New Post'));
+                       expect(json.redirectLink).to.equal('/' + encodeURIComponent('New Post'));
                        db.Post.findById(post.id)
                        .then(function(post) {
                          expect(post.published).to.be.true;
@@ -344,7 +344,7 @@ describe('post routes', function() {
         var res = {json: function(json) {
                      expect(json.success).to.be.true;
                      expect(json.redirect).to.be.true;
-                     expect(json.redirectLink).to.equal('/blog/' + encodeURIComponent('New Post'));
+                     expect(json.redirectLink).to.equal('/' + encodeURIComponent('New Post'));
                      done();
                    }};
         this.handle(req, res);
