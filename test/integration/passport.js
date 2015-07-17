@@ -165,11 +165,8 @@ describe('passport', function() {
                                  biography: 'hello'});
       var callback = function(err, user, message) {
         expect(user).to.be.false;
-        var uniqueError = false;
-        req.session.flash.forEach(function(flashMessage) {
-          if (flashMessage.type === 'error' && /already exists/.test(flashMessage.message)) uniqueError = true;
-        });
-        expect(uniqueError).to.be.true;
+        expect(req.session.temporaryUser.displayName).to.equal('phil');
+        expect(message).to.match(/already exists/);        
         done();
       };
       passport._strategies.localRegistration._verify(req, undefined, undefined, callback);
@@ -183,6 +180,7 @@ describe('passport', function() {
                                  biography: 'hello'});
       var callback = function(err, user, message) {
         expect(user).to.be.false;
+        expect(req.session.temporaryUser.displayName).to.equal('phil');
         var emailError = false;
         req.session.flash.forEach(function(flashMessage) {
           if (flashMessage.type === 'error' && /not properly formatted/.test(flashMessage.message)) emailError = true;
@@ -199,8 +197,9 @@ describe('passport', function() {
                                  password: encryptPassword('abc'), 
                                  passwordConfirmation: encryptPassword('abc'),
                                  biography: 'hello'});
-      var callback = function(err, user, message) {
+      var callback = function(err, user, message) {        
         expect(user).to.be.false;
+        expect(req.session.temporaryUser.displayName).to.equal('phil');
         var foundPasswordLengthError = false;
         req.session.flash.forEach(function(flashMessage) {
           if (flashMessage.type === 'error' && /too short/.test(flashMessage.message)) foundPasswordLengthError = true;
@@ -219,6 +218,7 @@ describe('passport', function() {
                                  biography: 'hello'});
       var callback = function(err, user, message) {
         expect(user).to.be.false;
+        expect(req.session.temporaryUser.email).to.equal('phil@abc.com');
         var displayNameLengthError = false;
         req.session.flash.forEach(function(flashMessage) {
           if (flashMessage.type === 'error' && /too short/.test(flashMessage.message)) displayNameLengthError = true;

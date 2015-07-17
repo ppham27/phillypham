@@ -2,10 +2,13 @@
 var chai = require('chai');
 chai.use(require('chai-things'));
 var expect = chai.expect;
+var sinon = require('sinon');
 var http = require('http');
 var url = require('url');
 var config = require('config');
 
+var random = require('../../lib/random');
+var transporter = require('../../lib/smtpTransporter');
 
 describe('comments', function() {
   before(function(done) {
@@ -407,6 +410,138 @@ describe('comment view', function() {
     .then(function(text) {
       expect(text.length).to.equal(2);
       done();
+    });
+  });
+});
+
+describe('comment as an unverified user', function() {
+  before(function(done) {    
+    sinon.stub(random, 'token').returns('simpleToken');
+    sinon.stub(transporter, 'sendMail', function(mailOptions, callback) {
+      callback(null, true);      
+    });
+
+    this.siteUrl = 'http://localhost:8888';
+    this.app = require('../../app')
+    this.db = require('../../models');
+    this.server = http.createServer(this.app);
+    this.server.listen(8888);     
+    if (this.app.isReady) {
+      done();
+    } else {
+      this.app.once('ready', function() {
+        done();
+      });    
+    }
+  });
+  
+  beforeEach(function(done) {
+    var siteUrl = this.siteUrl;
+    this.browser = require('../support/browser')(); 
+    var browser = this.browser;
+    var db = this.db;
+    db.sequelize.sync({force: true})
+    .then(function() {        
+      return db.loadFixtures(config.fixtures);        
+    })
+    .then(function() {
+      browser.init().url(siteUrl)
+      .click('a.topbar-link[href="/login"]')
+      .setValue('input[name="email"]', 'phil@phillypham.com')
+      .setValue('input[name="password"]', 'unverified')
+      .click('button[type="submit"]')   
+      .click('a[href="/' + encodeURIComponent('First Post') + '"]')
+      .then(function() {
+        done();
+      });
+    });
+  });
+  
+  afterEach(function(done) {
+    this.browser.end()
+    .then(function() {
+      done();
+    });
+  });
+
+  after(function(done) {
+    random.token.restore();
+    transporter.sendMail.restore();
+    this.server.close(function(err) {
+      done(err);
+    });
+  });
+  
+  it('should flash error message on empty comment', function(done) {
+    var browser = this.browser;
+    browser.click('button.submit-button.comment')
+    .pause(1000)
+    .getText('.comments #flash')
+    .then(function(text) {
+      expect(text).to.match(/body cannot be empty/);
+      done();
+    });
+  });
+
+  it('should make a published reply', function(done) {
+    var browser = this.browser;
+    var db = this.db;
+    browser.click('.posted-comments .comment.comment-1 .reply-expander')
+    .pause(1000)
+    .click('.posted-comments .comment.comment-5 button.reply')
+    .pause(1000)
+    .click('#wmd-editor-comment')    
+    .keys('newly unverified comment')
+    .click('button.submit-button.comment')
+    .pause(1000)
+    .click('button.verify-email')
+    .pause(2000)
+    .url(url.resolve(this.siteUrl, '/register/verify/simpleToken'))
+    .pause(1000)
+    .url() 
+    .then(function(res) {
+      db.Comment.findOne({where: {body: 'newly unverified comment'}})
+      .then(function(comment) {
+        var parsedUrl = url.parse(res.value);
+        expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'))
+        expect(parsedUrl.hash).to.equal('#comment-' + comment.id);
+        browser.getText('.comment.comment-5 .comment.comment-' + comment.id + ' .wmd-preview')
+        .then(function(text) {
+          expect(text).to.match(/newly unverified comment/);
+          done();
+        });
+      });
+    });
+  });
+
+  it('should make an unpublished reply', function(done) {
+    var browser = this.browser;
+    var db = this.db;
+    browser.click('.posted-comments .comment.comment-1 .reply-expander')
+    .pause(1000)
+    .click('.posted-comments .comment.comment-5 button.reply')
+    .pause(1000)
+    .click('#wmd-editor-comment')    
+    .keys('newly unverified comment')
+    .click('button.submit-button.save-draft')
+    .pause(1000)
+    .click('button.verify-email')
+    .pause(2000)
+    .url(url.resolve(this.siteUrl, '/register/verify/simpleToken'))
+    .pause(1000)
+    .url() 
+    .then(function(res) {
+      db.Comment.findOne({where: {body: 'newly unverified comment'}})
+      .then(function(comment) {
+        var parsedUrl = url.parse(res.value);
+        expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'))
+        expect(parsedUrl.hash).to.equal('#comment-' + comment.id);
+        browser.getText('.comment.comment-5 .comment.comment-' + comment.id + ' .wmd-preview')
+        .then(function(text) {
+          expect(text).to.match(/newly unverified comment/);
+          done();
+        });
+      });
     });
   });
 });

@@ -5,7 +5,7 @@ block content
   script
     include ../public/javascripts/encryptPasswordBundle-min.js
   form#login-form(action="/login", method="POST", onsubmit="return encryptPassword(this);")
-    input.text(type="text", name="email", placeholder="Email")
+    input.text(type="text", name="email", placeholder="Email", autofocus=true)
     br
     input.text.encrypt(type="password", name="password", placeholder="Password")
     br

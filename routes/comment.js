@@ -7,13 +7,13 @@ var authorize = require('../lib/middleware/authorize');
 
 var db = require('../models');
 
-router.post('/', authorize({role: 'commenter'}), function(req, res, next) {
+router.post('/', authorize({failureSilent: true, role: 'commenter'}), function(req, res, next) {
   if (!req.is('json')) return res.json({error: 'only json requests are accepted'});
   Promise.join(db.Post.findOne({where: {title: req.params.title}}), 
                req.body.commentId ? db.Comment.findById(req.body.commentId, {attributes: ['id', 'published', 'postId']}) : Promise.resolve(null))
   .spread(function(post, comment) {    
     var newComment = {};
-    newComment.userId = req.user.id;
+    newComment.userId = req.user ? req.user.id : null;
     if (post === null) throw new Error('post not found');
     if (!post.published) throw new Error('you cannot comment on an unpublished post');    
     if (comment) {      
@@ -26,9 +26,24 @@ router.post('/', authorize({role: 'commenter'}), function(req, res, next) {
     newComment.body = req.body.body;
     if (req.body.published === true) newComment.published = true;
     trimComment(newComment);
-    return post.createComment(newComment);
+    if (newComment.body === '') throw new Error('body cannot be empty');
+    if (req.isAuthorized) {
+      return post.createComment(newComment);
+    } else {
+      newComment.postId = post.id;
+      req.session.deferredComment = newComment;
+      req.session.preLoginPath = '/' + encodeURIComponent(post.title);
+      if (req.user) {
+        req.flash('info', 'Verify your email address to post comment');
+        return Promise.resolve('/user/edit/' + encodeURIComponent(req.user.displayName));
+      } else {
+        req.flash('info', 'Login to post your comment');
+        return Promise.resolve('/login');
+      }
+    }
   })
   .then(function(newComment) {
+    if (typeof newComment === 'string') return res.json({success: true, redirect: true, redirectLink: newComment});
     req.flash('info', 'Comment was successfully created!');
     if (newComment.published) {
       return res.json({success: true, redirect: true,
