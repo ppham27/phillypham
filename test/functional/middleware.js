@@ -166,12 +166,12 @@ describe('middleware', function() {
         .click('#google-button')
         .setValue('#Email', user.email)
         .click('#next')
-        .pause(1000)
+        .pause(3000)
         .setValue('#Passwd', user.password)
         .click('#signIn')
-        .pause(2000)            //waiting for callback and redirects
+        .pause(3000)            //waiting for callback and redirects
         .click('#submit_approve_access') // i can't preauthorize for some reason?
-        .pause(1000)
+        .pause(3000)
         .then(function(res) {
           // asuume 
           // now check that the user actually exists
@@ -196,12 +196,12 @@ describe('middleware', function() {
           .click('#google-button')
           .setValue('#Email', user.email)
           .click('#next')
-          .pause(1000)  
+          .pause(3000)  
           .setValue('#Passwd', user.password)
           .click('#signIn')
-          .pause(2000)            //waiting for callback and redirects
+          .pause(3000)            //waiting for callback and redirects
           .click('#submit_approve_access') // i can't preauthorize for some reason?
-          .pause(1000)
+          .pause(3000)
           .then(function(res) {
             // now check that the user is merged
             db.User.findOne({where: {email: user.email}})

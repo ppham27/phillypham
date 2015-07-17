@@ -318,21 +318,21 @@ append body
     function expandReplies() {
       var children = document.querySelector('.children.comment-' + this.dataset.commentId);
       if (this.classList.contains('expanded')) {
-        children.style.height = children.getBoundingClientRect().height + 'px';        
-        setTimeout(function() { children.style.height = null; }, 0);
+        children.style.height = children.getBoundingClientRect().height + 'px';                
         this.classList.remove('expanded');
         children.classList.remove('expanded');
+        setTimeout(function() { children.style.height = null; }, 0);
       } else {
         children.style.height = '0px';
+        this.classList.add('expanded');
+        children.classList.add('expanded');
         setTimeout(function() {
           var height = children.querySelector('.inner-children').getBoundingClientRect().height;
           children.style.height = height + 'px';
           setTimeout(function() {
             children.style.height = null;
           }, 500);
-        }, 0)
-        this.classList.add('expanded');
-        children.classList.add('expanded');
+        }, 0);
       }
     }
     function toggleButtons(disabled) {

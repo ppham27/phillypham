@@ -58,6 +58,22 @@ describe('comments', function() {
     });
   });
 
+  it('should only have two unpublished post and 5 edit posts', function(done) {
+    var browser = this.browser;
+    browser
+    .getText('.unposted-comments button.edit')
+    .then(function(text) {
+      expect(text.length).to.equal(2);
+      return browser.getText('.posted-comments button.edit');
+    })
+    .then(function(text) {    
+      expect(text.length).to.equal(5);
+      done();
+    });
+  });
+
+  
+
   it('should create a new comment', function(done) {
     var browser = this.browser;
     var db = this.db;
@@ -165,6 +181,27 @@ describe('comments', function() {
 
   it('should reply to a comment', function(done) {
     var browser = this.browser;
+    var db = this.db;
+    browser.click('.posted-comments .comment.comment-2 button.reply')
+    .click('#wmd-editor-comment')
+    .keys('newly created nested comment')
+    .click('button.submit-button.comment')
+    .pause(2000)
+    .url()
+    .then(function(res) {
+      var parsedUrl = url.parse(res.value);
+      expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'));
+      db.Comment.findOne({where: {body: 'newly created nested comment'}})
+      .then(function(comment) {
+        expect(parsedUrl.hash).to.equal('#comment-' + comment.id);
+        expect(comment.commentId).to.equal(2);
+        browser.isExisting('.comment.comment-2 .children .comment.comment-' + comment.id)
+        .then(function(isExisting) {
+          expect(isExisting).to.be.true;
+          done();
+        });
+      });
+    });    
   });
 
   describe('edit', function() {
@@ -178,10 +215,51 @@ describe('comments', function() {
         });
       });
 
-      it('should edit and save unpublished comment', function(done) {
+      it('should edit and save unpublished comment and not redirect', function(done) {
+        var browser = this.browser;
+        var db = this.db;
+        browser.click('#wmd-editor-comment')
+        .keys('newly added comment updates')
+        .click('button.submit-button.save')
+        .pause(1000)
+        .getText('.comments #flash')
+        .then(function(text) {
+          expect(text).to.match(/Comment was updated!/);
+        })
+        .url()
+        .then(function(res) {
+          var parsedUrl = url.parse(res.value);
+          expect(parsedUrl.hash).to.equal('#edit-comment-7');
+        })
+        .getText('.unposted-comments button.edit')
+        .then(function(text) {
+          expect(text.length).to.equal(2);
+          db.Comment.findById(7)
+          .then(function(comment) {
+            expect(comment.body).to.match(/newly added comment updates/)
+            done();
+          });
+        });
       });
 
-      it('should edit and publish unpublished comment', function(done) {
+      it('should edit and publish unpublished comment and redirect', function(done) {
+        var browser = this.browser;
+        var db = this.db;
+        browser.click('#wmd-editor-comment')
+        .keys('newly added comment updates')
+        .click('button.submit-button.publish')
+        .pause(2000)
+        .url()
+        .then(function(res) {
+          var parsedUrl = url.parse(res.value);
+          expect(parsedUrl.hash).to.equal('#comment-7');
+          expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'));
+        })
+        .getText('.posted-comments .comment.comment-3 .children .comment.comment-7 .wmd-preview')
+        .then(function(text) {                 
+          expect(text).to.match(/newly added comment updates/);                
+          done();
+        });
       });
     });
 
@@ -318,11 +396,17 @@ describe('comment view', function() {
     });
   });
 
-  it('should only have one unpublished post', function(done) {
-    
+  it('should only have one unpublished post and two edit posts', function(done) {
+    var browser = this.browser;
+    browser
+    .getText('.unposted-comments button.edit')
+    .then(function(text) {
+      expect(text).to.be.a('string');
+      return browser.getText('.posted-comments button.edit');
+    })
+    .then(function(text) {
+      expect(text.length).to.equal(2);
+      done();
+    });
   });
-
-  it('should only have two edit posts', function(done) {
-    
-  });
-})
+});
