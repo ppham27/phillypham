@@ -8,7 +8,7 @@ block content
   each post, idx in posts
     +postView(post)
     if (idx < posts.length - 1)
-      hr.post
+     hr.post
 append head
   meta(property="fb:app_id", content=settings.config.appKeys.facebook.clientID)
   meta(property="og:title", content=settings.ApplicationSettings.title)

@@ -270,7 +270,7 @@ append body
     function fillReplyPreview(id) {
       var commentReply = document.getElementById('comment-reply');
       if (id) {
-        var clonedComment = document.querySelector('.comment-' + id).cloneNode(true);
+        var clonedComment = document.querySelector('.posted-comments .comment.comment-' + id).cloneNode(true);
         clonedComment.style.marginLeft = null;
         var children = clonedComment.querySelector('.children');
         if (children !== null) clonedComment.removeChild(children);
