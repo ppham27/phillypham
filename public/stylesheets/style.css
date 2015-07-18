@@ -8,6 +8,11 @@ body {
   margin-bottom: 32px;
 }
 
+pre, code {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 14px;  
+}
+
 a {
   color: #145d8a;
 }
