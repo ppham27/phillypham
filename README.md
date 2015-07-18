@@ -35,6 +35,16 @@ and inherits from [default.js](https://github.com/ppham27/phillypham/blob/master
   - RSA key pair (passwords are encrypted client-side before being sent to the server, where they are decrypted; this is poor man's SSL).
   - Facebook, Google, and Twitter app keys
 
+To generate an RSA key pair, run 
+```
+$ openssl genrsa -out test_rsa_privkey.pem 2048 
+```
+for the private key and
+```
+$ openssl rsa -in test_rsa_privkey.pem -pubout -out test_rsa_pubkey.pem
+```
+for the public key.
+
 ### Building
 
 1. npm install, the following subtasks are automatically run post install
@@ -110,7 +120,7 @@ Config files for Facebook and SweetCaptcha are also needed. For Facebook you can
   ]
 }
 ```
-You'll need to create `facebookDevelopment.json`, too. I believe one of the tests requires a user that has the same email as a Facebook test user and a Google test user. See the comment in `test.js`.
+You'll need to create `facebookDevelopment.json`, too. One of the tests requires a user that has the same email as a Facebook test user and a Google test user. See the comment in `test.js`.
 
 `sweetCaptcha.json` looks like:
 ```
