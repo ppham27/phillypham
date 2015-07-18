@@ -21,6 +21,11 @@ describe('Tag', function() {
     .spread(function(tag, created) {
       expect(created).to.be.true;
       expect(tag.name).to.equal('jesus');
+      return self.Tag.findOrCreateByName('node.js');      
+    })
+    .spread(function(tag, created) {
+      expect(created).to.be.true;
+      expect(tag.name).to.equal('node.js');
       done();
     });
   });

@@ -34,5 +34,6 @@ module.exports = function(sequelize, DataTypes) {
 function makeTagName(name) {
   name = name.trim().toLowerCase();
   if (name === 'jesus') return name;
+  if (/\.js$/.test(name)) return name;
   return inflection.singularize(name);
 }
