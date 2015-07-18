@@ -173,7 +173,7 @@ describe('middleware', function() {
         .click('#submit_approve_access') // i can't preauthorize for some reason?
         .pause(3000)
         .then(function(res) {
-          // asuume 
+          // assume 
           // now check that the user actually exists
           db.User.findOne({where: {email: user.email}})
           .then(function(createdUser) {
@@ -355,14 +355,15 @@ describe('middleware', function() {
       it('should login pre-authorized user', function(done) {
         var browser = this.browser;
         var siteUrl = this.siteUrl;
+        var testUser = config.appKeys.facebook.testUsers[0];
         var db = this.db;
         browser.click('a.topbar-link[href="/login"]')
         .click('#facebook-button')
-        .setValue('#email', 'rourzea_qinstein_1434678793@tfbnw.net')
-        .setValue('#pass', 'password123')
+        .setValue('#email', testUser.email)
+        .setValue('#pass', testUser.password)
         .click('input[name="login"]')
         .then(function() {
-          db.User.findOne({where: {email: 'rourzea_qinstein_1434678793@tfbnw.net'}})
+          db.User.findOne({where: {email: testUser.email}})
           .then(function(user) {
             expect(user).to.not.be.null;
             done();
@@ -373,12 +374,13 @@ describe('middleware', function() {
       it('should redirect a user to their pre-login page', function(done) {
         var browser = this.browser;
         var siteUrl = this.siteUrl;
+        var testUser = config.appKeys.facebook.testUsers[0];
         var db = this.db;
         browser.url(url.resolve(siteUrl, 'post'))
         .click('a.topbar-link[href="/login"]')
         .click('#facebook-button')
-        .setValue('#email', 'rourzea_qinstein_1434678793@tfbnw.net')
-        .setValue('#pass', 'password123')
+        .setValue('#email', testUser.email)
+        .setValue('#pass', testUser.password)
         .click('input[name="login"]')
         .url()
         .then(function(res) {          
@@ -425,7 +427,7 @@ describe('middleware', function() {
         var db = this.db;
         var siteUrl = this.siteUrl;
         var browser = this.browser;
-        db.User.findOne({where: {email: 'gdsgtzj_sharpesen_1434574400@tfbnw.net'}})
+        db.User.findOne({where: {email: config.appKeys.facebook.testUsers[1].email}})
         .then(function(user) {
           // make sure user exists
           expect(user).to.not.be.null;
@@ -434,15 +436,15 @@ describe('middleware', function() {
           // now log in from facebook          
           browser.click('a.topbar-link[href="/login"]')
           .click('#facebook-button')
-          .setValue('#email', 'gdsgtzj_sharpesen_1434574400@tfbnw.net')
-          .setValue('#pass', 'password')
+          .setValue('#email', config.appKeys.facebook.testUsers[1].email)
+          .setValue('#pass', config.appKeys.facebook.testUsers[1].password)
           .click('input[name="login"]')
           .then(function() {
-            db.User.findOne({where: {email: 'gdsgtzj_sharpesen_1434574400@tfbnw.net'}})
+            db.User.findOne({where: {email: config.appKeys.facebook.testUsers[1].email}})
             .then(function(user) {
               // new updated dispaly name from facebook
               expect(user.facebookId).to.not.be.null;
-              expect(user.displayName).to.equal('Rick Amiibfhhcegg Sharpesen');
+              expect(user.displayName).to.equal(config.appKeys.facebook.testUsers[1].displayName);
               done();
             });
           });

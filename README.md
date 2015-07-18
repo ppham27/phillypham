@@ -91,6 +91,36 @@ You will need to enable the Google+ API, and you will also need a `google.json` 
 }
 ```
 
+Config files for Facebook and SweetCaptcha are also needed. For Facebook you can create test users. Your `facebookTest.json` file should look like:
+```
+{
+  "clientID": "",
+  "clientSecret": "",
+  "testUsers": [
+    {
+      "email": "",
+      "password": "",
+      "displayName": ""
+    },
+    {
+      "email": "",
+      "password": "",
+      "displayName": ""
+    }
+  ]
+}
+```
+You'll need to create `facebookDevelopment.json`, too. I believe one of the tests requires a user that has the same email as a Facebook test user and a Google test user. See the comment in `test.js`.
+
+`sweetCaptcha.json` looks like:
+```
+{
+  "id": "239163",
+  "key": "b3d024a06d8ee4225743a357bf63d43f",
+  "secret": "db7f0cc141eaac91c99a434ea2fdb8fb"
+}
+```
+
 ### Customization
 
 #### New Menubar Items

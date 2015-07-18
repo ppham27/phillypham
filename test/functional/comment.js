@@ -9,6 +9,7 @@ var config = require('config');
 
 var random = require('../../lib/random');
 var transporter = require('../../lib/smtpTransporter');
+var sweetCaptcha = require('../../lib/sweetCaptcha');
 
 describe('comments', function() {
   before(function(done) {
@@ -75,6 +76,18 @@ describe('comments', function() {
     });
   });
 
+  it('should flash error message when comment doesn\'t exist', function(done) {
+    var browser = this.browser;
+    browser
+    .url(url.resolve(this.siteUrl, '/' + encodeURIComponent('First Post') + '#edit-comment-100'))
+    .refresh()
+    .pause(1000)
+    .getText('.comments #flash')
+    .then(function(text) {
+      expect(text).to.match(/does not exist/);
+      done();
+    });
+  });
   
 
   it('should create a new comment', function(done) {
@@ -412,6 +425,19 @@ describe('comment view', function() {
       done();
     });
   });
+
+  it('should flash error message when comment doesn\'t exist', function(done) {
+    var browser = this.browser;
+    browser
+    .url(url.resolve(this.siteUrl, '/' + encodeURIComponent('First Post') + '#edit-comment-1'))
+    .refresh()
+    .pause(1000)
+    .getText('.comments #flash')
+    .then(function(text) {
+      expect(text).to.match(/not authorized/i);
+      done();
+    });
+  });
 });
 
 describe('comment as an unverified user', function() {
@@ -500,11 +526,13 @@ describe('comment as an unverified user', function() {
     .pause(1000)
     .url() 
     .then(function(res) {
-      db.Comment.findOne({where: {body: 'newly unverified comment'}})
+      db.Comment.findOne({where: {body: 'newly unverified comment'},
+                          include: [db.User]})
       .then(function(comment) {
         var parsedUrl = url.parse(res.value);
         expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'))
         expect(parsedUrl.hash).to.equal('#comment-' + comment.id);
+        expect(comment.User.displayName).to.equal('unverified');
         browser.getText('.comment.comment-5 .comment.comment-' + comment.id + ' .wmd-preview')
         .then(function(text) {
           expect(text).to.match(/newly unverified comment/);
@@ -531,11 +559,331 @@ describe('comment as an unverified user', function() {
     .pause(1000)
     .url() 
     .then(function(res) {
-      db.Comment.findOne({where: {body: 'newly unverified comment'}})
+      db.Comment.findOne({where: {body: 'newly unverified comment'},
+                          include: [db.User]})
+      .then(function(comment) {
+        var parsedUrl = url.parse(res.value);
+        expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'))
+        expect(parsedUrl.hash).to.equal('#edit-comment-' + comment.id);
+        expect(comment.User.displayName).to.equal('unverified');
+        browser.isExisting('.unposted-comments button.edit[data-comment-id="' + comment.id + '"]')
+        .then(function(isExisting) {
+          expect(isExisting).to.be.true;
+          done();
+        });
+      });
+    });
+  });  
+});
+
+describe('comment without being logged in at all', function() {
+  before(function(done) {    
+    sinon.stub(random, 'token').returns('simpleToken');
+    sinon.stub(transporter, 'sendMail', function(mailOptions, callback) {
+      callback(null, true);      
+    });
+    sinon.stub(sweetCaptcha, 'api', function(method, sweetCaptchaKeys, callback) {        
+      if (method === 'check') return callback(null, 'true');
+      if (method === 'get_html') return sweetCaptchaKeys(null, '');
+    });      
+    this.siteUrl = 'http://localhost:8888';
+    this.app = require('../../app')
+    this.db = require('../../models');
+    this.server = http.createServer(this.app);
+    this.server.listen(8888);     
+    if (this.app.isReady) {
+      done();
+    } else {
+      this.app.once('ready', function() {
+        done();
+      });    
+    }
+  });
+  
+  beforeEach(function(done) {
+    var siteUrl = this.siteUrl;
+    this.browser = require('../support/browser')(); 
+    var browser = this.browser;
+    var db = this.db;
+    db.sequelize.sync({force: true})
+    .then(function() {        
+      return db.loadFixtures(config.fixtures);        
+    })
+    .then(function() {
+      browser.init().url(siteUrl)
+      .click('a[href="/' + encodeURIComponent('First Post') + '"]')
+      .then(function() {
+        done();
+      });
+    });
+  });
+  
+  afterEach(function(done) {
+    this.browser.end()
+    .then(function() {
+      done();
+    });
+  });
+
+  after(function(done) {
+    random.token.restore();
+    transporter.sendMail.restore();
+    sweetCaptcha.api.restore();
+    this.server.close(function(err) {
+      done(err);
+    });
+  });
+  
+  it('should flash error message on empty comment', function(done) {
+    var browser = this.browser;
+    browser.click('button.submit-button.comment')
+    .pause(1000)
+    .getText('.comments #flash')
+    .then(function(text) {
+      expect(text).to.match(/body cannot be empty/);
+      done();
+    });
+  });
+
+  it('should comment after login', function(done) {
+    var browser = this.browser;
+    var db = this.db;
+    browser.click('.posted-comments .comment.comment-1 .reply-expander')
+    .pause(1000)
+    .click('.posted-comments .comment.comment-5 button.reply')
+    .pause(1000)
+    .click('#wmd-editor-comment')    
+    .keys('newly unverified comment')
+    .click('button.submit-button.comment')
+    .pause(1000)
+    .url()
+    .then(function(res) {
+      var parsedUrl = url.parse(res.value);
+      expect(parsedUrl.pathname).to.equal('/login');
+    })
+    .setValue('input[name="email"]', 'standard@gmail.com')
+    .setValue('input[name="password"]', 'standard')
+    .click('button[type="submit"]')
+    .url() 
+    .then(function(res) {
+      db.Comment.findOne({where: {body: 'newly unverified comment'},
+                          include: [db.User]})
       .then(function(comment) {
         var parsedUrl = url.parse(res.value);
         expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'))
         expect(parsedUrl.hash).to.equal('#comment-' + comment.id);
+        expect(comment.User.displayName).to.equal('standard');
+        browser.getText('.comment.comment-5 .comment.comment-' + comment.id + ' .wmd-preview')
+        .then(function(text) {
+          expect(text).to.match(/newly unverified comment/);
+          done();
+        });
+      });
+    });
+  });
+
+  it('should flash link if user navigates elsewhere', function(done) {
+    var browser = this.browser;
+    var db = this.db;
+    browser.click('.posted-comments .comment.comment-1 .reply-expander')
+    .pause(1000)
+    .click('.posted-comments .comment.comment-5 button.reply')
+    .pause(1000)
+    .click('#wmd-editor-comment')    
+    .keys('newly unverified comment')
+    .click('button.submit-button.comment')
+    .pause(1000)
+    .url()
+    .then(function(res) {
+      var parsedUrl = url.parse(res.value);
+      expect(parsedUrl.pathname).to.equal('/login');
+    })
+    .click('a.header-link[href="/projects"]')
+    .click('a.topbar-link[href="/login"]')
+    .setValue('input[name="email"]', 'standard@gmail.com')
+    .setValue('input[name="password"]', 'standard')
+    .click('button[type="submit"]')
+    .url() 
+    .then(function(res) {
+      db.Comment.findOne({where: {body: 'newly unverified comment'},
+                          include: [db.User]})
+      .then(function(comment) {
+        var parsedUrl = url.parse(res.value);
+        expect(parsedUrl.pathname).to.equal('/projects');
+        expect(comment.User.displayName).to.equal('standard');
+        browser.getAttribute('#flash a', 'href')
+        .then(function(href) {
+          var parsedUrl = url.parse(href);
+          expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'));
+          expect(parsedUrl.hash).to.equal('#comment-' + comment.id);
+          done();
+        });
+      });
+    });
+  });
+
+  it('should not post comment if user is unverified but remind them to verify their email', function(done) {
+    var browser = this.browser;
+    var db = this.db;
+    var siteUrl = this.siteUrl;
+    browser.click('.posted-comments .comment.comment-1 .reply-expander')
+    .pause(1000)
+    .click('.posted-comments .comment.comment-5 button.reply')
+    .pause(1000)
+    .click('#wmd-editor-comment')    
+    .keys('newly unverified comment')
+    .click('button.submit-button.comment')
+    .pause(1000)
+    .url()
+    .then(function(res) {
+      var parsedUrl = url.parse(res.value);
+      expect(parsedUrl.pathname).to.equal('/login');
+    })
+    .setValue('input[name="email"]', 'phil@phillypham.com')
+    .setValue('input[name="password"]', 'unverified')
+    .click('button[type="submit"]')
+    .url() 
+    .then(function(res) {
+      db.Comment.findOne({where: {body: 'newly unverified comment'},
+                          include: [db.User]})
+      .then(function(comment) {
+        var parsedUrl = url.parse(res.value);
+        expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'));
+        expect(comment).to.be.null;
+        browser.getAttribute('#flash a', 'href')
+        .then(function(href) {
+          var parsedUrl = url.parse(href);
+          expect(parsedUrl.pathname).to.equal('/user/edit/unverified');          
+        })
+        .click('#flash a')
+        .click('button.verify-email')
+        .pause(2000)
+        .url(url.resolve(siteUrl, '/register/verify/simpleToken'))
+        .pause(1000)
+        .url() 
+        .then(function(res) {
+          db.Comment.findOne({where: {body: 'newly unverified comment'},
+                              include: [db.User]})
+          .then(function(comment) {
+            var parsedUrl = url.parse(res.value);
+            expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'))
+            expect(parsedUrl.hash).to.equal('#comment-' + comment.id);
+            expect(comment.User.displayName).to.equal('unverified');
+            browser.getText('.comment.comment-5 .comment.comment-' + comment.id + ' .wmd-preview')
+            .then(function(text) {
+              expect(text).to.match(/newly unverified comment/);
+              done();
+            });
+          });
+        });     
+      });
+    });    
+  });
+
+  it('should comment after registering and verifying', function(done) {
+    var browser = this.browser;
+    var db = this.db;
+    var siteUrl = this.siteUrl;
+    browser.click('.posted-comments .comment.comment-1 .reply-expander')
+    .pause(1000)
+    .click('.posted-comments .comment.comment-5 button.reply')
+    .pause(1000)
+    .click('#wmd-editor-comment')    
+    .keys('newly unverified comment')
+    .click('button.submit-button.comment')    
+    .pause(1000)
+    .click('#mainbar a[href="/register"]')
+    .setValue('input[name="displayName"]', 'im a new user')
+    .setValue('input[name="email"]', 'newuser@gmail.com')
+    .setValue('input[name="password"]', 'newpassword')
+    .setValue('input[name="passwordConfirmation"]', 'newpassword')
+    .click('button[type="submit"]')
+    .pause(2000)
+    .url(url.resolve(siteUrl, '/register/verify/simpleToken'))
+    .pause(1000)
+    .url() 
+    .then(function(res) {
+      db.Comment.findOne({where: {body: 'newly unverified comment'},
+                          include: [db.User]})
+      .then(function(comment) {
+        var parsedUrl = url.parse(res.value);
+        expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'))
+        expect(parsedUrl.hash).to.equal('#comment-' + comment.id);
+        expect(comment.User.displayName).to.equal('im a new user');
+        browser.getText('.comment.comment-5 .comment.comment-' + comment.id + ' .wmd-preview')
+        .then(function(text) {
+          expect(text).to.match(/newly unverified comment/);
+          done();
+        });
+      });
+    });     
+  });
+
+  it('should comment after facebook login', function(done) {
+    var testUser = config.appKeys.facebook.testUsers[0];
+    var browser = this.browser;
+    var db = this.db;
+    browser.click('.posted-comments .comment.comment-1 .reply-expander')
+    .pause(1000)
+    .click('.posted-comments .comment.comment-5 button.reply')
+    .pause(1000)
+    .click('#wmd-editor-comment')    
+    .keys('newly unverified comment')
+    .click('button.submit-button.comment')
+    .pause(1000)
+    .click('#facebook-button')
+    .setValue('#email', testUser.email)
+    .setValue('#pass', testUser.password)
+    .click('input[name="login"]')
+    .pause(2000)
+    .url() 
+    .then(function(res) {
+      db.Comment.findOne({where: {body: 'newly unverified comment'},
+                          include: [db.User]})
+      .then(function(comment) {
+        var parsedUrl = url.parse(res.value);
+        expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'))
+        expect(parsedUrl.hash).to.equal('#comment-' + comment.id);
+        expect(comment.User.displayName).to.equal(testUser.displayName);
+        browser.getText('.comment.comment-5 .comment.comment-' + comment.id + ' .wmd-preview')
+        .then(function(text) {
+          expect(text).to.match(/newly unverified comment/);
+          done();
+        });
+      });
+    });
+  });
+
+  it('should comment after google login', function(done) {
+    var testUser = config.appKeys.google.testUsers[0];    
+    var browser = this.browser;
+    var db = this.db;
+    browser.click('.posted-comments .comment.comment-1 .reply-expander')
+    .pause(1000)
+    .click('.posted-comments .comment.comment-5 button.reply')
+    .pause(1000)
+    .click('#wmd-editor-comment')    
+    .keys('newly unverified comment')
+    .click('button.submit-button.comment')
+    .pause(1000)
+    .click('#google-button')
+    .setValue('#Email', testUser.email)
+    .click('#next')
+    .pause(3000)
+    .setValue('#Passwd', testUser.password)
+    .click('#signIn')
+    .pause(3000)            
+    .click('#submit_approve_access') 
+    .pause(3000)
+    .url() 
+    .then(function(res) {
+      db.Comment.findOne({where: {body: 'newly unverified comment'},
+                          include: [db.User]})
+      .then(function(comment) {
+        var parsedUrl = url.parse(res.value);
+        expect(parsedUrl.pathname).to.equal('/' + encodeURIComponent('First Post'))
+        expect(parsedUrl.hash).to.equal('#comment-' + comment.id);
+        expect(comment.User.displayName).to.equal(testUser.displayName);
         browser.getText('.comment.comment-5 .comment.comment-' + comment.id + ' .wmd-preview')
         .then(function(text) {
           expect(text).to.match(/newly unverified comment/);
