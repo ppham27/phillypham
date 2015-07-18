@@ -1,7 +1,6 @@
 var markdown = require('../../lib/markdown');
 var MarkdownAceEditor = require('./markdownAceEditor');
 var hljs = require('highlight.js');
-var pagedownExtra = require('../../lib/pagedownExtra');
 var mathJax = require('../../lib/mathJax');
 
 var inputTitles = document.querySelectorAll('.wmd-input-title');
@@ -15,7 +14,13 @@ if (makeEditor) {
     var postfix = div.id.substr(10); // get rid of wmd-editor
     var editor = new MarkdownAceEditor(markdown.Converter, postfix,
                                        {helpButton: editorHelp });
-    pagedownExtra.hookEditor(editor);
+    editor.hooks.chain('onPreviewRefresh', function(editor) {
+      var codeBlocks = Array.prototype.slice.call(editor.panels.preview.querySelectorAll('pre code'));
+      codeBlocks.forEach(function(code) {     
+        hljs.highlightBlock(code);
+      });
+      return editor;
+    });
     editors[postfix] = editor;
   });
 }

@@ -1,7 +1,7 @@
 PhillyPham
 ===
 
-This is the code for my personal blog written in Node.js with Express. The main feature of this blog is a customized version of the [Ace editor](http://ace.c9.io/) on top of the [PageDown Markdown converter](https://code.google.com/p/pagedown/). 
+This is the code for my personal blog written in Node.js with Express. The main feature of this blog is a customized version of the [Ace editor](http://ace.c9.io/) on top of [PageDown](https://code.google.com/p/pagedown/) and [marked](https://github.com/chjj/marked). 
 
 Developer Guide
 ---
