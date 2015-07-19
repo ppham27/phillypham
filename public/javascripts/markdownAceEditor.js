@@ -145,6 +145,7 @@ function MarkdownAceEditor(converter, idPostfix, options) {
     if (!(key in this.aceOptions)) this.aceOptions[key] = defaultAceOptions[key];
   }
   this.editor = createEditor(this.panels, this.aceOptions);
+  makeGrippie(this.panels.editor, this.editor); // grippie for adjustable size
 
   var aceOptions = this.aceOptions;
   var panels = this.panels;
@@ -793,4 +794,67 @@ function setSettingsCookie(options) {
 function readSettingsCookie() {
   var parsedCookie = cookie.parse(document.cookie);
   return parsedCookie.markdownAceEditorSettings ? JSON.parse(parsedCookie.markdownAceEditorSettings) : {};
+}
+
+function makeGrippie(editorDiv, editor) {
+  var grippie = document.createElement('div');
+  grippie.classList.add('wmd-editor-grippie');
+  grippie.style.width = editorDiv.getBoundingClientRect().width + 'px';
+  grippie.style.height = '12px';
+  grippie.style.borderRight = '1px solid #ddd';
+  grippie.style.borderLeft = '1px solid #ddd';
+  grippie.style.borderBottom = '1px solid #ddd';
+  grippie.style.borderBottomLeftRadius = '5px';
+  grippie.style.borderBottomRightRadius = '5px';
+  grippie.style.cursor = 'ns-resize';
+  grippie.style.backgroundColor = '#eee';
+  grippie.style.textAlign = 'center';
+  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttributeNS(null, 'width', 26);
+  svg.setAttributeNS(null, 'height', 11);
+  for (var i = 0; i < 5; ++i) {
+    var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttributeNS(null, 'x', i*6);
+    rect.setAttributeNS(null, 'y', 0);
+    rect.setAttributeNS(null, 'width', 2);
+    rect.setAttributeNS(null, 'height', 2);
+    rect.style.fill = '#9E9E9E';
+    svg.appendChild(rect);    
+  }
+  for (var i = 0; i < 4; ++i) {
+    var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttributeNS(null, 'x', i*6 + 3);
+    rect.setAttributeNS(null, 'y', 3);
+    rect.setAttributeNS(null, 'width', 2);
+    rect.setAttributeNS(null, 'height', 2);
+    rect.style.fill = '#9E9E9E';
+    svg.appendChild(rect);    
+  }  
+  grippie.appendChild(svg);
+  grippie.addEventListener('mousedown', function(event) {    
+    var baseY = editorDiv.getBoundingClientRect().height; 
+    document.addEventListener('mouseup', mouseup, true);
+    document.addEventListener('mousemove', mousemove, true);
+    var startY = event.clientY; 
+    function mousemove(event) {
+      editorDiv.style.height = Math.max(20, (baseY + (event.clientY - startY))) + 'px';
+      editor.resize();
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    function mouseup(event) {      
+      editor.resize();
+      document.removeEventListener('mousemove', mousemove, true);
+      document.removeEventListener('mouseup', mouseup, true);
+      event.preventDefault();
+      event.stopPropagation();      
+    }
+    event.preventDefault();
+    event.stopPropagation();
+  }, false);
+  if (editorDiv.nextSibling !== null) {
+    editorDiv.parentNode.insertBefore(grippie, editorDiv.nextSibling);
+  } else {
+    editorDiv.parentNode.appendChild(grippie);
+  }
 }

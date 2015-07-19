@@ -618,10 +618,6 @@ hr {
   margin-top: 15px;
 }
 
-#application-settings-form .wmd-editor {
-  margin-bottom: 15px;
-}
-
 #application-settings-form .wmd-panel.buttons {
   text-align: right;
 }
@@ -761,7 +757,6 @@ a.twitter-share-button {
 
 #wmd-editor-comment {
   height: 125px;
-  margin-bottom: 15px;
 }
 
 .comment .wmd-preview {
@@ -797,3 +792,8 @@ a.twitter-share-button {
 .comments h2 a {
   color: #003b52;  
 }
+
+.comment-editor .wmd-editor-grippie, #application-settings-form .wmd-editor-grippie {
+  margin-bottom: 15px;
+}
+
