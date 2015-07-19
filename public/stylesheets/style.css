@@ -251,7 +251,7 @@ textarea.wmd-input {
   width: 100%;
   max-width: 100%;
   height: 275px;
-  outline: 1px solid #999;
+  border: 1px solid #999;
 }
 
 .wmd-editor.focused {

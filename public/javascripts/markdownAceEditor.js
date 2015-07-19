@@ -798,8 +798,8 @@ function readSettingsCookie() {
 
 function makeGrippie(editorDiv, editor) {
   var grippie = document.createElement('div');
-  grippie.classList.add('wmd-editor-grippie');
-  grippie.style.width = editorDiv.getBoundingClientRect().width + 'px';
+  grippie.classList.add('wmd-editor-grippie'); 
+  grippie.style.width = window.getComputedStyle(editorDiv).getPropertyValue('width');
   grippie.style.height = '12px';
   grippie.style.borderRight = '1px solid #ddd';
   grippie.style.borderLeft = '1px solid #ddd';
@@ -832,7 +832,7 @@ function makeGrippie(editorDiv, editor) {
   }  
   grippie.appendChild(svg);
   grippie.addEventListener('mousedown', function(event) {    
-    var baseY = editorDiv.getBoundingClientRect().height; 
+    var baseY = parseInt(window.getComputedStyle(editorDiv).getPropertyValue('height'));    
     document.addEventListener('mouseup', mouseup, true);
     document.addEventListener('mousemove', mousemove, true);
     var startY = event.clientY; 
