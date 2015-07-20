@@ -85,7 +85,7 @@ router.get('/:id', authorize({failureSilent: true, role: 'post_editor'}), functi
                               {model: db.Comment, attributes: ['published']}]})
   .then(function(post) {
     var authorized = authorizePost(req, post);    
-    if (authorized) {
+    if (authorized === true) {
       res.render('post/edit', {title: 'Post', edit: true, temporaryPost: post});
     } else {
       next(authorized);
@@ -101,7 +101,7 @@ router.put('/:id', authorize({failureSilent: true, role: 'post_editor'}), functi
   db.Post.findById(req.params.id)
   .then(function(post) {
     var authorized = authorizePost(req, post);    
-    if (authorized) {
+    if (authorized === true) {
       trimPost(updates);
       updates.tags = updates.tags || [];
       var tagPromises = updates.tags.filter(function(tag) { 
