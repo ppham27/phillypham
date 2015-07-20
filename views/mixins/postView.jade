@@ -32,9 +32,11 @@ mixin postView(post, edit, view)
       .left
         - var numComments = post.Comments.filter(function(d) { return d.published; }).length
         a(href='/' + encodeURIComponent(post.title) + '#comments')= numComments === 1 ? '1 comment' : numComments + ' comments'
-        if (view)
-          .share-div.spacer
+        .share-div.spacer
+        if (view || edit)          
           button.reply(type="button") Comment
+        else
+          button(type="button", onclick="window.location.href = '/" + encodeURIComponent(post.title) + "#new-comment'; return false;") Comment
       .right
         if (locals.user && (locals.user.id === post.User.id || roles['post_editor']))
           +postAdmin(post)
