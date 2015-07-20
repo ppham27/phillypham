@@ -9,7 +9,7 @@ var db = require('../models');
 router.get('/create', authorize({role: 'project_manager'}), function(req, res, next) {
   db.Project.findAll({where: {published: false}})
   .then(function(projects) {
-    res.render('projects/edit', {title: 'Projects', unpublishedProjects: projects});
+    res.render('projects/edit', {title: 'Project Editor', unpublishedProjects: projects});
   });
 })
 
@@ -97,7 +97,7 @@ router.get('/edit/:title', authorize({role: 'project_manager'}), function(req, r
                db.Project.findAll({where: {published: false}}))  
   .spread(function(project, projects) {
     if (!project) return next(new Error('Project does not exist'));
-    res.render('projects/edit', {title: 'Projects', temporaryProject: project, update: true,
+    res.render('projects/edit', {title: 'Project Editor', temporaryProject: project, update: true,
                                  unpublishedProjects: projects});
   });
 })

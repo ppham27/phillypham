@@ -2,6 +2,7 @@ extends ../layout
   
 block content
   - var temporaryProject = locals.temporaryProject || {}
+  h1= title
   if (unpublishedProjects.length) 
     h2 Unpublished Projects
     ul
