@@ -18,7 +18,7 @@ mixin commentView(comment, offset)
         span.reply-expander&attributes({"data-comment-id": comment.id})
           div.bullet
             span &#8227; 
-          span.reply= children.length === 1 ? '1 reply' : children.length + ' replies'
+          span.reply= replyCounts[comment.id] === 1 ? '1 reply' : replyCounts[comment.id] + ' replies'
         .share-div.spacer
         button.reply(type="button")&attributes({"data-comment-id": comment.id}) Reply
       .right
@@ -87,6 +87,9 @@ block content
     h2
       a(name="comments") Comments
     - var comments = temporaryPost.Comments.filter(function(comment) { return comment.published; }).sort(function(a, b) { return a.publishedAt - b.publishedAt; })
+    - var replyCounts = {}
+    - function countReplies(comment) { if (replyCounts[comment.id] !== undefined) return replyCounts[comment.id]; var children = comments.filter(function(child) { return child.commentId === comment.id; }); var replies = 0; children.forEach(function(child) { replies += 1 + countReplies(child); }); replyCounts[comment.id] = replies; return replies; }    
+    - comments.forEach(function(comment) { countReplies(comment); })
     if (comments.length === 0)
       p No comments have been posted yet. You can be the first!
     .posted-comments
