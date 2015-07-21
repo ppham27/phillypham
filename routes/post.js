@@ -177,7 +177,7 @@ function authorizePost(req, post) {
   } else if (req.isAuthorized || (req.user && req.user.id === post.user_id)) {
     return true;
   } else {
-    return new Error('Not authorized. You can only edit your own posts');
+    return new Error('Not authorized. You can only edit your own posts.');
   }  
 }
 

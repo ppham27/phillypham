@@ -317,22 +317,33 @@ append body
     }
     function expandReplies() {
       var children = document.querySelector('.children.comment-' + this.dataset.commentId);
+      var self = this;
       if (this.classList.contains('expanded')) {
-        children.style.height = children.getBoundingClientRect().height + 'px';                
-        this.classList.remove('expanded');
-        children.classList.remove('expanded');
-        setTimeout(function() { children.style.height = null; }, 0);
-      } else {
-        children.style.height = '0px';
-        this.classList.add('expanded');
-        children.classList.add('expanded');
+        children.style.transition = 'none';
+        children.style.height = window.getComputedStyle(children).getPropertyValue('height');        
         setTimeout(function() {
-          var height = children.querySelector('.inner-children').getBoundingClientRect().height;
+          children.style.transition = 'all 0.5s ease';
+          setTimeout(function() {
+            self.classList.remove('expanded');
+            children.classList.remove('expanded');
+            children.style.height = null;            
+          }, 20);
+        }, 0);
+      } else {
+        children.style.height = '0px';        
+        setTimeout(function() {
+          self.classList.add('expanded');
+          children.classList.add('expanded');
+          var height = children.querySelector('.inner-children').getBoundingClientRect().height;          
           children.style.height = height + 'px';
           setTimeout(function() {
+            children.style.transition = 'none';
             children.style.height = null;
+            setTimeout(function() {
+              children.style.transition = 'all 0.5s ease';
+            }, 0);
           }, 500);
-        }, 0);
+        }, 20);
       }
     }
     function toggleButtons(disabled) {

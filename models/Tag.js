@@ -35,5 +35,6 @@ function makeTagName(name) {
   name = name.trim().toLowerCase();
   if (name === 'jesus') return name;
   if (/\.js$/.test(name)) return name;
+  if (name === 'css') return name;
   return inflection.singularize(name);
 }

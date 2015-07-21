@@ -14,7 +14,7 @@ block content
     h2= 'Edit ' + temporaryProject.title
   else
     h2 New Project
-  form#project-form.wmd-panel    
+  form#project-form.wmd-panel(onsubmit="return false;")
     fieldset
       label(for="title") Title:
       input#wmd-input-title-summary.text-input.wmd-input-title(type="text", name="title", placeholder="Enter a title here", value=temporaryProject.title || '', autofocus=true)
@@ -126,15 +126,17 @@ append body
         return false;
       });
       destroyButton.addEventListener('click', function() {
-        saveButton.disabled = true;
-        destroyButton.disabled = true;
-        publishButton.disabled = true;
-        deleteProject.abort();
-        deleteProject.open('DELETE', window.location.pathname);
-        deleteProject.setRequestHeader('Accept', 'application/json');
-        deleteProject.setRequestHeader('Content-Type', 'application/json');
-        deleteProject.responseType = 'json';
-        deleteProject.send();
+        if (confirm('Are you sure you want to delete this project?')) {
+          saveButton.disabled = true;
+          destroyButton.disabled = true;
+          publishButton.disabled = true;
+          deleteProject.abort();
+          deleteProject.open('DELETE', window.location.pathname);
+          deleteProject.setRequestHeader('Accept', 'application/json');
+          deleteProject.setRequestHeader('Content-Type', 'application/json');
+          deleteProject.responseType = 'json';
+          deleteProject.send();
+        }
         return false;
       });
       saveButton.disabled = false;
