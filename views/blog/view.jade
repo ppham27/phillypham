@@ -406,8 +406,8 @@ append body
       setupCreate();
       var comment = {body: '', User: {}};
       if (#{!!locals.user}) {
-        comment.User.displayName = '#{(locals.user && locals.user.displayName) || ''}';
-        comment.User.photoUrl = '#{(locals.user && locals.user.photoUrl) || ''}';
+        comment.User.displayName = '!{(locals.user && locals.user.displayName) || ''}';
+        comment.User.photoUrl = '!{(locals.user && locals.user.photoUrl) || ''}';
         fillCommentPreview(comment);
         document.querySelector('.comment-editor .comment.new-comment .user-link').target = '_blank';
       } else {
