@@ -1,4 +1,6 @@
-var expect = require('chai').expect;
+var chai = require('chai');
+chai.use(require('chai-things'));
+var expect = chai.expect;
 var Sequelize = require('sequelize');
 
 describe('Project', function() {
@@ -55,7 +57,8 @@ describe('Project', function() {
                              summary: 'summary', description: 'description', published: false});
     })
     .catch(function(err) {             
-             expect(err).to.be.instanceof(Error, /title must be unique/);
+             expect(err).to.be.instanceof(Error);
+             expect(err.errors.map(function(err) { return err.message; })).to.include.something.that.matches(/title must be unique/)
              done();
            });
   });

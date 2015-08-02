@@ -37,7 +37,9 @@ describe('comments', function() {
       return db.loadFixtures(config.fixtures);        
     })
     .then(function() {
-      browser.init().url(siteUrl)
+      browser.init()
+      .timeoutsImplicitWait(1000)
+      .url(siteUrl)      
       .click('a.topbar-link[href="/login"]')
       .setValue('input[name="email"]', 'admin@admin.com')
       .setValue('input[name="password"]', 'password')
@@ -186,6 +188,7 @@ describe('comments', function() {
       expect(isExisting).to.be.true;
     })
     .click('.posted-comments button.destroy[data-comment-id="2"]')
+    .pause(1000)
     .alertAccept()
     .pause(3000)
     .isExisting('.posted-comments .comment.comment-2')
@@ -312,6 +315,7 @@ describe('comments', function() {
         var browser = this.browser;
         browser
         .click('.comment-editor button.submit-button.destroy')
+        .pause(1000)
         .alertAccept()
         .pause(3000)
         .url()
@@ -387,7 +391,9 @@ describe('comment view', function() {
       return db.loadFixtures(config.fixtures);        
     })
     .then(function() {
-      browser.init().url(siteUrl)
+      browser.init()
+      .timeoutsImplicitWait(1000)
+      .url(siteUrl)
       .click('a.topbar-link[href="/login"]')
       .setValue('input[name="email"]', 'power@gmail.com')
       .setValue('input[name="password"]', 'powerpower')
@@ -471,7 +477,9 @@ describe('comment as an unverified user', function() {
       return db.loadFixtures(config.fixtures);        
     })
     .then(function() {
-      browser.init().url(siteUrl)
+      browser.init()
+      .timeoutsImplicitWait(1000)
+      .url(siteUrl)
       .click('a.topbar-link[href="/login"]')
       .setValue('input[name="email"]', 'phil@phillypham.com')
       .setValue('input[name="password"]', 'unverified')
@@ -610,7 +618,9 @@ describe('comment without being logged in at all', function() {
       return db.loadFixtures(config.fixtures);        
     })
     .then(function() {
-      browser.init().url(siteUrl)
+      browser.init()
+      .timeoutsImplicitWait(1000)
+      .url(siteUrl)
       .click('a[href="/' + encodeURIComponent('First Post') + '"]')
       .then(function() {
         done();
@@ -664,6 +674,7 @@ describe('comment without being logged in at all', function() {
     .setValue('input[name="email"]', 'standard@gmail.com')
     .setValue('input[name="password"]', 'standard')
     .click('button[type="submit"]')
+    .pause(1000)
     .url() 
     .then(function(res) {
       db.Comment.findOne({where: {body: 'newly unverified comment'},
@@ -703,6 +714,7 @@ describe('comment without being logged in at all', function() {
     .setValue('input[name="email"]', 'standard@gmail.com')
     .setValue('input[name="password"]', 'standard')
     .click('button[type="submit"]')
+    .pause(1000)
     .url() 
     .then(function(res) {
       db.Comment.findOne({where: {body: 'newly unverified comment'},
@@ -742,6 +754,7 @@ describe('comment without being logged in at all', function() {
     .setValue('input[name="email"]', 'phil@phillypham.com')
     .setValue('input[name="password"]', 'unverified')
     .click('button[type="submit"]')
+    .pause(1000)
     .url() 
     .then(function(res) {
       db.Comment.findOne({where: {body: 'newly unverified comment'},

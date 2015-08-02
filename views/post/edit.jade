@@ -15,6 +15,9 @@ block content
       fieldset
         label(for="photoUrl") Photo URL:
         input.text-input(type="text", name="photoUrl", placeholder="Enter photo URL here", value=temporaryPost.photoUrl || '')
+      fieldset
+        label(for="photoLink") Photo Link:
+        input.text-input(type="text", name="photoLink", placeholder="Enter photo link here", value=temporaryPost.photoLink || '')
       #wmd-button-bar.wmd-button-bar
       #wmd-editor.wmd-editor.tex2jax_ignore= temporaryPost.body || ''
       textarea(name="body")#wmd-input.wmd-input= temporaryPost.body || ''
@@ -52,6 +55,11 @@ append body
         img.style.display = 'none';
       }
     });
+    document.querySelector('#post-form input[name="photoLink"]')
+      .addEventListener('input', function() {
+        var a = document.querySelector('.post-img').parentNode;
+        if (this.value) a.href = this.value;
+      });
     document.querySelector('#post-form input[name="tags"]')
     .addEventListener('input', function() {
       var tagMeta = document.querySelector('.post-meta.tags');
@@ -65,7 +73,7 @@ append body
     function formToJSON(form) {
       var json = {};
       // inputs
-      ['title', 'photoUrl', 'tags'].forEach(function(key) {
+      ['title', 'photoUrl', 'photoLink', 'tags'].forEach(function(key) {
         if (key === 'tags') {
           var tags = form.querySelector('input[name="' + key + '"]').value;
           json[key] = tags.split(',').map(function(tag) { return tag.toLowerCase().trim(); });

@@ -5,7 +5,7 @@ var db = require('../models');
 
 router.get('/', function(req, res, next) {
   db.Post.findAll({where: {published: true}, 
-                   attributes: ['id', 'title', 'bodyHtml', 'photoUrl', 'published', 'publishedAt', 'user_id'],
+                   attributes: ['id', 'title', 'bodyHtml', 'photoUrl', 'photoLink', 'published', 'publishedAt', 'user_id'],
                    order: '"Post"."published_at" DESC',
                    include: [{model: db.User, attributes: ['id', 'displayName']},
                              {model: db.Tag, attributes: ['name']},
@@ -19,7 +19,7 @@ router.use('/:title/comment', require('./comment'));
 
 router.get('/:title', function(req, res, next) {
   db.Post.findOne({where: {title: req.params.title}, 
-                   attributes: ['id', 'title', 'body', 'bodyHtml', 'photoUrl', 'published', 'publishedAt', 'user_id'],
+                   attributes: ['id', 'title', 'body', 'bodyHtml', 'photoUrl', 'photoLink', 'published', 'publishedAt', 'user_id'],
                    include: [{model: db.User, attributes: ['id', 'displayName']},
                              {model: db.Tag, attributes: ['name']},
                              {model: db.Comment, attributes: ['id', 'body', 'bodyHtml', 'published', 'publishedAt', 'post_id', 'commentId', 'created_at'],

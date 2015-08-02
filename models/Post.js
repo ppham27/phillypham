@@ -11,6 +11,8 @@ module.exports = function(sequelize, DataTypes) {
     bodyHtml: {type: DataTypes.TEXT, field: 'body_html'},
     photoUrl: {type: DataTypes.STRING, allowNull: true, defaultValue: null, field: 'photo_url',
                validate: {isUrl: {args: true, msg: 'photo URL is not properly formatted'}}},
+    photoLink: {type: DataTypes.STRING, allowNull: true, defaultValue: null, field: 'photo_link',
+                validate: {isUrl: {args: true, msg: 'photo link is not properly formatted'}}},
     published: {type: DataTypes.BOOLEAN, defaultValue: false},
     publishedAt: {type: DataTypes.DATE, allowNull: true, field: 'published_at', defaultValue: null}
   },
@@ -26,6 +28,14 @@ module.exports = function(sequelize, DataTypes) {
                               }
                             },
                             hooks: {
+                              beforeValidate: function(post) {
+                                if (post.photoLink && !post.photoUrl) {
+                                  return Promise.reject(new Sequelize.ValidationError('photo URL must exist for there to be a photo link', 
+                                                                                      [new Sequelize.ValidationErrorItem('photo URL must exist for there to be a photo link')]));
+                                } else {
+                                  return Promise.resolve(post);
+                                }
+                              },
                               beforeUpdate: function(post) {
                                 if (post.changed('published')) post.publishedAt = new Date();
                                 post.bodyHtml = converter.makeHtml(post.body);

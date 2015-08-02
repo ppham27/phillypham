@@ -32,7 +32,9 @@ describe('posts', function() {
       return db.loadFixtures(config.fixtures);        
     })
     .then(function() {
-      browser.init().url(siteUrl)
+      browser.init()
+      .timeoutsImplicitWait(1000)
+      .url(siteUrl)
       .click('a.topbar-link[href="/login"]')
       .setValue('input[name="email"]', 'admin@admin.com')
       .setValue('input[name="password"]', 'password')
@@ -140,11 +142,13 @@ describe('posts', function() {
       .then(function(post) {
         expect(url.parse(res.value).path).to.equal('/post/' + post.id);
         browser.click('a[href="/"]')
+        .pause(1000)
         .getText('h1')
         .then(function(text) {
           return expect(text).to.not.include.something.that.equals('New Post'); 
         })
         .click('a.topbar-link[href="/post/list"]')
+        .pause(1000)
         .isExisting('a[href="/' + encodeURIComponent('New Post') + '"]')
         .then(function(isExisting) {
           expect(isExisting).to.be.true;
@@ -174,6 +178,7 @@ describe('posts', function() {
       return expect(text).to.include.something.that.matches(/added to Post body/);
     })
     .click('a[href="/"]')
+    .pause(1000)
     .getText('h1')
     .then(function(text) {
       expect(text).to.include.something.that.equals('Updated Post');

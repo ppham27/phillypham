@@ -79,7 +79,7 @@ router.post('/', authorize({role: 'poster'}), function(req, res, next) {
 router.get('/:id', authorize({failureSilent: true, role: 'post_editor'}), function(req, res, next) {
   if (isNaN(req.params.id)) return res.json({error: req.params.id.toString() + ' is not an integer'});
   db.Post.findById(req.params.id,
-                   {attributes: ['id', 'title', 'body', 'bodyHtml', 'photoUrl', 'published', 'publishedAt', 'user_id'],
+                   {attributes: ['id', 'title', 'body', 'bodyHtml', 'photoUrl', 'photoLink', 'published', 'publishedAt', 'user_id'],
                     include: [{model: db.User, attributes: ['id', 'displayName']},
                               {model: db.Tag, attributes: ['name']},
                               {model: db.Comment, attributes: ['published']}]})
@@ -185,6 +185,7 @@ function trimPost(post) {
   post.title = post.title.trim();
   post.body.trim();
   if (typeof post.photoUrl === 'string') post.photoUrl = post.photoUrl.trim() || null;
+  if (typeof post.photoLink === 'string') post.photoLink = post.photoLink.trim() || null;
   if (typeof post.tags === 'string') {
     post.tags = post.tags.split(',');
   }

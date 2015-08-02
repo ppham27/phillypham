@@ -10,7 +10,7 @@ mixin postView(post, edit, view)
   .post.wmd-panel
     h1.post-title
       a(class=edit ? 'wmd-preview-title' : null, href='/' + encodeURIComponent(post.title))= post.title
-    a(href=post.photoUrl || null, target='_blank')
+    a(href=post.photoLink || post.photoUrl || null, target='_blank')
       img.centered.post-img(src=post.photoUrl, alt='Photo URL is broken', style=post.photoUrl ? null : 'display: none')
     .wmd-preview(id=edit ? 'wmd-preview' : null)!= post.bodyHtml
     if (edit || post.Tags.length) 

@@ -32,7 +32,9 @@ describe('projects', function() {
       return db.loadFixtures(config.fixtures);        
     })
     .then(function() {
-      browser.init().url(siteUrl)
+      browser.init()
+      .timeoutsImplicitWait(1000)
+      .url(siteUrl)
       .click('a.topbar-link[href="/login"]')
       .setValue('input[name="email"]', 'admin@admin.com')
       .setValue('input[name="password"]', 'password')
@@ -158,14 +160,19 @@ describe('projects', function() {
   });
 
   describe('delete', function() {
-     it('should delete published project and redirect to projects', function(done) {
+    it('should delete published project and redirect to projects', function(done) {
       var browser = this.browser;
       var db = this.db;
       browser
+      .pause(1000)
       .click('.header-link[href="/projects"]')
+      .pause(1000)
       .click('.footer .right a') // edit link, for second project
+      .pause(1000)
       .click('button.submit-button.destroy')
       .pause(2000)
+      .alertAccept()
+      .pause(1000)
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/projects');     
@@ -179,8 +186,8 @@ describe('projects', function() {
           done();
         });
       });
-     });
-
+    });
+    
     it('should delete unpublished project and redirect to create page', function(done) {
       var browser = this.browser;
       var db = this.db;
@@ -189,6 +196,8 @@ describe('projects', function() {
       .click('a[href="/projects/edit/Unpublished%20First%20Project"]')
       .click('button.submit-button.destroy')
       .pause(2000)
+      .alertAccept()
+      .pause(1000)
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/projects/create');     
@@ -210,7 +219,9 @@ describe('projects', function() {
       var browser = this.browser;
       var db = this.db;
       browser
+      .pause(1000)
       .click('.header-link[href="/projects"]')
+      .pause(1000)
       .click('.footer .right a') // edit link, for second project
       .setValue('input[name="title"]', 'New Project Title')
       .setValue('input[name="url"]', 'http://google.com')
@@ -237,7 +248,9 @@ describe('projects', function() {
       var browser = this.browser;
       var db = this.db;
       browser
+      .pause(1000)
       .click('.header-link[href="/projects"]')
+      .pause(1000)
       .click('.footer .right a') // edit link, for second project
       .setValue('input[name="title"]', '')
       .click('button.submit-button.save')
@@ -253,7 +266,9 @@ describe('projects', function() {
       var browser = this.browser;
       var db = this.db;
       browser
+      .pause(1000)
       .click('.header-link[href="/projects"]')
+      .pause(1000)
       .click('.footer .right a') // edit link, for second project
       .setValue('input[name="title"]', 'New Project Title')
       .click('button.submit-button.unpublish')

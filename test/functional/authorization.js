@@ -30,6 +30,7 @@ describe('authorization', function() {
   beforeEach(function(done) {
     this.browser = require('../support/browser')(); 
     this.browser.init()
+    .timeoutsImplicitWait(500)
     .url(this.siteUrl)
     .then(function() {
       done();
@@ -55,11 +56,13 @@ describe('authorization', function() {
     .setValue('input[name="email"]', 'admin@admin.com')
     .setValue('input[name="password"]', 'password')
     .click('button[type="submit"]')
+    .pause(100)
     .url(url.resolve(this.siteUrl, '/user/edit/admin'))
     .getValue('input[name="email"]')
     .then(function(value) {
       expect(value).to.equal('admin@admin.com');    
     })
+    .pause(100)
     .url(url.resolve(this.siteUrl, '/user/edit/power'))
     .getValue('input[name="email"]')
     .then(function(value) {

@@ -25,6 +25,7 @@ describe('middleware', function() {
   beforeEach(function(done) {
     this.browser = require('../support/browser')(); 
     this.browser.init()
+    .timeoutsImplicitWait(1000)
     .url(this.siteUrl)
     .then(function() {
       done();
@@ -71,6 +72,7 @@ describe('middleware', function() {
       .setValue('input[name="email"]', 'admin@admin.com')
       .setValue('input[name="password"]', 'password')
       .click('button[type="submit"]')
+      .pause(1000)
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/');
@@ -90,6 +92,7 @@ describe('middleware', function() {
       .setValue('input[name="email"]', 'power@gmail.com')
       .setValue('input[name="password"]', 'powerpower')
       .click('button[type="submit"]')
+      .pause(1000)
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/');
@@ -110,6 +113,7 @@ describe('middleware', function() {
       .setValue('input[name="email"]', 'standard@gmail.com')
       .setValue('input[name="password"]', 'wrongpassword')
       .click('button[type="submit"]')
+      .pause(1000)
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/login');
@@ -129,6 +133,7 @@ describe('middleware', function() {
       .setValue('input[name="email"]', 'moderator@gmail.com')
       .setValue('input[name="password"]', 'moderator')
       .click('button[type="submit"]')
+      .pause(1000)
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/post');
@@ -144,12 +149,15 @@ describe('middleware', function() {
       .setValue('input[name="email"]', 'moderator@gmail.com')
       .setValue('input[name="password"]', 'wrongpassword')
       .click('button[type="submit"]')      
+      .pause(1000)
       .setValue('input[name="email"]', 'wrongusername@gmail.com')
       .setValue('input[name="password"]', 'moderator')
       .click('button[type="submit"]')      
+      .pause(1000)
       .setValue('input[name="email"]', 'moderator@gmail.com')
       .setValue('input[name="password"]', 'moderator')
       .click('button[type="submit"]')      
+      .pause(1000)
       .url()
       .then(function(res) {
         expect(url.parse(res.value).path).to.equal('/post');
@@ -358,10 +366,12 @@ describe('middleware', function() {
         var testUser = config.appKeys.facebook.testUsers[0];
         var db = this.db;
         browser.click('a.topbar-link[href="/login"]')
+        .pause(1000)
         .click('#facebook-button')
         .setValue('#email', testUser.email)
         .setValue('#pass', testUser.password)
         .click('input[name="login"]')
+        .pause(2000)
         .then(function() {
           db.User.findOne({where: {email: testUser.email}})
           .then(function(user) {
@@ -382,6 +392,7 @@ describe('middleware', function() {
         .setValue('#email', testUser.email)
         .setValue('#pass', testUser.password)
         .click('input[name="login"]')
+        .pause(1000)
         .url()
         .then(function(res) {          
           expect(url.parse(res.value).path).to.equal('/post');
@@ -396,7 +407,9 @@ describe('middleware', function() {
         var loginUsers = users.map(function(user) {                           
                            var browser = require('../support/browser')();
                            var loginUser =  function(cb) {
-                             browser.init().url(siteUrl)
+                             browser.init()
+                             .timeoutsImplicitWait(1000)
+                             .url(siteUrl)
                              .click('a.topbar-link[href="/login"]')
                              .click('#facebook-button')
                              .setValue('#email', user.email)
@@ -439,6 +452,7 @@ describe('middleware', function() {
           .setValue('#email', config.appKeys.facebook.testUsers[1].email)
           .setValue('#pass', config.appKeys.facebook.testUsers[1].password)
           .click('input[name="login"]')
+          .pause(2000)
           .then(function() {
             db.User.findOne({where: {email: config.appKeys.facebook.testUsers[1].email}})
             .then(function(user) {
