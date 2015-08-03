@@ -37,7 +37,9 @@ describe('update user', function() {
       return db.loadFixtures(config.fixtures);        
     })
     .then(function() {
-      browser.init().url(siteUrl)
+      browser.init()
+      .timeoutsImplicitWait(1000)
+      .url(siteUrl)
       .click('a.topbar-link[href="/login"]')
       .setValue('input[name="email"]', 'moderator@gmail.com')
       .setValue('input[name="password"]', 'moderator')

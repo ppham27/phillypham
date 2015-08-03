@@ -203,6 +203,7 @@ describe('posts', function() {
     var browser = this.browser;
     var db = this.db;
     browser
+    .pause(1000)
     .getText('h1')
     .then(function(text) {
       return expect(text).to.not.include.something.that.equals('Unpublished Title');
@@ -215,6 +216,7 @@ describe('posts', function() {
         .click('.submit-button.publish')
         .pause(2000)
         .click('a[href="/"]')
+        .pause(1000)
         .getText('h1')
         .then(function(text) {
           expect(text).to.include.something.that.equals('Unpublished Title');

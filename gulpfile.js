@@ -76,8 +76,8 @@ gulp.task('javascripts', ['markdown', 'encryptPassword']);
 
 gulp.task('selenium', function() {
   // on my system selenium is an alias for:
-  // java -jar /Users/phil/selenium/selenium-server-standalone-2.46.0.jar -Dwebdriver.chrome.driver=/Users/phil/selenium/chromedriver
-  var selenium = child_process.spawn('java', ['-jar', '/Users/phil/selenium/selenium-server-standalone-2.46.0.jar',
+  // java -jar /Users/phil/selenium/selenium-server-standalone-2.47.1.jar -Dwebdriver.chrome.driver=/Users/phil/selenium/chromedriver
+  var selenium = child_process.spawn('java', ['-jar', '/Users/phil/selenium/selenium-server-standalone-2.47.1.jar',
                                               '-Dwebdriver.chrome.driver=/Users/phil/selenium/chromedriver']);
   selenium.stdout.pipe(process.stdout);
   selenium.stderr.pipe(process.stderr);
@@ -122,7 +122,7 @@ gulp.task('test:integration', function(done) {
 });
 
 gulp.task('test:functional', function(done) {
-  var mocha = child_process.spawn('mocha', ['test/functional', '-t', '180000']);
+  var mocha = child_process.spawn('mocha', ['test/functional', '-t', '120000']);
   mocha.stdout.pipe(process.stdout);
   mocha.stderr.pipe(process.stdout);
   mocha.on('exit', function() {

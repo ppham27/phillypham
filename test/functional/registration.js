@@ -39,6 +39,7 @@ describe('registration', function() {
   beforeEach(function(done) {
     this.browser = require('../support/browser')(); 
     this.browser.init()
+    .timeoutsImplicitWait(1000)
     .url(this.siteUrl)
     .then(function() {
       done();
@@ -71,6 +72,7 @@ describe('registration', function() {
     .setValue('input[name="password"]', 'newpassword')
     .setValue('input[name="passwordConfirmation"]', 'newpassword')
     .click('button[type="submit"]')
+    .pause(1000)
     .url()
     .then(function(res) {
       expect(url.parse(res.value).path).to.equal('/');
@@ -187,6 +189,7 @@ describe('email verification', function() {
     .setValue('input[name="password"]', 'newpassword')
     .setValue('input[name="passwordConfirmation"]', 'newpassword')
     .click('button[type="submit"]')
+    .pause(2000)
     .then(function() {
       db.User.findOne({where: {email: 'newuser@gmail.com'}})
       .then(function(user) {

@@ -27,7 +27,9 @@ describe('application settings', function() {
     this.db.ApplicationSettings.set(config.applicationSettings)
     .save()      
     .then(function() {
-      browser.init().url(siteUrl)
+      browser.init()
+      .timeoutsImplicitWait(1000)
+      .url(siteUrl)
       .click('a.topbar-link[href="/login"]')
       .setValue('input[name="email"]', 'admin@admin.com')
       .setValue('input[name="password"]', 'password')

@@ -30,7 +30,7 @@ describe('authorization', function() {
   beforeEach(function(done) {
     this.browser = require('../support/browser')(); 
     this.browser.init()
-    .timeoutsImplicitWait(500)
+    .timeoutsImplicitWait(1000)
     .url(this.siteUrl)
     .then(function() {
       done();
@@ -77,6 +77,7 @@ describe('authorization', function() {
     .setValue('input[name="email"]', 'power@gmail.com')
     .setValue('input[name="password"]', 'powerpower')
     .click('button[type="submit"]')
+    .pause(1000)
     .url(url.resolve(this.siteUrl, '/user/edit/admin'))
     .getText('.error-message')
     .then(function(text) {
