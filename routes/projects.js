@@ -111,7 +111,8 @@ router.get('/', function(req, res, next) {
 })
 
 router.get('/:title', function(req, res, next) {
-  db.Project.findOne({where: {title: req.params.title}})  
+  db.Project.findOne({where: {title: req.params.title},
+                      include: [{model: db.User, attributes: ['id', 'displayName', 'facebookId']}]})
   .then(function(project) {
     if (!project) return next(new Error('Project does not exist'));
     if (!project.published && (!req.user || !req.session.roles['project_manager'])) return next(new Error('Project is not published'));

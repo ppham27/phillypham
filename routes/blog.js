@@ -20,7 +20,7 @@ router.use('/:title/comment', require('./comment'));
 router.get('/:title', function(req, res, next) {
   db.Post.findOne({where: {title: req.params.title}, 
                    attributes: ['id', 'title', 'body', 'bodyHtml', 'photoUrl', 'photoLink', 'published', 'publishedAt', 'user_id'],
-                   include: [{model: db.User, attributes: ['id', 'displayName']},
+                   include: [{model: db.User, attributes: ['id', 'displayName', 'facebookId']},
                              {model: db.Tag, attributes: ['name']},
                              {model: db.Comment, attributes: ['id', 'body', 'bodyHtml', 'published', 'publishedAt', 'post_id', 'commentId', 'created_at'],
                               include: [{model: db.User, attributes: ['id', 'displayName', 'photoUrl']}]}]})
