@@ -30,7 +30,7 @@ describe('authorization', function() {
   beforeEach(function(done) {
     this.browser = require('../support/browser')(); 
     this.browser.init()
-    .timeoutsImplicitWait(1000)
+    .timeoutsImplicitWait(2000)
     .url(this.siteUrl)
     .then(function() {
       done();
@@ -53,6 +53,7 @@ describe('authorization', function() {
   it('should let the admin go everywhere', function(done) {
     var browser = this.browser;
     browser.click('a.topbar-link[href="/login"]')
+    .pause(100)
     .setValue('input[name="email"]', 'admin@admin.com')
     .setValue('input[name="password"]', 'password')
     .click('button[type="submit"]')

@@ -70,7 +70,7 @@ describe('passport', function() {
         done();
       }
       passport._strategies.local._verify('admin@admin.com', 
-                                         encryptPassword('pasword') + 'a', 
+                                         'a' + encryptPassword('pasword'), 
                                          callback);
     });
 
