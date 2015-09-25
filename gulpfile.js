@@ -28,16 +28,16 @@ gulp.task('markdown-browserify', ['markdown-help'], function(done) {
 });
 
 gulp.task('markdown-closurecompiler', ['markdown-browserify'], function(done) {
-  ClosureCompiler.compile('./public/javascripts/markdownBundle.js',
-                          {language_in: 'ECMASCRIPT5'},
-                          function(err, res) {
-                            fs.writeFile('./public/javascripts/markdownBundle-min.js', res,
-                                         function(err) {
-                                           if (err) throw err;
-                                           done();
-                                         });
-                          });
+  var cc = child_process.spawn('ccjs', 
+                               ['./public/javascripts/markdownBundle.js',
+                                '--language_in=ECMASCRIPT5', '--compilation_level=SIMPLE_OPTIMIZATIONS']);
+  cc.stdout.pipe(fs.createWriteStream('./public/javascripts/markdownBundle-min.js'));
+  cc.stderr.pipe(process.stdout);
+  cc.on('exit', function() {
+    done();
+  });
 });
+
 gulp.task('markdown', ['markdown-closurecompiler']);
 
 gulp.task('encryptPassword-browserify', function(done) {
@@ -54,8 +54,9 @@ gulp.task('encryptPassword-browserify', function(done) {
 gulp.task('encryptPassword-closurecompiler', ['encryptPassword-browserify'], function(done) {
   // compilation_level: "ADVANCED_OPTIMIZATIONS", possible additional optimization?
   ClosureCompiler.compile('./public/javascripts/encryptPasswordBundle.js',
-                          {language_in: 'ECMASCRIPT5'},
+                          {language_in: 'ECMASCRIPT5', compilation_level: "SIMPLE_OPTIMIZATIONS"},
                           function(err, res) {
+                            if (err) console.info(err);
                             fs.writeFile('./public/javascripts/encryptPasswordBundle-min.js', res,
                                          function(err) {
                                            if (err) throw err;
