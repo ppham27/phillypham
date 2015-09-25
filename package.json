@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://github.com/ppham27/phillypham.git"
   },
-  "version": "0.1.7",
+  "version": "0.1.8",
   "license": "MIT",
   "private": true,
   "engines": {
@@ -53,7 +53,7 @@
     "passport": "^0.3.0",
     "passport-facebook": "^2.0.0",
     "passport-google-oauth": "^0.2.0",
-    "passport-hash": "^0.4.0",
+    "passport-hash": "ppham27/passport-hash",
     "passport-local": "^1.0.0",
     "pg": "^4.4.2",
     "pg-hstore": "^2.3.2",
