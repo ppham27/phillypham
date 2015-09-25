@@ -47,14 +47,21 @@ for the public key.
 
 ### Building
 
-1. npm install, the following subtasks are automatically run post install
+1. `npm install`, the following subtasks are automatically run post install
   1. envify
   2. uglifyify
-  2. browserify
-  2. closurecompiler
-2. npm start
+  3. browserify
+  4. closurecompiler
+2. `gulp markdown`
+3. `npm start`
 
 Now you can visit the site at [http://localhost:3000](http://localhost:3000).
+
+### Deploying
+
+After pushing to master, the repo will automatically deploy to Heroku. 
+If any changes were made to the JavaScript, run `gulp markdown` first. 
+I would prefer to compile on deployment, but Heroku doesn't provide sufficient memory.
 
 ### Testing
 

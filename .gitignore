@@ -8,6 +8,5 @@ config/facebook*.json
 public/*.html
 public/javascripts/editorHelpHtml.js
 public/javascripts/markdownBundle.js
-public/javascripts/markdownBundle-min.js
 public/javascripts/encryptPasswordBundle.js
 public/javascripts/encryptPasswordBundle-min.js

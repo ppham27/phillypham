@@ -67,7 +67,7 @@ gulp.task('encryptPassword-closurecompiler', ['encryptPassword-browserify'], fun
 
 gulp.task('encryptPassword', ['encryptPassword-closurecompiler']);
 
-gulp.task('javascripts', ['markdown', 'encryptPassword']);
+gulp.task('javascripts', ['encryptPassword']);
 
 // sequelize migrations
 
