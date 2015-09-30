@@ -74,6 +74,10 @@ module.exports = function(redisClient) {
       return new TypeError('Sidebar info must be a nonempty string');
     if (!ApplicationSettings.defaultUserGroupId) 
       return new TypeError('User Group must be set');
+    if (typeof ApplicationSettings['blog:postsPerPage'] !== 'number' ||
+        ApplicationSettings['blog:postsPerPage'] <= 0 ||
+        ApplicationSettings['blog:postsPerPage'] % 1 !== 0)
+      return new TypeError('Posts per page must be a natural number');
     // add timestamp check here...
     return true;  
   }

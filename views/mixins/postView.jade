@@ -16,10 +16,15 @@ mixin postView(post, edit, view)
     if (edit || post.Tags.length) 
       p(style = post.Tags.length ? null : 'display: none')
         span.post-meta Tags: 
-        span.post-meta.tags #{post.Tags.map(function(d) { return d.name; }).join(', ')}
+        span.post-meta.tags
+          each tag, idx in post.Tags
+            a(href=settings.config.siteUrl + '/?tag=' + tag.name)= tag.name
+            if idx !== post.Tags.length - 1
+              | , 
     .footer.meta
       .left
-        span.post-meta By #{post.User.displayName}
+        span.post-meta By 
+          a(href=settings.config.siteUrl + '/user/' + encodeURIComponent(post.User.displayName))= post.User.displayName
       .right
         span.post-meta Published on #{post.publishedAt || new Date()}
     .footer

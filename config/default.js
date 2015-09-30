@@ -58,7 +58,8 @@ var config = {
                          "contact:twitter": '',
                          "contact:instagram": '',
                          "menu:dataViz": '',
-                         "menu:resume": ''
+                         "menu:resume": '',
+                         "blog:postsPerPage": 5
                        },
   fixtures: [
     {model: 'Role', data: {name: 'poster', description: 'can post'}},

@@ -93,7 +93,8 @@ describe('ApplicationSettings on fresh database', function() {
                                   "sidebar:photoUrl": 'test.jpg',
                                   "sidebar:info": 'Hello, World!',
                                   "sidebar:title": 'About Me',
-                                  "sidebar:infoHtml": '<p>Hello, World!</p>'});
+                                  "sidebar:infoHtml": '<p>Hello, World!</p>',
+                                  "blog:postsPerPage": 5});
     var stub = sinon.stub(this.redisClient, 'hmset', 
                           function(key, obj, callback) {
                             expect(key).to.equal('applicationSettings');
@@ -114,6 +115,36 @@ describe('ApplicationSettings on fresh database', function() {
                                           });
 
   });
+
+  it('should only take positive integer values for posts per page', function(done) {
+    this.ApplicationSettings.set({defaultUserGroupId: 1,
+                                  "sidebar:photoUrl": 'test.jpg',
+                                  "sidebar:info": 'Hello, World!',
+                                  "sidebar:title": 'About Me',
+                                  "sidebar:infoHtml": '<p>Hello, World!</p>'});
+    this.ApplicationSettings.set({'blog:postsPerPage': 'not an integer'});
+    this.ApplicationSettings.save().catch(TypeError,
+                                          function(err) {
+                                            expect(err).to.be.instanceOf(TypeError);
+                                            expect(err.toString()).to.match(/natural number/);
+                                            done();
+                                          });
+  });
+
+  it('should not take negative integer values for posts per page', function(done) {
+    this.ApplicationSettings.set({defaultUserGroupId: 1,
+                                  "sidebar:photoUrl": 'test.jpg',
+                                  "sidebar:info": 'Hello, World!',
+                                  "sidebar:title": 'About Me',
+                                  "sidebar:infoHtml": '<p>Hello, World!</p>'});
+    this.ApplicationSettings.set({'blog:postsPerPage': -1});
+    this.ApplicationSettings.save().catch(TypeError,
+                                          function(err) {
+                                            expect(err).to.be.instanceOf(TypeError);
+                                            expect(err.toString()).to.match(/natural number/);
+                                            done();
+                                          });
+  });
 });
 
 describe('ApplicationSettings on existing database', function() {
@@ -132,7 +163,8 @@ describe('ApplicationSettings on existing database', function() {
                                                        'sidebar:photoUrl': 'test.jpg',
                                                        'sidebar:info': 'Hello, World!',
                                                        "sidebar:title": 'About Me',
-                                                       "sidebar:infoHtml": '<p>Hello, World!</p>'});
+                                                       "sidebar:infoHtml": '<p>Hello, World!</p>',
+                                                       "blog:postsPerPage": 5});
                });
   });
   beforeEach(function(done) {

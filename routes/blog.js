@@ -1,18 +1,56 @@
 var express = require('express');
 var router = express.Router();
+var Promise = require('bluebird');
+var qs = require('querystring');
 
 var db = require('../models');
 
 router.get('/', function(req, res, next) {
-  db.Post.findAll({where: {published: true}, 
-                   attributes: ['id', 'title', 'bodyHtml', 'photoUrl', 'photoLink', 'published', 'publishedAt', 'user_id'],
-                   order: '"Post"."published_at" DESC',
-                   include: [{model: db.User, attributes: ['id', 'displayName']},
-                             {model: db.Tag, attributes: ['name']},
-                             {model: db.Comment, attributes: ['published']}]})
-  .then(function(posts) {
-    res.render('blog/index', {posts: posts});
-  });  
+  var page = (Math.max(1, req.query.page) - 1) || 0;
+  var tag = req.query.tag || null;
+  if (tag) {
+    db.Tag.findOne({where: {name: tag}})
+    .then(function(tag) {
+      if (!tag) return Promise.join([], []);
+      return Promise.join(
+        tag.getPosts({
+          where: {published: true},
+          attributes: ['id', 'title', 'bodyHtml', 'photoUrl', 'photoLink', 'published', 'publishedAt', 'user_id'],
+          order: '"Post"."publishedAt" DESC',
+          limit: db.ApplicationSettings['blog:postsPerPage'],
+          offset: page*db.ApplicationSettings['blog:postsPerPage'],
+          include: [{model: db.User, attributes: ['id', 'displayName']},
+                    {model: db.Tag, attributes: ['name']},
+                    {model: db.Comment, attributes: ['published']}]}),
+        tag.getPosts({attributes: ['id']})
+      )
+    })    
+    .spread(function(posts, allPosts) {
+      var postCount = allPosts.length;
+      res.render('blog/index', {
+        title: 'Posts tagged <em>' + tag + '</em>',
+        posts: posts,
+        nextPage: postCount > (page + 1)*db.ApplicationSettings['blog:postsPerPage'] ? qs.stringify({page: page + 2, tag: tag}) : null,
+        previousPage: page > 0 ? qs.stringify({page: page, tag: tag}) : null});
+    });    
+  } else {
+    Promise.join(
+      db.Post.findAll({where: {published: true}, 
+                       attributes: ['id', 'title', 'bodyHtml', 'photoUrl', 'photoLink', 'published', 'publishedAt', 'user_id'],
+                       order: '"Post"."publishedAt" DESC',
+                       limit: db.ApplicationSettings['blog:postsPerPage'],
+                       offset: page*db.ApplicationSettings['blog:postsPerPage'],
+                       include: [{model: db.User, attributes: ['id', 'displayName']},
+                                 {model: db.Tag, attributes: ['name']},
+                                 {model: db.Comment, attributes: ['published']}]}),
+      db.Post.count()
+    )
+    .spread(function(posts, postCount) {
+      res.render('blog/index', {posts: posts,
+                                nextPage: postCount > (page+1)*db.ApplicationSettings['blog:postsPerPage'] ? qs.stringify({page: page + 2}) : null,
+                                previousPage: page > 0 ? qs.stringify({page: page}) : null});
+    });  
+  }
 });
 
 router.use('/:title/comment', require('./comment'));

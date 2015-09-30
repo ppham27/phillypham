@@ -3,12 +3,22 @@ include ../mixins/postView.jade
 extends ../layout
 
 block content
+  if locals.title
+    h1!= title
   if posts.length === 0
-    h2 No one has posted yet!
+    h2 No one has posted yet, there are no posts on this page, or this tag is invalid.
   each post, idx in posts
     +postView(post)
     if (idx < posts.length - 1)
      hr.post
+  if locals.previousPage || locals.nextPage
+    .page-nav
+      .left
+        if locals.previousPage
+          a(href="/?" + locals.previousPage) <<< Previous page
+      .right
+        if locals.nextPage
+          a(href="/?" + locals.nextPage) Next page >>>
 append head
   meta(property="fb:app_id", content=settings.config.appKeys.facebook.clientID)
   meta(property="og:title", content=settings.ApplicationSettings.title)

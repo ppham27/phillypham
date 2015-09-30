@@ -27,6 +27,8 @@ block content
       h2 Menu
       +settingsFieldSet('Data Viz', 'menu:dataViz', settings.ApplicationSettings['menu:dataViz'], 'URL to data visualizations')
       +settingsFieldSet('Résumé', 'menu:resume', settings.ApplicationSettings['menu:resume'], 'URL to résumé')
+      h2 Blog
+      +settingsFieldSet('Posts per Page', 'blog:postsPerPage', settings.ApplicationSettings['blog:postsPerPage'], 'Posts per page')
     .wmd-panel.buttons
       button.submit-button(disabled=true, type="submit") Update
         .overlay      
@@ -62,8 +64,12 @@ append body
       var data = {};
       ['sidebar:info', 'sidebar:photoUrl', 'sidebar:title',
        'contact:email', 'contact:facebook', 'contact:instagram', 'contact:twitter',
-       'menu:dataViz', 'menu:resume'].forEach(function(key) {
-        data[key] = getValue(key);
+       'menu:dataViz', 'menu:resume', 'blog:postsPerPage'].forEach(function(key) {
+        if (key === 'blog:postsPerPage') {
+          data[key] = parseInt(getValue(key));
+        } else {
+          data[key] = getValue(key);
+        }
       });
       updateRequest.send(JSON.stringify(data));
       function getValue(name) {

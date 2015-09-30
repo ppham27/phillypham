@@ -65,6 +65,8 @@ config.fixtures.push({model: 'Tag',
                       data: {name: 'tennis'}});
 config.fixtures.push({model: 'Tag',
                       data: {name: 'panda'}});
+config.fixtures.push({model: 'Tag',
+                      data: {name: 'filler'}});
 
 config.fixtures.push({model: 'Post',
                       data: {title: 'First Post',
@@ -98,6 +100,70 @@ config.fixtures.push({model: 'Post',
                              published: true,
                              User: {displayName: 'power'},
                              Tags: [{name: 'math'}, {name: 'tennis'}]}});
+
+config.fixtures.push({model: 'Post',
+                      data: {title: 'Post 5',
+                             body: 'some post',
+                             published: true,
+                             User: {displayName: 'power'},
+                             Tags: [{name: 'filler'}]}});
+
+config.fixtures.push({model: 'Post',
+                      data: {title: 'Post 6',
+                             body: 'some post',
+                             published: true,
+                             User: {displayName: 'power'},
+                             Tags: [{name: 'filler'}]}});
+
+config.fixtures.push({model: 'Post',
+                      data: {title: 'Post 7',
+                             body: 'some post',
+                             published: true,
+                             User: {displayName: 'power'},
+                             Tags: [{name: 'filler'}]}});
+
+config.fixtures.push({model: 'Post',
+                      data: {title: 'Post 8',
+                             body: 'some post',
+                             published: true,
+                             User: {displayName: 'power'},
+                             Tags: [{name: 'filler'}]}});
+
+config.fixtures.push({model: 'Post',
+                      data: {title: 'Post 9',
+                             body: 'some post',
+                             published: true,
+                             User: {displayName: 'power'},
+                             Tags: [{name: 'filler'}]}});
+
+config.fixtures.push({model: 'Post',
+                      data: {title: 'Post 10',
+                             body: 'some post',
+                             published: true,
+                             User: {displayName: 'power'},
+                             Tags: [{name: 'filler'}]}});
+
+config.fixtures.push({model: 'Post',
+                      data: {title: 'Post 11',
+                             body: 'some post',
+                             published: true,
+                             User: {displayName: 'power'},
+                             Tags: [{name: 'filler'}]}});
+
+config.fixtures.push({model: 'Post',
+                      data: {title: 'Post 12',
+                             body: 'some post',
+                             published: true,
+                             User: {displayName: 'power'},
+                             Tags: [{name: 'filler'}]}});
+
+config.fixtures.push({model: 'Post',
+                      data: {title: 'Post 13',
+                             body: 'some post',
+                             published: true,
+                             User: {displayName: 'power'},
+                             Tags: [{name: 'filler'}]}});
+
                              
 config.fixtures.push({model: 'Comment',
                       data: {body: 'comment',

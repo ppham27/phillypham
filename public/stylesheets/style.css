@@ -708,6 +708,15 @@ a.twitter-share-button {
   font-style: italic;
 }
 
+.post-meta a {
+  color: #888;  
+  text-decoration: none;  
+}
+
+.post-meta a:hover {
+  color: #d02027;  
+}
+
 .post .footer.meta {
   margin-bottom: 3px;
 }
@@ -797,3 +806,11 @@ a.twitter-share-button {
   margin-bottom: 15px;
 }
 
+.page-nav .left {
+  display: inline-block;  
+}
+
+.page-nav .right {
+  display: inline-block;  
+  float: right;
+}
