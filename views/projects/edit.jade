@@ -48,10 +48,12 @@ block content
       p
         strong URL: 
         a.project-url(href=temporaryProject.url, target="_blank")= temporaryProject.url
-      if (locals.update)
-        p
-          strong By 
+      p
+        strong By 
+        if (locals.update)      
           a(href=settings.config.siteUrl + '/user/' + encodeURIComponent(temporaryProject.User.displayName))= temporaryProject.User.displayName
+        else if locals.user
+          a(href=settings.config.siteUrl + '/user/' + encodeURIComponent(user.displayName))= user.displayName
       #wmd-preview-description.wmd-preview
     hr
     .buttons
