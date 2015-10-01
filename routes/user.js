@@ -51,6 +51,9 @@ router.put('/edit/:displayName', authorize({userId: true, role: 'user_manager'})
     updates.familyName = newUser.familyName || null;
     updates.biography = newUser.biography || null;
     updates.photoUrl = newUser.photoUrl || db.User.tableAttributes.photoUrl.defaultValue;
+    if (typeof newUser.facebookUsername === 'string') {
+      updates.facebookUsername = newUser.facebookUsername.toLowerCase() || null;
+    }
         
     if (newUser.password) {
       // logic for updating password      

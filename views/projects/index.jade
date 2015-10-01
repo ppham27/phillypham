@@ -16,6 +16,9 @@ block content
             img(src=project.thumbnail)
         .wmd-preview!=project.summaryHtml
       .footer
+        .project-meta
+          span By 
+          a(href=settings.config.siteUrl + '/user/' + encodeURIComponent(project.User.displayName))= project.User.displayName
         .left
           +shareButtons(settings.config.siteUrl + '/projects/' + encodeURIComponent(project.title), project.title)
         .right

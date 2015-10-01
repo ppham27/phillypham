@@ -702,18 +702,18 @@ a.twitter-share-button {
   float: right;
 }
 
-.post-meta {
+.project-meta, .post-meta {
   font-size: 90%;
   color: #888;
   font-style: italic;
 }
 
-.post-meta a {
+.post-meta a, .project-meta a {
   color: #888;  
   text-decoration: none;  
 }
 
-.post-meta a:hover {
+.post-meta a:hover, .project-meta a:hover {
   color: #d02027;  
 }
 

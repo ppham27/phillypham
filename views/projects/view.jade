@@ -13,6 +13,9 @@ block content
       p
         strong URL: 
         a.project-url(href=project.url, target="_blank")= project.url
+      p
+        strong By 
+        a(href=settings.config.siteUrl + '/user/' + encodeURIComponent(project.User.displayName))= project.User.displayName
     .wmd-preview!= project.descriptionHtml
     hr
     .footer
@@ -28,8 +31,8 @@ append head
   meta(property="og:url", content=settings.config.siteUrl + '/projects/' + encodeURIComponent(project.title))
   meta(property="og:description", content=project.summary)
   meta(property="og:type", content="article")
-  if (settings.ApplicationSettings['contact:facebook'])
-    meta(property="article:author", content='https://www.facebook.com/' + settings.ApplicationSettings['contact:facebook'])
+  if (project.User.facebookUsername)
+    meta(property="article:author", content='https://www.facebook.com/' + project.User.facebookUsername)
   if (project.photoUrl)
     meta(property="og:image", content=project.photoUrl[0] === '/' ? settings.config.siteUrl + project.photoUrl : project.photoUrl)
   if (settings.ApplicationSettings['contact:twitter'])

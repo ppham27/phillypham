@@ -38,9 +38,10 @@ describe('update user', function() {
     })
     .then(function() {
       browser.init()
-      .timeoutsImplicitWait(1000)
+      .timeoutsImplicitWait(2000)
       .url(siteUrl)
       .click('a.topbar-link[href="/login"]')
+      .pause(1000)
       .setValue('input[name="email"]', 'moderator@gmail.com')
       .setValue('input[name="password"]', 'moderator')
       .click('button[type="submit"]')
@@ -63,6 +64,28 @@ describe('update user', function() {
     transporter.sendMail.restore();
     this.server.close(function(err) {
       done(err);
+    });
+  });
+
+  it('should update facebook username and display meta tag', function(done) {
+    var browser = this.browser;
+    var db = this.db;
+    var siteUrl = this.siteUrl;
+    browser
+    .pause(1000).click('a.topbar-link[href="/logout"]')
+    .pause(1000).click('a.topbar-link[href="/login"]')
+    .pause(1000).setValue('input[name="email"]', 'admin@admin.com')
+    .setValue('input[name="password"]', 'password')
+    .click('button[type="submit"]')
+    .pause(1000).click('a.topbar-link[href="/user/edit/admin"]')
+    .pause(1000).setValue('input[name="facebookUsername"]', 'myFace')
+    .click('#registration-form button[type="submit"]')
+    .pause(1000).click('#header-title')
+    .pause(1000).click('a[href="/Third%20Post"]')
+    .pause(1000).getAttribute('meta[property="article:author"]', 'content')
+    .then(function(attr) {
+      expect(attr).to.match(/myface$/);
+      done();
     });
   });
 

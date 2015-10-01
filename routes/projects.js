@@ -93,7 +93,8 @@ router.put('/edit/:title', authorize({role: 'project_manager'}), function(req, r
 });
 
 router.get('/edit/:title', authorize({role: 'project_manager'}), function(req, res, next) {
-  Promise.join(db.Project.findOne({where: {title: req.params.title}}),
+  Promise.join(db.Project.findOne({where: {title: req.params.title},
+                                   include: [{model: db.User, attributes: ['id', 'displayName']}]}),
                db.Project.findAll({where: {published: false}}))  
   .spread(function(project, projects) {
     if (!project) return next(new Error('Project does not exist'));
@@ -104,7 +105,9 @@ router.get('/edit/:title', authorize({role: 'project_manager'}), function(req, r
 
 
 router.get('/', function(req, res, next) {
-  db.Project.findAll({where: {published: true}, order: 'published_at DESC'})
+  db.Project.findAll({where: {published: true}, 
+                      order: 'published_at DESC',
+                      include: [{model: db.User, attributes: ['id', 'displayName']}]})
   .then(function(projects) {
     res.render('projects/index', {title: 'Projects', projects: projects});
   });
@@ -112,7 +115,7 @@ router.get('/', function(req, res, next) {
 
 router.get('/:title', function(req, res, next) {
   db.Project.findOne({where: {title: req.params.title},
-                      include: [{model: db.User, attributes: ['id', 'displayName', 'facebookId']}]})
+                      include: [{model: db.User, attributes: ['id', 'displayName', 'facebookUsername']}]})
   .then(function(project) {
     if (!project) return next(new Error('Project does not exist'));
     if (!project.published && (!req.user || !req.session.roles['project_manager'])) return next(new Error('Project is not published'));

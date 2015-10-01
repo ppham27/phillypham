@@ -146,12 +146,14 @@ describe('passport', function() {
                                  email: ' phiL@abc.com ', 
                                  password: encryptPassword('abcabcabc'), 
                                  passwordConfirmation: encryptPassword('abcabcabc'),
+                                 facebookUsername: 'myface',
                                  biography: 'hello'});
       var callback = function(err, user, message) {
         expect(user).to.not.be.null;
         expect(user.email).to.equal('phil@abc.com'); // make sure email is trimmed
         expect(user.photoUrl).to.equal('/images/default-profile.jpg'); // no image means default
         expect(user.biographyHtml).to.equal('<p>hello</p>'); // bio is converted
+        expect(user.facebookUsername).to.equal('myface');
         done();
       };
       passport._strategies.localRegistration._verify(req, undefined, undefined, callback);

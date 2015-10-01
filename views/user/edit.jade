@@ -36,7 +36,7 @@ append body
       var data = {};
       ['givenName', 'middleName', 'familyName', 'displayName', 'email',
        'oldPassword', 'password', 'passwordConfirmation',
-       'photoUrl', 'biography'].forEach(function(k) {
+       'photoUrl', 'biography', 'facebookUsername'].forEach(function(k) {
         data[k] = getValue(k);
       });
       setValue('oldPassword', '');

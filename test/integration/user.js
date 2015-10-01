@@ -190,6 +190,7 @@ describe('user routes', function() {
                                  oldPassword: encryptPassword('powerpower'),
                                  password: encryptPassword('newPassword'),
                                  passwordConfirmation: encryptPassword('newPassword'),
+                                 facebookUsername: ' fB.id ',
                                  email: 'new_email@gmail.com'}, 
                                 true, 
                                 {accepts: ['json'], is: ['json']});   
@@ -210,6 +211,7 @@ describe('user routes', function() {
                                    expect(user.biographyHtml).to.equal('<p>my new bio</p>');
                                    expect(user.email).to.equal('new_email@gmail.com');
                                    expect(user.emailVerified).to.be.false;
+                                   expect(user.facebookUsername).to.equal('fb.id');
                                    return Promise.resolve(true);
                                  }))
                    promises.push(db.User.authenticate('new_email@gmail.com', 'newPassword'));

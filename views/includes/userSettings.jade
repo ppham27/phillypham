@@ -21,9 +21,10 @@ if (locals.update)
   +descriptiveFieldSet('New Password', 'password', '', 'New Password', 'must be from 8 to 64 characters', true)
 else
   +descriptiveFieldSet('Email', 'email', temporaryUser.email || '', 'Email', 'required')
-  +descriptiveFieldSet('Password', 'password', '', 'Password', 'required, must be from 8 to 64 characters', true)
+  +descriptiveFieldSet('Password', 'password', '', 'Password', 'required, must be from 8 to 64 characters', true)  
 +descriptiveFieldSet('Password Confirmation', 'passwordConfirmation', '', 'Password Confirmation', undefined, true)
-+descriptiveFieldSet('Picture', 'photoUrl', temporaryUser.photoUrl || '', 'Picture URL', 'a url to a picture, e.g. http://example.com/me.jpg')
++descriptiveFieldSet('Facebook Username', 'facebookUsername', temporaryUser.facebookUsername || '', 'Facebook Username', 'Profile URL, https://www.facebook.com/{username}')
++descriptiveFieldSet('Picture', 'photoUrl', temporaryUser.photoUrl || '', 'Picture URL', 'a URL to a picture, e.g. http://example.com/me.jpg')
 if (!locals.update)
   fieldset.captcha!= captcha
     span.field-sublabel

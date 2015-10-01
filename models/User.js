@@ -22,6 +22,7 @@ module.exports = function(sequelize, DataTypes) {
     biography: {type: DataTypes.TEXT, allowNull: true},
     biographyHtml: {type: DataTypes.TEXT, allowNull: true, field: 'biography_html'},
     facebookId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'facebook_id'},
+    facebookUsername: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'facebook_username'},
     googleId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'google_id'},
     twitterId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'twitter_id'}    
   },

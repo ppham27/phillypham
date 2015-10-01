@@ -436,7 +436,7 @@ describe('middleware', function() {
                        });  
       });  
 
-      it.only('should merge facebook users and give their info priority', function(done) {
+      it('should merge facebook users and give their info priority', function(done) {
         var db = this.db;
         var siteUrl = this.siteUrl;
         var browser = this.browser;
