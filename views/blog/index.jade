@@ -27,8 +27,6 @@ append head
   meta(property="og:site_name", content=settings.ApplicationSettings.title)
   meta(property="og:url", content=settings.config.siteUrl)
   meta(property="og:description", content=settings.ApplicationSettings['sidebar:info'].substr(0, 600))
-  if (settings.ApplicationSettings['contact:facebook'])
-    meta(property="website:author", content=settings.ApplicationSettings['contact:facebook'])
   if (settings.ApplicationSettings['sidebar:photoUrl'])
     meta(property="og:image", content=settings.ApplicationSettings['sidebar:photoUrl'])
   if (settings.ApplicationSettings['contact:twitter'])
