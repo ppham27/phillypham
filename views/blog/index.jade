@@ -10,8 +10,9 @@ block content
   each post, idx in posts
     +postView(post)
     if (idx < posts.length - 1)
-     hr.post
+      hr.post
   if locals.previousPage || locals.nextPage
+    hr.post
     .page-nav
       .left
         if locals.previousPage
