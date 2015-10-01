@@ -15,8 +15,8 @@ router.get('/', function(req, res, next) {
       return Promise.join(
         tag.getPosts({
           where: {published: true},
-          attributes: ['id', 'title', 'bodyHtml', 'photoUrl', 'photoLink', 'published', 'publishedAt', 'user_id'],
-          order: '"Post"."publishedAt" DESC',
+          attributes: ['id', 'title', 'bodyHtml', 'photoUrl', 'photoLink', 'published', ['published_at', 'published_at'], 'user_id'],
+          order: [['"published_at"', 'DESC']],
           limit: db.ApplicationSettings['blog:postsPerPage'],
           offset: page*db.ApplicationSettings['blog:postsPerPage'],
           include: [{model: db.User, attributes: ['id', 'displayName']},
@@ -36,8 +36,8 @@ router.get('/', function(req, res, next) {
   } else {
     Promise.join(
       db.Post.findAll({where: {published: true}, 
-                       attributes: ['id', 'title', 'bodyHtml', 'photoUrl', 'photoLink', 'published', 'publishedAt', 'user_id'],
-                       order: '"Post"."publishedAt" DESC',
+                       attributes: ['id', 'title', 'bodyHtml', 'photoUrl', 'photoLink', 'published', ['published_at', 'published_at'], 'user_id'],
+                       order: [['"published_at"', 'DESC']],
                        limit: db.ApplicationSettings['blog:postsPerPage'],
                        offset: page*db.ApplicationSettings['blog:postsPerPage'],
                        include: [{model: db.User, attributes: ['id', 'displayName']},

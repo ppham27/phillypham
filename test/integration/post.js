@@ -5,8 +5,8 @@ var postRoutes = require('../../routes/post');
 var blogRoutes = require('../../routes/blog');
 var config = require('config');
 var Promise = require('bluebird');
+var sequelizeFixtures = require('sequelize-fixtures');
 var FakeRequest = require('../support/fakeRequest');
-
 
 describe('post routes', function() {
   before(function(done) {
@@ -37,7 +37,7 @@ describe('post routes', function() {
         this.handle = this.handle[0].route.stack[0].handle;
       });
       it('should include user, comments, and tags', function(done) {        
-        var req = new FakeRequest();;
+        var req = new FakeRequest();
         req.params = {};
         req.params.title = 'First Post';
         var res = {}
@@ -407,5 +407,149 @@ describe('post routes', function() {
         this.handle(req, res);
       });
     });
+  });
+});
+
+
+describe('post tags and pages', function() {
+  before(function(done) {
+    this.handle = blogRoutes.stack.filter(function(handle) {
+                    return handle.route && handle.route.path === '/' && handle.route.methods.get;
+                  });
+    this.handle = this.handle[0].route.stack[0].handle;
+    this.db = require('../../models');
+    var db = this.db;
+    var callback = function() {
+      db.sequelize.sync({force: true})
+      .then(function() {
+        return db.loadFixtures(config.fixtures);
+      })
+      .then(function() {
+        // extra posts
+        var newFixtures = [];
+        newFixtures.push({model: 'Tag',
+                          data: {name: 'filler'}});
+        for (var p = 11; p < 20; ++p) {
+          newFixtures.push({model: 'Post',
+                            data: {title: 'Post ' + p,
+                                   body: 'some post',
+                                   published: true,
+                                   publishedAt: new Date(1000000000000 + 100000*p),
+                                   User: {displayName: 'power'},
+                                   Tags: [{name: 'filler'}]}});
+        }
+        return db.loadFixtures(newFixtures, true);
+      })
+      .then(function() {
+        done();
+      });
+    };
+    if (this.db.isReady) callback();
+    this.db.once('ready', callback)
+  });  
+
+  it ('should only list 5 posts', function(done) {
+    var db = this.db;
+    var res = {};
+    res.render = function(view, locals) {
+      expect(view).to.equal('blog/index');
+      expect(locals.posts.length).to.equal(5);
+      expect(locals.previousPage).to.be.null;
+      expect(locals.nextPage).to.not.be.null;
+      done();
+    };
+    var req = new FakeRequest();
+    req.query = {};
+    this.handle(req, res);
+  });
+
+  it ('should only list 5 posts on page 2', function(done) {
+    var db = this.db;
+    var res = {};
+    res.render = function(view, locals) {
+      expect(view).to.equal('blog/index');
+      expect(locals.posts.length).to.equal(5);
+      expect(locals.previousPage).to.not.be.null;
+      expect(locals.nextPage).to.not.be.null;
+      done();
+    };
+    var req = new FakeRequest();
+    req.query = {page: 2};
+    this.handle(req, res);
+  });
+
+  it ('should only list 2 posts on page 3', function(done) {
+    var db = this.db;
+    var res = {};
+    res.render = function(view, locals) {
+      expect(view).to.equal('blog/index');
+      expect(locals.posts.length).to.equal(2);
+      expect(locals.previousPage).to.not.be.null;
+      expect(locals.nextPage).to.be.null;
+      done();
+    };
+    var req = new FakeRequest();
+    req.query = {page: 3};
+    this.handle(req, res);
+  });
+  
+  it ('should take invalid negative pages as the first page', function(done) {
+    var db = this.db;
+    var res = {};
+    res.render = function(view, locals) {
+      var expectedTitles = ['Third Post', 'Second Post', 'First Post', 'Post 19', 'Post 18'];
+      var actualTitles = locals.posts.map(function(post) { return post.title; });
+      expect(actualTitles).to.deep.equal(expectedTitles);
+      done();
+    };
+    var req = new FakeRequest();
+    req.query = {page: -10};
+    this.handle(req, res);
+  });
+  
+  it('should have no posts for very large page numbes', function(done) {
+    var db = this.db;
+    var res = {};
+    res.render = function(view, locals) {        
+      expect(locals.posts).to.be.empty;
+      done();
+    };
+    var req = new FakeRequest();
+    req.query = {page: 10000};
+    this.handle(req, res);
+  });
+
+  it('should return only tagged posts', function(done) {
+    var db = this.db;
+    var res = {};
+    res.render = function(view, locals) {
+      var expectedTitles = ['Post 14', 'Post 13', 'Post 12', 'Post 11'];
+      var actualTitles = locals.posts.map(function(post) { return post.title; });
+      expect(locals.previousPage).to.not.be.null;
+      expect(locals.nextPage).to.be.null;
+      expect(actualTitles).to.deep.equal(expectedTitles);
+      expect(locals.title).to.match(/filler/);
+      done();
+    };
+    var req = new FakeRequest();
+    req.query = {page: 2, tag: 'filler'};
+    this.handle(req, res);
+  });
+
+  it('should paginate tagged posts', function(done) {
+    var db = this.db;
+    var res = {};
+    res.render = function(view, locals) {
+      var expectedTitles = ['Post 19', 'Post 18', 'Post 17', 'Post 16', 'Post 15'];
+      var actualTitles = locals.posts.map(function(post) { return post.title; });
+      expect(locals.previousPage).to.be.null;
+      expect(locals.nextPage).to.not.be.null;
+      expect(actualTitles).to.deep.equal(expectedTitles);
+      expect(locals.title).to.match(/filler/);
+      done();
+    };
+    var req = new FakeRequest();
+    req.query = {tag: 'filler'};
+    this.handle(req, res);
   });
 });

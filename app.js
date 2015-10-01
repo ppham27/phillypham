@@ -24,10 +24,13 @@ var db = require('./models');
 db.once('ready', function() {
   app.set('config', config);
   app.set('ApplicationSettings', db.ApplicationSettings);
-  db.loadFixtures(config.fixtures, process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')
+  db.sequelize.sync({force: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'})
   .then(function() {
-    app.isReady = true;
-    app.emit('ready');    
+    db.loadFixtures(config.fixtures)
+    .then(function() {
+      app.isReady = true;
+      app.emit('ready');    
+    });
   });
 });
 

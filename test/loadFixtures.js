@@ -5,10 +5,10 @@ describe('loadFixtures', function() {
   before(function() {
     this.db = require('./support/db');
     this.db.sequelizeModels = ['user', 'post'];
-    this.fixtures = [{model: 'user', data: {id: 1, name: 'phil'}},
-                     {model: 'user', data: {id: 2, name: 'chris'}},
-                     {model: 'post', data: {id: 1, title: 'first post'}},
-                     {model: 'post', data: {id: 2, title: 'second post'}}];
+    this.fixtures = [{model: 'user', data: {name: 'phil'}},
+                     {model: 'user', data: {name: 'chris'}},
+                     {model: 'post', data: {title: 'first post'}},
+                     {model: 'post', data: {title: 'second post'}}];
     this.db.user = this.db.sequelize.define('user', {name: this.db.Sequelize.STRING});
     this.db.post = this.db.sequelize.define('post', {title: this.db.Sequelize.STRING});
   });
@@ -38,18 +38,12 @@ describe('loadFixtures', function() {
         return loadFixtures(db, fixtures, true);
       })
       .then(function() {
-        return db.post.count();
+        return db.user.count();
       })
       .then(function(count) {
-        expect(count).to.equal(2);      
-      })
-      .then(function() {
-        return db.user.findOne({where: {name: 'tim'}});
-      })
-      .then(function(tim) {
-        expect(tim).to.be.null;
+        expect(count).to.equal(3);      
         done();
-      });    
+      })
     }); 
 
     it('should test case 2', function(done) {
@@ -59,18 +53,12 @@ describe('loadFixtures', function() {
         return loadFixtures(db, fixtures, true);
       })
       .then(function() {
-        return db.user.count();
+        return db.post.count();
       })
       .then(function(count) {
-        expect(count).to.equal(2);      
-      })
-      .then(function() {
-        return db.post.findOne({where: {title: 'new post'}});
-      })
-      .then(function(post) {
-        expect(post).to.be.null;
+        expect(count).to.equal(3);      
         done();
-      });    
+      });
     }); 
     
   });

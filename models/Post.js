@@ -42,7 +42,7 @@ module.exports = function(sequelize, DataTypes) {
                                 return Promise.resolve(post);
                               },
                               beforeCreate: function(post) {
-                                if (post.published) post.publishedAt = new Date();
+                                if (post.published && !post.publishedAt) post.publishedAt = new Date();
                                 post.bodyHtml = converter.makeHtml(post.body);
                                 return Promise.resolve(post);
                               }
