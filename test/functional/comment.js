@@ -38,7 +38,7 @@ describe('comments', function() {
     })
     .then(function() {
       browser.init()
-      .timeoutsImplicitWait(1000)
+      .timeoutsImplicitWait(2000)
       .url(siteUrl)      
       .click('a.topbar-link[href="/login"]')
       .setValue('input[name="email"]', 'admin@admin.com')
@@ -508,7 +508,8 @@ describe('comment as an unverified user', function() {
   
   it('should flash error message on empty comment', function(done) {
     var browser = this.browser;
-    browser.click('button.submit-button.comment')
+    browser.pause(1000)
+    .click('button.submit-button.comment')
     .pause(1000)
     .getText('.comments #flash')
     .then(function(text) {

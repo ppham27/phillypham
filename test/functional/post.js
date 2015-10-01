@@ -33,7 +33,7 @@ describe('posts', function() {
     })
     .then(function() {
       browser.init()
-      .timeoutsImplicitWait(1000)
+      .timeoutsImplicitWait(2000)
       .url(siteUrl)
       .click('a.topbar-link[href="/login"]')
       .setValue('input[name="email"]', 'admin@admin.com')
