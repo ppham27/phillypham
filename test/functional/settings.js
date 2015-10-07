@@ -28,12 +28,14 @@ describe('application settings', function() {
     .save()      
     .then(function() {
       browser.init()
-      .timeoutsImplicitWait(1000)
+      .timeoutsImplicitWait(2000)
       .url(siteUrl)
       .click('a.topbar-link[href="/login"]')
+      .pause(1000)
       .setValue('input[name="email"]', 'admin@admin.com')
       .setValue('input[name="password"]', 'password')
       .click('button[type="submit"]')
+      .pause(1000)
       .click('a.topbar-link[href="/settings"]')
       .then(function() {
         done();

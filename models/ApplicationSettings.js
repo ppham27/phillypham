@@ -78,6 +78,16 @@ module.exports = function(redisClient) {
         ApplicationSettings['blog:postsPerPage'] <= 0 ||
         ApplicationSettings['blog:postsPerPage'] % 1 !== 0)
       return new TypeError('Posts per page must be a natural number');
+    try {
+      var tagArray = JSON.parse(ApplicationSettings['blog:tags']);
+      if (!Array.isArray(tagArray)) throw new TypeError("tag must be an array");
+      tagArray.forEach(function(tag) {
+        if (!Array.isArray(tag)) throw new TypeError("tag must be an array");
+        if (tag.length !== 2 || !tag[0] || !tag[1]) throw new TypeError("tag must be of length 2 and nonempty");
+      });
+    } catch (err) {
+      return err;
+    }
     // add timestamp check here...
     return true;  
   }

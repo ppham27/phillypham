@@ -59,7 +59,8 @@ var config = {
                          "contact:instagram": '',
                          "menu:dataViz": '',
                          "menu:resume": '',
-                         "blog:postsPerPage": 5
+                         "blog:postsPerPage": 5,
+                         "blog:tags": JSON.stringify([])
                        },
   fixtures: [
     {model: 'Role', data: {name: 'poster', description: 'can post'}},

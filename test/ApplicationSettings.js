@@ -94,11 +94,13 @@ describe('ApplicationSettings on fresh database', function() {
                                   "sidebar:info": 'Hello, World!',
                                   "sidebar:title": 'About Me',
                                   "sidebar:infoHtml": '<p>Hello, World!</p>',
-                                  "blog:postsPerPage": 5});
+                                  "blog:postsPerPage": 5,
+                                  'blog:tags': '[["c","d"],["a","b"]]'});
     var stub = sinon.stub(this.redisClient, 'hmset', 
                           function(key, obj, callback) {
                             expect(key).to.equal('applicationSettings');
                             expect(obj['sidebar:photoUrl']).to.equal('test.jpg');
+                            expect(obj['blog:tags']).to.equal('[["c","d"],["a","b"]]');
                             setTimeout(callback, 100);
                           });
     this.ApplicationSettings.save().then(done);
@@ -114,6 +116,64 @@ describe('ApplicationSettings on fresh database', function() {
                                             done();
                                           });
 
+  });
+
+  describe('tag format', function(done) {
+    before(function() {
+      this.settings = {defaultUserGroupId: 1,
+                       "sidebar:photoUrl": 'test.jpg',
+                       "sidebar:info": 'Hello, World!',
+                       "sidebar:title": 'About Me',
+                       "sidebar:infoHtml": '<p>Hello, World!</p>',
+                       "blog:postsPerPage": 5};
+    })
+    it('not an array', function(done) {
+      this.settings['blog:tags'] = 'afdsfs';
+      this.ApplicationSettings.set(this.settings);
+      this.ApplicationSettings.save().catch(Error,
+                                            function(err) {
+                                              expect(err).to.be.instanceOf(Error);
+                                              expect(err.toString()).to.match(/unexpected token/i);
+                                              done();
+                                            });
+
+    });
+
+    it('length 2 array', function(done) {
+      this.settings['blog:tags'] = '[["a","b","c"],["e","f"]]';
+      this.ApplicationSettings.set(this.settings);
+      this.ApplicationSettings.save().catch(Error,
+                                            function(err) {
+                                              expect(err).to.be.instanceOf(Error);
+                                              expect(err.toString()).to.match(/length 2/i);
+                                              done();
+                                            });
+
+    });
+
+    it('inner array', function(done) {
+      this.settings['blog:tags'] = '["a","b"]';
+      this.ApplicationSettings.set(this.settings);
+      this.ApplicationSettings.save().catch(Error,
+                                            function(err) {
+                                              expect(err).to.be.instanceOf(Error);
+                                              expect(err.toString()).to.match(/must be an array/);
+                                              done();
+                                            });
+
+    });
+
+    it('nonempty array', function(done) {
+      this.settings['blog:tags'] = '[["","b"],["c",""]]';;
+      this.ApplicationSettings.set(this.settings);
+      this.ApplicationSettings.save().catch(Error,
+                                            function(err) {
+                                              expect(err).to.be.instanceOf(Error);
+                                              expect(err.toString()).to.match(/nonempty/);
+                                              done();
+                                            });
+
+    });
   });
 
   it('should only take positive integer values for posts per page', function(done) {
@@ -164,7 +224,8 @@ describe('ApplicationSettings on existing database', function() {
                                                        'sidebar:info': 'Hello, World!',
                                                        "sidebar:title": 'About Me',
                                                        "sidebar:infoHtml": '<p>Hello, World!</p>',
-                                                       "blog:postsPerPage": 5});
+                                                       "blog:postsPerPage": 5,
+                                                       "blog:tags": '[]'});
                });
   });
   beforeEach(function(done) {

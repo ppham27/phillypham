@@ -170,6 +170,8 @@ describe('Application Settings update routes', function() {
     req.body['sidebar:title'] = 'new sidebar title';
     req.body['sidebar:info'] = 'new bio';
     req.body['sidebar:photoUrl'] = 'pic.jpg';
+    req.body['blog:postsPerPage'] = 10;
+    req.body['blog:tags'] = [["c","d"],["a","b"]];
     var res = {json: function(json) {
                  expect(json.success).to.be.true;
                  // make sure updates propagate
@@ -179,6 +181,8 @@ describe('Application Settings update routes', function() {
                    expect(self.ApplicationSettings['sidebar:info']).to.equal('new bio');
                    expect(self.ApplicationSettings['sidebar:infoHtml']).to.equal('<p>new bio</p>');
                    expect(self.ApplicationSettings['sidebar:photoUrl']).to.equal('pic.jpg');
+                   expect(self.ApplicationSettings['blog:postsPerPage']).to.equal(10);
+                   expect(self.ApplicationSettings['blog:tags']).to.equal('[["c","d"],["a","b"]]');
                    done();
                  }, 100);
                }};
