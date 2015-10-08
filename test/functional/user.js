@@ -84,7 +84,7 @@ describe('update user', function() {
     .pause(1000).click('a[href="/Third%20Post"]')
     .pause(1000).getAttribute('meta[property="article:author"]', 'content')
     .then(function(attr) {
-      expect(attr).to.match(/myface$/);
+      expect(attr).to.match(/myFace$/);
       done();
     });
   });

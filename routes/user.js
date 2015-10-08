@@ -52,7 +52,7 @@ router.put('/edit/:displayName', authorize({userId: true, role: 'user_manager'})
     updates.biography = newUser.biography || null;
     updates.photoUrl = newUser.photoUrl || db.User.tableAttributes.photoUrl.defaultValue;
     if (typeof newUser.facebookUsername === 'string') {
-      updates.facebookUsername = newUser.facebookUsername.toLowerCase() || null;
+      updates.facebookUsername = newUser.facebookUsername || null;
     }
         
     if (newUser.password) {
