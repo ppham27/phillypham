@@ -4,7 +4,7 @@ include ./postAdmin.jade
   
 mixin postView(post, edit, view)
   - post = post || {}
-  - if (!edit) post.User = locals.user || {}
+  - if (edit && !post.User) post.User = locals.user || {}
   - post.Tags = post.Tags || []
   - post.Comments = post.Comments || []
   .post.wmd-panel
