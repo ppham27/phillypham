@@ -110,6 +110,7 @@ a.topbar-link {
 }
 
 #header-title {
+  color: #003b52;
   display: inline-block;
   padding: 10px;
   margin: 0px;
@@ -123,10 +124,6 @@ a.topbar-link {
   text-align: center;
 }
 
-#header a {
-  color: #003b52;
-}
-
 #header .logo svg {
   width: 70px;
   height: 70px;
@@ -134,22 +131,31 @@ a.topbar-link {
   margin-left: 20px;  
 }
 
-#header-menu {
+ul#header-menu {
   align: bottom;
-}
-
-.header-link-div {
-  display: inline-block;
-  line-height: 32px;
-  padding-top: 0px;
-  padding-bottom: 0px;
+  list-style: none;
+  padding: 0px;
   margin: 0px;
 }
 
-a.header-link  {
+li.header-link {
+  display: inline-block;
+  line-height: 28px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin: 0px;
+  min-width: 140px;
+}
+
+li.header-link.blog {
+  min-width: 180px;
+}
+
+a.header-link {
+  color: #003b52;
+  position: relative;
   display: block;
-  padding-left: 30px;
-  padding-right: 30px;
+  margin: 2px;
   font-variant: small-caps;
   text-decoration: none;
   font-size: 125%;
@@ -160,6 +166,29 @@ a.header-link:hover {
   outline: 2px solid #d02027;
 }
 
+ul.header-dropdown-menu {
+  position: absolute;
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+  overflow: hidden;
+  max-height: 0px;
+  transition: max-height 0.5s ease;  
+  background: rgba(254, 254, 254, 0.9);
+}
+
+li.header-link:hover > ul { 
+  max-height: 252px;
+}
+
+li.header-dropdown-link {
+  display: block;
+  width: 100%;
+}
+
+a.header-dropdown-link { 
+  outline: 1px solid rgb(34, 34, 34);
+}
 
 #container {
   width: 1200px;

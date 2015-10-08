@@ -223,7 +223,7 @@ describe('middleware', function() {
       });
     });
     
-    describe('facebook', function() {
+    describe.only('facebook', function() {
       before(function(done) {
         // make a new user that is not authorized
         var self = this;

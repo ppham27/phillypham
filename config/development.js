@@ -15,6 +15,9 @@ var config = {
     google: JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8')).appKey,
     sweetCaptcha: JSON.parse(fs.readFileSync(path.join(__dirname, 'sweetCaptcha.json'), 'utf8'))
   },
+  applicationSettings: {
+    'blog:tags': JSON.stringify([['Math', 'math'], ['Filler', 'filler'], ['Jesus', 'jesus']])
+  },
   smtpOptions: JSON.parse(fs.readFileSync(path.join(__dirname, 'smtp.json'), 'utf8'))
 }
 
