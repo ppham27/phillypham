@@ -36,5 +36,6 @@ function makeTagName(name) {
   if (name === 'jesus') return name;
   if (/\.js$/.test(name)) return name;
   if (name === 'css') return name;
+  if (name === 'meta') return name;
   return inflection.singularize(name);
 }
