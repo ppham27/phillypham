@@ -9,11 +9,11 @@
     "type": "git",
     "url": "https://github.com/ppham27/phillypham.git"
   },
-  "version": "0.2.4",
+  "version": "0.2.5",
   "license": "MIT",
   "private": true,
   "engines": {
-    "node": "^4.1.1"
+    "node": "^4.1.2"
   },
   "scripts": {
     "postinstall": "gulp",

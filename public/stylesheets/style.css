@@ -228,6 +228,11 @@ a.header-dropdown-link {
   max-height: 600px;
 }
 
+.comment .wmd-preview img {
+  max-width: 500px;
+  max-height: 400px;
+}
+
 #content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
   color: #003b52;
 }
