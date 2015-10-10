@@ -684,6 +684,10 @@ hr {
   color: #003b52;
 }
 
+.post-title {
+  padding-bottom: 0px !important;
+}
+
 .project-list-content .wmd-preview {
   margin-left: 190px;
 }
@@ -731,7 +735,7 @@ a.twitter-share-button {
 }
 
 .project-meta, .post-meta {
-  font-size: 90%;
+  font-size: 14px;
   color: #888;
   font-style: italic;
 }

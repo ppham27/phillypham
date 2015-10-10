@@ -1,20 +1,23 @@
 include ./shareButtons.jade
 include ./postAdmin.jade
 
-  
 mixin postView(post, edit, view)
   - post = post || {}
   - if (edit && !post.User) post.User = locals.user || {}
   - post.Tags = post.Tags || []
   - post.Comments = post.Comments || []
   .post.wmd-panel
-    h1.post-title
-      a(class=edit ? 'wmd-preview-title' : null, href='/' + encodeURIComponent(post.title))= post.title
+    .header
+      h1.post-title
+        a(class=edit ? 'wmd-preview-title' : null, href='/' + encodeURIComponent(post.title))= post.title
+      .post-meta
+        span.post-meta By 
+          a(href=settings.config.siteUrl + '/user/' + encodeURIComponent(post.User.displayName))= post.User.displayName
     a(href=post.photoLink || post.photoUrl || null, target='_blank')
       img.centered.post-img(src=post.photoUrl, alt='Photo URL is broken', style=post.photoUrl ? null : 'display: none')
     .wmd-preview(id=edit ? 'wmd-preview' : null)!= post.bodyHtml
     if (edit || post.Tags.length) 
-      p(style = post.Tags.length ? null : 'display: none')
+      .tags(style = post.Tags.length ? null : 'display: none')
         span.post-meta Tags: 
         span.post-meta.tags
           each tag, idx in post.Tags
