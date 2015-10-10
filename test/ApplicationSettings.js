@@ -95,7 +95,8 @@ describe('ApplicationSettings on fresh database', function() {
                                   "sidebar:title": 'About Me',
                                   "sidebar:infoHtml": '<p>Hello, World!</p>',
                                   "blog:postsPerPage": 5,
-                                  'blog:tags': '[["c","d"],["a","b"]]'});
+                                  "blog:tags": '[["c","d"],["a","b"]]',
+                                  "blog:authors": '[]'})
     var stub = sinon.stub(this.redisClient, 'hmset', 
                           function(key, obj, callback) {
                             expect(key).to.equal('applicationSettings');
@@ -225,7 +226,8 @@ describe('ApplicationSettings on existing database', function() {
                                                        "sidebar:title": 'About Me',
                                                        "sidebar:infoHtml": '<p>Hello, World!</p>',
                                                        "blog:postsPerPage": 5,
-                                                       "blog:tags": '[]'});
+                                                       "blog:tags": '[]',
+                                                       "blog:authors": '[]'});
                });
   });
   beforeEach(function(done) {

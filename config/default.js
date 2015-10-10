@@ -60,7 +60,8 @@ var config = {
                          "menu:dataViz": '',
                          "menu:resume": '',
                          "blog:postsPerPage": 5,
-                         "blog:tags": JSON.stringify([])
+                         "blog:tags": JSON.stringify([]),
+                         "blog:authors": JSON.stringify([])
                        },
   fixtures: [
     {model: 'Role', data: {name: 'poster', description: 'can post'}},

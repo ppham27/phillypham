@@ -22,16 +22,17 @@ router.get('/', function(req, res, next) {
           include: [{model: db.User, attributes: ['id', 'displayName']},
                     {model: db.Tag, attributes: ['name']},
                     {model: db.Comment, attributes: ['published']}]}),
-        tag.getPosts({attributes: ['id']})
+        tag.getPosts({where: {published: true}, attributes: ['id']})
       )
     })    
     .spread(function(posts, allPosts) {
       var postCount = allPosts.length;
       res.render('blog/index', {
         title: 'Posts tagged <em>' + tag + '</em>',
+        blogTag: tag,
         posts: posts,
-        nextPage: postCount > (page + 1)*db.ApplicationSettings['blog:postsPerPage'] ? qs.stringify({page: page + 2, tag: tag}) : null,
-        previousPage: page > 0 ? qs.stringify({page: page, tag: tag}) : null});
+        nextPage: postCount > (page + 1)*db.ApplicationSettings['blog:postsPerPage'] ? '?' + qs.stringify({page: page + 2, tag: tag}) : null,
+        previousPage: page > 0 ? '?' + qs.stringify({page: page, tag: tag}) : null});
     });    
   } else {
     Promise.join(
@@ -43,12 +44,69 @@ router.get('/', function(req, res, next) {
                        include: [{model: db.User, attributes: ['id', 'displayName']},
                                  {model: db.Tag, attributes: ['name']},
                                  {model: db.Comment, attributes: ['published']}]}),
-      db.Post.count()
+      db.Post.count({where: {published: true}})
     )
     .spread(function(posts, postCount) {
+      res.render('blog/index', {posts: posts,                                
+                                nextPage: postCount > (page+1)*db.ApplicationSettings['blog:postsPerPage'] ? '?' + qs.stringify({page: page + 2}) : null,
+                                previousPage: page > 0 ? '?' + qs.stringify({page: page}) : null});
+    });  
+  }
+});
+
+router.get('/author/:displayName', function(req, res, next) {
+  var page = (Math.max(1, req.query.page) - 1) || 0;
+  var tag = req.query.tag || null;
+  var author = req.params.displayName;
+  if (tag) {
+    Promise.join(db.Tag.findOne({where: {name: tag}}), db.User.findOne({where: {displayName: author}}))
+    .spread(function(tag, user) {
+      if (!tag) return Promise.join([], []);
+      if (!user) return Promise.join([], []);
+      return Promise.join(
+        tag.getPosts({
+          where: {published: true, user_id: user.id},
+          attributes: ['id', 'title', 'bodyHtml', 'photoUrl', 'photoLink', 'published', ['published_at', 'published_at'], 'user_id'],
+          order: [['"published_at"', 'DESC']],
+          limit: db.ApplicationSettings['blog:postsPerPage'],
+          offset: page*db.ApplicationSettings['blog:postsPerPage'],
+          include: [{model: db.User, attributes: ['id', 'displayName']},
+                    {model: db.Tag, attributes: ['name']},
+                    {model: db.Comment, attributes: ['published']}]}),
+        tag.getPosts({where: {published: true, user_id: user.id}, attributes: ['id']})
+      )
+    })    
+    .spread(function(posts, allPosts) {
+      var postCount = allPosts.length;
+      res.render('blog/index', {
+        title: 'Posts by ' + author + ' tagged ' + tag,
+        blogTag: tag,
+        blogAuthor: author,
+        posts: posts,
+        nextPage: postCount > (page + 1)*db.ApplicationSettings['blog:postsPerPage'] ? 'author/' + encodeURIComponent(author) + '?' + qs.stringify({page: page + 2, tag: tag}) : null,
+        previousPage: page > 0 ? 'author/' + encodeURIComponent(author) + '?' + qs.stringify({page: page, tag: tag}) : null});
+    });    
+  } else {
+    db.User.findOne({where: {displayName: author}})
+    .then(function(user) {
+      if (!user) return Promise.resolve([], []);
+      return Promise.join(
+        db.Post.findAll({where: {published: true, user_id: user.id}, 
+                         attributes: ['id', 'title', 'bodyHtml', 'photoUrl', 'photoLink', 'published', ['published_at', 'published_at'], 'user_id'],
+                         order: [['"published_at"', 'DESC']],
+                         limit: db.ApplicationSettings['blog:postsPerPage'],
+                         offset: page*db.ApplicationSettings['blog:postsPerPage'],
+                         include: [{model: db.User, attributes: ['id', 'displayName']},
+                                   {model: db.Tag, attributes: ['name']},
+                                   {model: db.Comment, attributes: ['published']}]}),
+        db.Post.count({where: {published: true, user_id: user.id}})
+      );
+    })
+    .spread(function(posts, postCount) {
       res.render('blog/index', {posts: posts,
-                                nextPage: postCount > (page+1)*db.ApplicationSettings['blog:postsPerPage'] ? qs.stringify({page: page + 2}) : null,
-                                previousPage: page > 0 ? qs.stringify({page: page}) : null});
+                                blogAuthor: author,
+                                nextPage: postCount > (page+1)*db.ApplicationSettings['blog:postsPerPage'] ? 'author/' + encodeURIComponent(author) + '?' + qs.stringify({page: page + 2}) : null,
+                                previousPage: page > 0 ? 'author/' + encodeURIComponent(author) + '?' + qs.stringify({page: page}) : null});
     });  
   }
 });

@@ -172,6 +172,7 @@ describe('Application Settings update routes', function() {
     req.body['sidebar:photoUrl'] = 'pic.jpg';
     req.body['blog:postsPerPage'] = 10;
     req.body['blog:tags'] = [["c","d"],["a","b"]];
+    req.body['blog:authors'] = [["Admin","Admin"]];
     var res = {json: function(json) {
                  expect(json.success).to.be.true;
                  // make sure updates propagate
@@ -183,6 +184,7 @@ describe('Application Settings update routes', function() {
                    expect(self.ApplicationSettings['sidebar:photoUrl']).to.equal('pic.jpg');
                    expect(self.ApplicationSettings['blog:postsPerPage']).to.equal(10);
                    expect(self.ApplicationSettings['blog:tags']).to.equal('[["c","d"],["a","b"]]');
+                   expect(self.ApplicationSettings['blog:authors']).to.equal('[["Admin","Admin"]]');
                    done();
                  }, 100);
                }};

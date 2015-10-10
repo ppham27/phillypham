@@ -411,6 +411,269 @@ describe('post routes', function() {
 });
 
 
+describe('post authors and tags', function() {
+  before(function(done) {
+    this.handle = blogRoutes.stack.filter(function(handle) {
+                    return handle.route && handle.route.path === '/author/:displayName' && handle.route.methods.get;
+                  });
+    this.handle = this.handle[0].route.stack[0].handle;
+    this.db = require('../../models');
+    var db = this.db;
+    var callback = function() {
+      db.sequelize.sync({force: true})
+      .then(function() {
+        return db.loadFixtures(config.fixtures);
+      })
+      .then(function() {
+        // extra posts
+        var newFixtures = [];
+        newFixtures.push({model: 'Tag',
+                          data: {name: 'filler'}});
+        newFixtures.push({model: 'Tag',
+                          data: {name: 'junk'}});
+        for (var p = 11; p < 30; ++p) {
+          newFixtures.push({model: 'Post',
+                            data: {title: p + ' Post',
+                                   body: 'some post',
+                                   published: true,
+                                   publishedAt: new Date(1000000000000 + 100000*p),
+                                   User: {displayName: p % 2 == 0 ? 'power' : 'moderator'},
+                                   Tags: [{name: p % 3 == 0 ? 'junk' : 'filler'}]}});
+        }
+        return db.loadFixtures(newFixtures, true);
+      })
+      .then(function() {
+        done();
+      });
+    };
+    if (this.db.isReady) callback();
+    this.db.once('ready', callback)
+  });  
+
+  describe('power posts', function() {
+    it('first page', function(done) {
+      var db = this.db;
+      var res = {};
+      res.render = function(view, locals) {
+        var expectedTitles = ['28 Post', '26 Post', '24 Post', '22 Post', '20 Post'];
+        var actualTitles = locals.posts.map(function(post) { return post.title; });
+        expect(locals.previousPage).to.be.null;
+        expect(locals.nextPage).match(/author\/power/);
+        expect(actualTitles).to.deep.equal(expectedTitles);
+        done();
+      };
+      var req = new FakeRequest();
+      req.params = {displayName: 'power'};
+      req.query = {};
+      this.handle(req, res);
+    });    
+
+    it('second and last page', function(done) {
+      var db = this.db;
+      var res = {};
+      res.render = function(view, locals) {
+        var expectedTitles = ['18 Post', '16 Post', '14 Post', '12 Post'];
+        var actualTitles = locals.posts.map(function(post) { return post.title; });       
+        expect(locals.previousPage).match(/author\/power/);
+        expect(locals.nextPage).to.be.null;
+        expect(actualTitles).to.deep.equal(expectedTitles);
+        done();
+      };
+      var req = new FakeRequest();
+      req.params = {displayName: 'power'};
+      req.query = {page: 2};
+      this.handle(req, res);
+    });
+
+    it('junk posts', function(done) {
+      var db = this.db;
+      var res = {};
+      res.render = function(view, locals) {
+        var expectedTitles = ['24 Post', '18 Post', '12 Post'];
+        var actualTitles = locals.posts.map(function(post) { return post.title; });       
+        expect(locals.previousPage).to.be.null;
+        expect(locals.nextPage).to.be.null;
+        expect(actualTitles).to.deep.equal(expectedTitles);
+        done();
+      };
+      var req = new FakeRequest();
+      req.params = {displayName: 'power'};
+      req.query = {tag: 'junk'};
+      this.handle(req, res);
+    });    
+
+    it('tagged posts first page', function(done) {
+      var db = this.db;
+      var res = {};
+      res.render = function(view, locals) {
+        var expectedTitles = ['28 Post', '26 Post', '22 Post', '20 Post', '16 Post'];
+        var actualTitles = locals.posts.map(function(post) { return post.title; });       
+        expect(locals.previousPage).to.be.null;
+        expect(locals.nextPage).match(/author\/power/);
+        expect(actualTitles).to.deep.equal(expectedTitles);
+        done();
+      };
+      var req = new FakeRequest();
+      req.params = {displayName: 'power'};
+      req.query = {tag: 'filler'};
+      this.handle(req, res);
+    });
+
+    it('tagged posts second page', function(done) {
+      var db = this.db;
+      var res = {};
+      res.render = function(view, locals) {
+        var expectedTitles = ['14 Post'];
+        var actualTitles = locals.posts.map(function(post) { return post.title; });       
+        expect(locals.previousPage).match(/author\/power/);
+        expect(locals.nextPage).to.be.null;
+        expect(actualTitles).to.deep.equal(expectedTitles);
+        done();
+      };
+      var req = new FakeRequest();
+      req.params = {displayName: 'power'};
+      req.query = {page: 2, tag: 'filler'};
+      this.handle(req, res);
+    });
+  });  
+
+  describe('moderator posts', function() {
+    it('first page', function(done) {
+      var db = this.db;
+      var res = {};
+      res.render = function(view, locals) {
+        var expectedTitles = ['29 Post', '27 Post', '25 Post', '23 Post', '21 Post'];
+        var actualTitles = locals.posts.map(function(post) { return post.title; });
+        expect(locals.previousPage).to.be.null;
+        expect(locals.nextPage).match(/author\/moderator/);
+        expect(actualTitles).to.deep.equal(expectedTitles);
+        done();
+      };
+      var req = new FakeRequest();
+      req.params = {displayName: 'moderator'};
+      req.query = {};
+      this.handle(req, res);
+    });    
+
+    it('second page and last page', function(done) {
+      var db = this.db;
+      var res = {};
+      res.render = function(view, locals) {
+        var expectedTitles = ['19 Post', '17 Post', '15 Post', '13 Post', '11 Post'];
+        var actualTitles = locals.posts.map(function(post) { return post.title; });       
+        expect(locals.blogAuthor).to.equal('moderator');
+        expect(locals.previousPage).match(/author\/moderator/);
+        expect(locals.nextPage).to.be.null;
+        expect(actualTitles).to.deep.equal(expectedTitles);
+        done();
+      };
+      var req = new FakeRequest();
+      req.params = {displayName: 'moderator'};
+      req.query = {page: 2};
+      this.handle(req, res);
+    });
+
+    it('junk posts', function(done) {
+      var db = this.db;
+      var res = {};
+      res.render = function(view, locals) {
+        var expectedTitles = ['27 Post', '21 Post', '15 Post'];
+        var actualTitles = locals.posts.map(function(post) { return post.title; });       
+        expect(locals.previousPage).to.be.null;
+        expect(locals.nextPage).to.be.null;
+        expect(actualTitles).to.deep.equal(expectedTitles);
+        done();
+      };
+      var req = new FakeRequest();
+      req.params = {displayName: 'moderator'};
+      req.query = {tag: 'junk'};
+      this.handle(req, res);
+    });    
+
+    it('tagged posts first page', function(done) {
+      var db = this.db;
+      var res = {};
+      res.render = function(view, locals) {
+        var expectedTitles = ['29 Post', '25 Post', '23 Post', '19 Post', '17 Post'];
+        var actualTitles = locals.posts.map(function(post) { return post.title; });       
+        expect(locals.blogAuthor).to.equal('moderator');
+        expect(locals.blogTag).to.equal('filler');
+        expect(locals.previousPage).to.be.null;
+        expect(locals.nextPage).match(/author\/moderator/);
+        expect(actualTitles).to.deep.equal(expectedTitles);
+        done();
+      };
+      var req = new FakeRequest();
+      req.params = {displayName: 'moderator'};
+      req.query = {tag: 'filler'};
+      this.handle(req, res);
+    });
+
+    it('tagged posts second page', function(done) {
+      var db = this.db;
+      var res = {};
+      res.render = function(view, locals) {
+        var expectedTitles = ['13 Post', '11 Post'];
+        var actualTitles = locals.posts.map(function(post) { return post.title; });       
+        expect(locals.previousPage).match(/author\/moderator/);
+        expect(locals.nextPage).to.be.null;
+        expect(actualTitles).to.deep.equal(expectedTitles);
+        done();
+      };
+      var req = new FakeRequest();
+      req.params = {displayName: 'moderator'};
+      req.query = {page: 2, tag: 'filler'};
+      this.handle(req, res);
+    });
+  });  
+
+  it('handle nonusers', function(done) {
+    var db = this.db;
+    var res = {};
+    res.render = function(view, locals) {
+      expect(locals.posts).to.be.empty; 
+      expect(locals.previousPage).to.be.null;
+      expect(locals.nextPage).to.be.null;
+      done();
+    };
+    var req = new FakeRequest();
+    req.params = {displayName: 'whoami'};
+    req.query = {};
+    this.handle(req, res);
+  });
+
+  it('handle users with no posts', function(done) {
+    var db = this.db;
+    var res = {};
+    res.render = function(view, locals) {
+      expect(locals.posts).to.be.empty; 
+      expect(locals.previousPage).to.be.null;
+      expect(locals.nextPage).to.be.null;
+      done();
+    };
+    var req = new FakeRequest();
+    req.params = {displayName: 'standard'};
+    req.query = {};
+    this.handle(req, res);
+  });
+
+  it('handle empty tags', function(done) {
+    var db = this.db;
+    var res = {};
+    res.render = function(view, locals) {
+      expect(locals.posts).to.be.empty; 
+      expect(locals.previousPage).to.be.null;
+      expect(locals.nextPage).to.be.null;
+      done();
+    };
+    var req = new FakeRequest();
+    req.params = {displayName: 'admin'};
+    req.query = {tag: 'no tag'};
+    this.handle(req, res);
+  });
+})
+
+
 describe('post tags and pages', function() {
   before(function(done) {
     this.handle = blogRoutes.stack.filter(function(handle) {
@@ -542,6 +805,7 @@ describe('post tags and pages', function() {
     res.render = function(view, locals) {
       var expectedTitles = ['Post 19', 'Post 18', 'Post 17', 'Post 16', 'Post 15'];
       var actualTitles = locals.posts.map(function(post) { return post.title; });
+      expect(locals.blogTag).to.equal('filler');
       expect(locals.previousPage).to.be.null;
       expect(locals.nextPage).to.not.be.null;
       expect(actualTitles).to.deep.equal(expectedTitles);
@@ -550,6 +814,20 @@ describe('post tags and pages', function() {
     };
     var req = new FakeRequest();
     req.query = {tag: 'filler'};
+    this.handle(req, res);
+  });
+
+  it('handle empty tags', function(done) {
+    var db = this.db;
+    var res = {};
+    res.render = function(view, locals) {
+      expect(locals.posts).to.be.empty; 
+      expect(locals.previousPage).to.be.null;
+      expect(locals.nextPage).to.be.null;
+      done();
+    };
+    var req = new FakeRequest();
+    req.query = {tag: 'no tag'};
     this.handle(req, res);
   });
 });

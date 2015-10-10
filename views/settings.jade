@@ -37,6 +37,13 @@ block content
       #wmd-editor-tags.wmd-editor.tex2jax_ignore=tagList
       textarea(name="blog:tags")#wmd-input-tags.wmd-input=tagList
       #wmd-preview-tags(style={display: "none"})
+      h3 Authors
+      p Each line should contain a label and the author's display name separated by a comma.
+      #wmd-button-bar-authors.wmd-button-bar
+      - var authorList = JSON.parse(settings.ApplicationSettings['blog:authors']).map(function(author) { return author.join(',') }).join('\n')
+      #wmd-editor-authors.wmd-editor.tex2jax_ignore=authorList
+      textarea(name="blog:authors")#wmd-input-authors.wmd-input=authorList
+      #wmd-preview-authors(style={display: "none"})
     .wmd-panel.buttons
       button.submit-button(disabled=true, type="submit") Update
         .overlay      
@@ -72,18 +79,19 @@ append body
       var data = {};
       ['sidebar:info', 'sidebar:photoUrl', 'sidebar:title',
        'contact:email', 'contact:facebook', 'contact:instagram', 'contact:twitter',
-       'menu:dataViz', 'menu:resume', 'blog:postsPerPage', 'blog:tags'].forEach(function(key) {
+       'menu:dataViz', 'menu:resume', 'blog:postsPerPage',
+       'blog:tags', 'blog:authors'].forEach(function(key) {
         if (key === 'blog:postsPerPage') {
           data[key] = parseInt(getValue(key));
-        } else if (key === 'blog:tags') {
-          data[key] = processTags(getValue(key));
+        } else if (key === 'blog:tags' || key === 'blog:authors') {
+          data[key] = processList(getValue(key));
         } else {
           data[key] = getValue(key);
         }
       });
       updateRequest.send(JSON.stringify(data));
       function getValue(name) {
-        if (name === 'sidebar:info' || name === 'blog:tags') {
+        if (name === 'sidebar:info' || name === 'blog:tags' || name === 'blog:authors') {
           var textarea = document.querySelector('textarea[name="' + name + '"]');
           return textarea.value;
         }
@@ -92,16 +100,16 @@ append body
       }
     }); 
     submitButton.disabled = false;
-    function processTags(tagList) {
-      var splitTags = tagList.split('\n');
-      var tags = splitTags.filter(function(tag) {
-        return tag.trim() !== "";
-      }).map(function(tag) {
-        return tag.split(',').map(function(d) {
+    function processList(list) {
+      var splitList = list.split('\n');
+      var items = splitList.filter(function(item) {
+        return item.trim() !== "";
+      }).map(function(item) {
+        return item.split(',').map(function(d) {
           return d.trim();
         });
-      }).filter(function(tag) {
-        return tag.length === 2 && tag[0] && tag[1];
+      }).filter(function(item) {
+        return item.length === 2 && item[0] && item[1];
       });
-      return tags;
+      return items;
     }  

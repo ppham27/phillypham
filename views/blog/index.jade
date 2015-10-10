@@ -3,10 +3,14 @@ include ../mixins/postView.jade
 extends ../layout
 
 block content
-  if locals.title
-    h1!= title
+  if locals.blogAuthor && locals.blogTag
+    h1 Posts by <a href="/user/#{encodeURIComponent(locals.blogAuthor)}">#{locals.blogAuthor}</a> tagged <em>#{locals.blogTag}</em>
+  else if locals.blogAuthor
+    h1 Posts by <a href="/user/#{encodeURIComponent(locals.blogAuthor)}">#{locals.blogAuthor}</a>
+  else if locals.blogTag
+    h1 Posts tagged <em>#{locals.blogTag}</em>
   if posts.length === 0
-    h2 No one has posted yet, there are no posts on this page, or this tag is invalid.
+    h2 No one has posted yet, there are no posts on this page, author does not exist, or this tag is invalid.
   each post, idx in posts
     +postView(post)
     if (idx < posts.length - 1)
@@ -16,10 +20,10 @@ block content
     .page-nav
       .left
         if locals.previousPage
-          a(href="/?" + locals.previousPage) <<< Previous page
+          a(href="/" + locals.previousPage) <<< Previous page
       .right
         if locals.nextPage
-          a(href="/?" + locals.nextPage) Next page >>>
+          a(href="/" + locals.nextPage) Next page >>>
 append head
   meta(property="fb:app_id", content=settings.config.appKeys.facebook.clientID)
   meta(property="og:title", content=settings.ApplicationSettings.title)

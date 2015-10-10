@@ -1,18 +1,28 @@
-mixin headerLink(text, href, label, subMenu)
+mixin headerLink(text, href, label, subMenu, subUrl)
   li.header-link(class=label ? label : null)
     a.header-link(href=href)= text
     if subMenu
       ul.header-dropdown-menu
         each tag in subMenu
           li.header-dropdown-link.header-link(class=label ? label : null)
-            a.header-dropdown-link.header-link(href=settings.config.siteUrl + "?tag=" + tag[1])= tag[0]
+            a.header-dropdown-link.header-link(href=settings.config.siteUrl + subUrl.replace('$0', encodeURIComponent(tag[1])))= tag[0]
 #header
   a#header-title(href="/")
     span= settings.ApplicationSettings.title
     span.logo
       include ../../public/images/logo.svg    
   ul#header-menu
-    +headerLink('Blog', '/', 'blog', JSON.parse(settings.ApplicationSettings['blog:tags']))
+    if (locals.blogAuthor)
+      +headerLink('Blog', '/', 'blog', JSON.parse(settings.ApplicationSettings['blog:tags']), '/author/' + encodeURIComponent(locals.blogAuthor) + '?tag=$0')
+    else
+      +headerLink('Blog', '/', 'blog', JSON.parse(settings.ApplicationSettings['blog:tags']), '?tag=$0')
+    if (settings.ApplicationSettings['blog:authors'])
+      - var authorsArray = JSON.parse(settings.ApplicationSettings['blog:authors'])
+      if authorsArray.length
+        if (locals.blogTag)
+          +headerLink('Authors', '/', 'blog', authorsArray, '/author/$0' + '?tag=' + locals.blogTag)
+        else
+          +headerLink('Authors', '/', 'blog', authorsArray, '/author/$0')
     if settings.ApplicationSettings['menu:dataViz']
       +headerLink('Data Viz', settings.ApplicationSettings['menu:dataViz'])
     +headerLink('Projects', '/projects')
