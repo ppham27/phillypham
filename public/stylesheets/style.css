@@ -223,12 +223,12 @@ a.header-dropdown-link {
   padding-bottom: 5px;  
 }
 
-.wmd-panel img {
+.wmd-panel img, .wmd-panel video {
   max-width: 640px;
   max-height: 600px;
 }
 
-.comment .wmd-preview img {
+.comment .wmd-preview img, .comment .wmd-preview video {
   max-width: 500px;
   max-height: 400px;
 }
