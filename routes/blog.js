@@ -28,7 +28,7 @@ router.get('/', function(req, res, next) {
     .spread(function(posts, allPosts) {
       var postCount = allPosts.length;
       res.render('blog/index', {
-        title: 'Posts tagged <em>' + tag + '</em>',
+        title: 'Posts tagged ' + tag,
         blogTag: tag,
         posts: posts,
         nextPage: postCount > (page + 1)*db.ApplicationSettings['blog:postsPerPage'] ? '?' + qs.stringify({page: page + 2, tag: tag}) : null,
@@ -103,10 +103,12 @@ router.get('/author/:displayName', function(req, res, next) {
       );
     })
     .spread(function(posts, postCount) {
-      res.render('blog/index', {posts: posts,
-                                blogAuthor: author,
-                                nextPage: postCount > (page+1)*db.ApplicationSettings['blog:postsPerPage'] ? 'author/' + encodeURIComponent(author) + '?' + qs.stringify({page: page + 2}) : null,
-                                previousPage: page > 0 ? 'author/' + encodeURIComponent(author) + '?' + qs.stringify({page: page}) : null});
+      res.render('blog/index', {
+        title: 'Posts by ' + author,
+        posts: posts,
+        blogAuthor: author,
+        nextPage: postCount > (page+1)*db.ApplicationSettings['blog:postsPerPage'] ? 'author/' + encodeURIComponent(author) + '?' + qs.stringify({page: page + 2}) : null,
+        previousPage: page > 0 ? 'author/' + encodeURIComponent(author) + '?' + qs.stringify({page: page}) : null});
     });  
   }
 });
