@@ -132,9 +132,9 @@ You'll need to create `facebookDevelopment.json`, too. One of the tests requires
 `sweetCaptcha.json` looks like:
 ```
 {
-  "id": "239163",
-  "key": "b3d024a06d8ee4225743a357bf63d43f",
-  "secret": "db7f0cc141eaac91c99a434ea2fdb8fb"
+  "id": "",
+  "key": "",
+  "secret": ""
 }
 ```
 
