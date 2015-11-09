@@ -9,11 +9,11 @@
     "type": "git",
     "url": "https://github.com/ppham27/phillypham.git"
   },
-  "version": "0.3.1",
+  "version": "0.4.0",
   "license": "MIT",
   "private": true,
   "engines": {
-    "node": "^4.1.2"
+    "node": "^5.0.0"
   },
   "scripts": {
     "postinstall": "gulp",
@@ -24,7 +24,7 @@
     "async": "^1.4.2",
     "base64-url": "^1.2.1",
     "bcrypt": "^0.8.5",
-    "bluebird": "^2.10.1",
+    "bluebird": "^3.0.5",
     "body-parser": "^1.14.0",
     "browserify": "^11.2.0",
     "cheerio": "^0.19.0",
@@ -55,14 +55,14 @@
     "passport-google-oauth": "^0.2.0",
     "passport-hash": "^0.5.0",
     "passport-local": "^1.0.0",
-    "pg": "^4.4.2",
+    "pg": "^4.4.3",
     "pg-hstore": "^2.3.2",
-    "public-encrypt": "^2.0.1",
-    "redis": "^2.0.1",
+    "public-encrypt": "^4.0.0",
+    "redis": "^2.3.0",
     "request": "^2.63.0",
-    "sanitize-html": "^1.10.0",
-    "sequelize": "^3.9.0",
-    "sequelize-cli": "^1.9.1",
+    "sanitize-html": "^1.11.1",
+    "sequelize": "^3.13.0",
+    "sequelize-cli": "^2.1.0",
     "sequelize-fixtures": "^0.4.7",
     "serve-favicon": "^2.3.0",
     "sweetcaptcha": "0.0.2",
@@ -74,7 +74,7 @@
     "chai": "^3.3.0",
     "chai-things": "^0.2.0",
     "sinon": "^1.17.0",
-    "webdriverio": "^3.2.4",
+    "webdriverio": "^3.2.6",
     "fakeredis": "^0.3.3",
     "sqlite3": "^3.1.0"
   }
