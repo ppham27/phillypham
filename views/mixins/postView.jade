@@ -29,7 +29,7 @@ mixin postView(post, edit, view)
         span.post-meta By 
           a(href=settings.config.siteUrl + '/user/' + encodeURIComponent(post.User.displayName))= post.User.displayName
       .right
-        span.post-meta Published #{post.dataValues.published_at || new Date()}
+        span.post-meta Published #{(post.dataValues && post.dataValues.published_at) || new Date()}
     .footer
       .left
         if (post.title) 
