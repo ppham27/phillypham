@@ -26,11 +26,11 @@ db.once('ready', function() {
   app.set('ApplicationSettings', db.ApplicationSettings);
   db.sequelize.sync({force: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'})
   .then(function() {
-    db.loadFixtures(config.fixtures)
-    .then(function() {
-      app.isReady = true;
-      app.emit('ready');    
-    });
+    return db.loadFixtures(config.fixtures)
+           .then(function() {
+             app.isReady = true;
+             app.emit('ready');    
+           });
   });
 });
 
