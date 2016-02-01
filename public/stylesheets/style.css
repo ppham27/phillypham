@@ -206,6 +206,7 @@ a.header-dropdown-link {
 }
 
 #content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
+  color: #003b52;
   margin: 0px;
   padding-top: 10px;
   padding-bottom: 10px;
@@ -231,10 +232,6 @@ a.header-dropdown-link {
 .comment .wmd-preview img, .comment .wmd-preview video {
   max-width: 500px;
   max-height: 400px;
-}
-
-#content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
-  color: #003b52;
 }
 
 #mainbar {
@@ -679,12 +676,12 @@ hr {
   max-width: 160px;  
 }
 
-.project-title a, .post-title a {
+.project-title a, .post-title a, #content h1 a, #content h2 a, #content h3 a, #content h4 a, #content h5 a, #content h6 a {
   text-decoration: none;    
   color: #003b52;
 }
 
-.project-title a:hover, .post-title a:hover {
+.project-title a:hover, .post-title a:hover, #content h1 a:hover, #content h2 a:hover, #content h3 a:hover, #content h4 a:hover, #content h5 a:hover, #content h6 a:hover {
   text-decoration: underline;
   color: #003b52;
 }
