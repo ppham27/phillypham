@@ -1,0 +1,17 @@
+include ../mixins/postView.jade
+  
+extends ../layout
+
+block content
+  h1 Search Blog Posts
+  form#blog-search-form(action="/search", method="GET")
+    input.text(type="text", name="tsquery", placeholder="What are you looking for?", autofocus=true)
+    button.submit-button(type="submit") Search
+      .overlay
+  p
+    | Search using PostgreSQL
+    tt tsquery
+    | s. They are described in detail 
+    a(href="http://www.postgresql.org/docs/current/static/datatype-textsearch.html", target="_blank") here
+    | .
+    

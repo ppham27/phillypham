@@ -8,7 +8,7 @@ body {
   margin-bottom: 32px;
 }
 
-pre, code {
+tt, pre, code {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
   font-size: 13px;  
 }
@@ -471,6 +471,14 @@ span.field-sublabel.success {
   line-height: 1.5em;
   margin-top: 2px;
   margin-bottom: 2px;
+}
+
+#blog-search-form input {
+  line-height: 2em;
+  font-size: 15px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  width: 300px;
 }
 
 #login-form input.text {

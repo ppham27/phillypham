@@ -54,6 +54,10 @@ router.get('/', function(req, res, next) {
   }
 });
 
+router.get('/search', function(req, res, next) {
+  res.render('blog/search');
+});
+
 router.get('/author/:displayName', function(req, res, next) {
   var page = (Math.max(1, req.query.page) - 1) || 0;
   var tag = req.query.tag || null;
