@@ -10,7 +10,7 @@ Developer Guide
 
 To get this app up and running there are several requirements:
 1. Redis, used for sessions and the Application Settings model
-2. A SQL database for the rest of the models (I used Postgres)
+2. A Postgres SQL database for the rest of the models, installing with homebrew is easiest. Make sure to run `createdb phillypham_development` and `createdb phillypham_test`.
 3. Obviously, [Node.js](https://nodejs.org/).
 
 The easiest way to get these things is [Homebrew](http://brew.sh/). 
