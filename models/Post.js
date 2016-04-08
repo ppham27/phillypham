@@ -25,9 +25,30 @@ module.exports = function(sequelize, DataTypes) {
                                 db.Post.hasMany(db.Comment, {foreignKey: {fieldName: 'postId', field: 'post_id', allowNull: false}, 
                                                              constraints: true, onDelete: 'CASCADE'});
                                 db.Post.belongsToMany(db.Tag, {through: db.PostTag});
+                              },
+                              addTSVector: function(db) {
+                                return db.sequelize.query("ALTER TABLE posts ADD COLUMN title_body_tsvector tsvector")
+                                       .then(function() {
+                                         return db.sequelize.query("UPDATE posts SET title_body_tsvector=setweight(to_tsvector('english', title), 'A') || setweight(to_tsvector('english', body), 'B')")
+                                       })
+                                       .then(function() {
+                                         return db.sequelize.query("CREATE INDEX IF NOT EXISTS title_body_search_idx ON posts USING gin(title_body_tsvector)")
+                                       })
+                                       .then(function() {
+                                         return db.sequelize.query("CREATE OR REPLACE FUNCTION posts_trigger() RETURNS trigger AS $$ begin new.title_body_tsvector := setweight(to_tsvector('english', new.title), 'A') || setweight(to_tsvector('english', new.body), 'B'); return new; end $$ LANGUAGE plpgsql");
+                                       })
+                                       .then(function() {
+                                         return db.sequelize.query("CREATE TRIGGER posts_update BEFORE INSERT OR UPDATE ON posts FOR EACH ROW EXECUTE PROCEDURE posts_trigger()");
+                                       }).catch(function(err) {
+                                         console.info(err);
+                                         return Promise.resolve(true);
+                                       });
                               }
                             },
                             hooks: {
+                              afterSync: function(Post) {                                
+                                return Post.classMethods.addTSVector(Post);
+                              },
                               beforeValidate: function(post) {
                                 if (post.photoLink && !post.photoUrl) {
                                   return Promise.reject(new Sequelize.ValidationError('photo URL must exist for there to be a photo link', 
