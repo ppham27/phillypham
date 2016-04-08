@@ -848,7 +848,7 @@ describe('comment without being logged in at all', function() {
     .click('#facebook-button')
     .setValue('#email', testUser.email)
     .setValue('#pass', testUser.password)
-    .click('input[name="login"]')
+    .click('button[name="login"]')
     .pause(2000)
     .url() 
     .then(function(res) {

@@ -1,3 +1,4 @@
+/*global make */
 var expect = require('chai').expect;
 var Promise = require('bluebird');
 var http = require('http');
@@ -60,8 +61,10 @@ describe('middleware', function() {
     });        
 
     afterEach(function(done) {
-      this.browser.url(url.resolve(this.siteUrl, 'logout'), function(err) {
-        done(err);
+      this.browser
+      .url(url.resolve(this.siteUrl, 'logout'))
+      .then(function(res) {
+        done();
       });
     });
     
@@ -247,10 +250,11 @@ describe('middleware', function() {
                                    },
                                    function(err, res, body) {
                                      var user = JSON.parse(body);
+                                     console.log(body);
                                      expect(user.id).to.not.be.undefined;
                                      setTimeout(function() {
                                        cb(err, user);
-                                     }, 500);
+                                     }, 1000);
                                    });
                     }
                     return newUserRequest;
@@ -299,7 +303,7 @@ describe('middleware', function() {
         .click('#facebook-button')
         .setValue('#email', user.email)
         .setValue('#pass', user.password)
-        .click('input[name="login"]')
+        .click('button[name="login"]')
         .pause(1000)
         .click('button[name="__CONFIRM__"]')
         .pause(2000)
@@ -328,7 +332,7 @@ describe('middleware', function() {
         .click('#facebook-button')
         .setValue('#email', user.email)
         .setValue('#pass', user.password)
-        .click('input[name="login"]')
+        .click('button[name="login"]')
         .pause(1000)
         .click('button[name="__CANCEL__"]')
         .pause(2000)
@@ -343,7 +347,7 @@ describe('middleware', function() {
         .click('#facebook-button') //try again
         .pause(1000)
         .click('button[name="__CONFIRM__"]')
-        .pause(2000)
+        .pause(5000)
         .then(function() {
           return browser.getText('#topbar');        
         })
@@ -353,7 +357,7 @@ describe('middleware', function() {
         })
         .then(function() {
           db.User.findOne({where: {displayName: 'Loves Lucy'}})
-          .then(function(user) {
+          .then(function(user) {            
             expect(user).to.not.be.null;
             done();
           });          
@@ -370,7 +374,7 @@ describe('middleware', function() {
         .click('#facebook-button')
         .setValue('#email', testUser.email)
         .setValue('#pass', testUser.password)
-        .click('input[name="login"]')
+        .click('button[name="login"]')
         .pause(2000)
         .then(function() {
           db.User.findOne({where: {email: testUser.email}})
@@ -391,7 +395,7 @@ describe('middleware', function() {
         .click('#facebook-button')
         .setValue('#email', testUser.email)
         .setValue('#pass', testUser.password)
-        .click('input[name="login"]')
+        .click('button[name="login"]')
         .pause(1000)
         .url()
         .then(function(res) {          
@@ -414,10 +418,10 @@ describe('middleware', function() {
                              .click('#facebook-button')
                              .setValue('#email', user.email)
                              .setValue('#pass', user.password)
-                             .click('input[name="login"]')
+                             .click('button[name="login"]')
                              .pause(1000)
                              .click('button[name="__CONFIRM__"]')
-                             .pause(2000)
+                             .pause(5000)
                              .click('#topbar a[href="/logout"]')
                              .end()
                              .then(function() {           
@@ -451,7 +455,7 @@ describe('middleware', function() {
           .click('#facebook-button')
           .setValue('#email', config.appKeys.facebook.testUsers[1].email)
           .setValue('#pass', config.appKeys.facebook.testUsers[1].password)
-          .click('input[name="login"]')
+          .click('button[name="login"]')
           .pause(2000)
           .then(function() {
             db.User.findOne({where: {email: config.appKeys.facebook.testUsers[1].email}})
