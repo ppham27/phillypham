@@ -121,4 +121,21 @@ describe('posts', function() {
       done(err);
     });
   });
+
+  it('should handle errors gracefully', function(done) {
+    var browser = this.browser;
+    browser
+    .setValue('input[name="tsquery"]', '(invalid')
+    .click('#blog-search-form button.submit-button')
+    .pause(1000)
+    .then(function() {      
+      return browser.getText('#flash li');
+    })
+    .then(function(text) {
+      expect(text).to.match(/syntax error/);
+      done();
+    }).catch(function(err) {
+      done(err);
+    });
+  });
 });
