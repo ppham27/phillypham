@@ -5,7 +5,7 @@ extends ../layout
 block content
   h1 Search Blog Posts
   form#blog-search-form(action="/search", method="GET")
-    input.text(type="text", name="tsquery", placeholder="What are you looking for?", autofocus=true)
+    input.text(type="text", name="tsquery", placeholder="What are you looking for?", autofocus=true, value=locals.previousTsquery)
     button.submit-button(type="submit") Search
       .overlay
   p

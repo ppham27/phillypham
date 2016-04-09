@@ -125,10 +125,10 @@ router.get('/search', function(req, res, next) {
     })
     .catch(function(err) {
              req.flash('error', err);
-             res.render('blog/search');
+             res.render('blog/search', {previousTsquery: tsquery});
            });
   } else {
-    res.render('blog/search');
+    res.render('blog/search', {previousTsquery: req.query['previous-tsquery']});
   }
 });
 

@@ -16,5 +16,5 @@ block content
         br
         span.highlight!= post.dataValues.headline
   p
-    a(href='/search') Search again
+    a(href='/search?previous-tsquery=' + tsquery) Search again
     
