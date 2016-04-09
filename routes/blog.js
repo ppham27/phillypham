@@ -54,10 +54,6 @@ router.get('/', function(req, res, next) {
   }
 });
 
-router.get('/search', function(req, res, next) {
-  res.render('blog/search');
-});
-
 router.get('/author/:displayName', function(req, res, next) {
   var page = (Math.max(1, req.query.page) - 1) || 0;
   var tag = req.query.tag || null;
@@ -114,6 +110,21 @@ router.get('/author/:displayName', function(req, res, next) {
         nextPage: postCount > (page+1)*db.ApplicationSettings['blog:postsPerPage'] ? 'author/' + encodeURIComponent(author) + '?' + qs.stringify({page: page + 2}) : null,
         previousPage: page > 0 ? 'author/' + encodeURIComponent(author) + '?' + qs.stringify({page: page}) : null});
     });  
+  }
+});
+
+router.get('/search', function(req, res, next) {
+  if (typeof req.query.tsquery === 'string' && req.query.tsquery.trim()) {
+    var tsquery = req.query.tsquery.trim();
+    db.Post.search(db, tsquery)
+    .then(function(posts) {
+      res.render('blog/searchResults', {
+        tsquery: tsquery,
+        posts: posts
+      });
+    });
+  } else {
+    res.render('blog/search');
   }
 });
 

@@ -1,0 +1,16 @@
+include ../mixins/postView.jade
+  
+extends ../layout
+
+block content
+  h1 Search Results for 
+    em= tsquery
+  ol.search-results
+    each post in posts
+      li
+        h3
+          a(href='/' + encodeURIComponent(post.title))= post.title  
+        span <strong>Rank:</strong> #{post.dataValues.rank}
+        br
+        span.highlight!= post.dataValues.headline
+    

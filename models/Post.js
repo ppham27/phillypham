@@ -43,6 +43,11 @@ module.exports = function(sequelize, DataTypes) {
                                          console.info(err);
                                          return Promise.resolve(true);
                                        });
+                              },
+                              search: function(db, tsquery) {                                
+                                var query = "to_tsquery('english','" + tsquery + "')";
+                                return db.sequelize.query("SELECT id, title, ts_rank_cd(title_body_tsvector," + query + ",1) AS rank, ts_headline('english', title || ' ' || body," + query + ", 'MaxWords=50') AS headline FROM posts WHERE title_body_tsvector @@ " + query + " ORDER BY rank DESC, id DESC",
+                                                          { model: db.Post });
                               }
                             },
                             hooks: {

@@ -6,6 +6,10 @@ mixin headerLink(text, href, label, subMenu, subUrl)
         each tag in subMenu
           li.header-dropdown-link.header-link(class=label ? label : null)
             a.header-dropdown-link.header-link(href=settings.config.siteUrl + subUrl.replace('$0', encodeURIComponent(tag[1])))= tag[0]
+        if label == 'blog'
+          li.header-dropdown-link.header-link(class=label ? label : null)
+            a.header-dropdown-link.header-link(href='/search')
+              strong Search Posts
 #header
   a#header-title(href="/")
     span= settings.ApplicationSettings.title
