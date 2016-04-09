@@ -28,6 +28,18 @@ describe('post routes', function() {
     });
   });
 
+  it('should return search results', function(done) {
+    var db = this.db;
+    db.Post.search(db, 'integer')
+    .then(function(posts) {
+      expect(posts.length).to.equal(3);
+      expect(posts[0].title).to.equal('Third Post');
+      expect(posts[0].dataValues.rank).to.not.be.undefined;
+      expect(posts[0].dataValues.headline).to.match(/integer/i);
+      done();
+    });
+  });
+
   describe('blog', function() {
     describe('view', function() {
       before(function() {

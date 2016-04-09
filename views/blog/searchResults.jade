@@ -5,6 +5,8 @@ extends ../layout
 block content
   h1 Search Results for 
     em= tsquery
+  if posts.length === 0
+    p There were no matching posts.
   ol.search-results
     each post in posts
       li
@@ -13,4 +15,6 @@ block content
         span <strong>Rank:</strong> #{post.dataValues.rank}
         br
         span.highlight!= post.dataValues.headline
+  p
+    a(href='/search') Search again
     
