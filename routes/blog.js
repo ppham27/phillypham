@@ -122,7 +122,11 @@ router.get('/search', function(req, res, next) {
         tsquery: tsquery,
         posts: posts
       });
-    });
+    })
+    .catch(function(err) {
+             req.flash('error', err);
+             res.render('blog/search');
+           });
   } else {
     res.render('blog/search');
   }
