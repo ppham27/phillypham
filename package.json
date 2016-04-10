@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://github.com/ppham27/phillypham.git"
   },
-  "version": "0.5.4",
+  "version": "0.5.5",
   "license": "MIT",
   "private": true,
   "engines": {
