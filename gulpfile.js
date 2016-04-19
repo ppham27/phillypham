@@ -132,4 +132,4 @@ gulp.task('test:functional', function(done) {
 });
 
 // necessary tasks to start the app
-gulp.task('default', ['db:migrate']);
+gulp.task('default', ['javascripts', 'db:migrate']);
