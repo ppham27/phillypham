@@ -53,7 +53,8 @@ for the public key.
   3. browserify
   4. closurecompiler
 2. `gulp markdown`
-3. `npm start`
+3. `gulp javascripts`
+4. `npm start`
 
 Now you can visit the site at [http://localhost:3000](http://localhost:3000).
 
