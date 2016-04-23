@@ -260,7 +260,7 @@ function MarkdownAceEditor(converter, idPostfix, options) {
                                                                    function(d) { editor.getSession().setMode(d); }));
   // auto-preview
   buttons.makeSpacer(++spacerNum);
-  buttons.makeCheckBox('autopreview', 'Auto-Preview:', this.aceOptions.autoPreview,
+  buttons.makeCheckBox('autopreview', 'Auto-Preview', this.aceOptions.autoPreview,
                        100, false, '-15px');
   buttons.buttonElements.autopreview.querySelector('input')
   .addEventListener('change', function(event) {
