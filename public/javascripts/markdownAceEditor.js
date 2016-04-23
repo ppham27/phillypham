@@ -30,6 +30,7 @@ var modes = {'C/C++': 'ace/mode/c_cpp',
 // default options
 var defaultAceOptions = {keybinding: 'Emacs', 
                          mode: 'Markdown',
+                         autoPreview: true,
                          gutter: true,
                          lineNumbers: true,
                          highlightGutterLine: true,
@@ -169,6 +170,7 @@ function MarkdownAceEditor(converter, idPostfix, options) {
   // hooks.addFalse("insertImageDialog"); TODO: currently doesn't do anything
   
   var buttons = this.buttons = new ButtonCollection(panels.buttonBar);
+  var spacerNum = 0;
   buttons.makeButton('bold', defaultStrings['bold'], '0px');
   bindButtonToCommand(buttons.buttonElements.bold,
                       fenceEditor,
@@ -179,7 +181,7 @@ function MarkdownAceEditor(converter, idPostfix, options) {
                       fenceEditor,
                       {editor: editor, 
                        fence: '*', defaultString: defaultStrings['italicExample']});
-  buttons.makeSpacer(1);  
+  buttons.makeSpacer(++spacerNum);  
   buttons.makeButton('link', defaultStrings['link'], '-40px');
   bindButtonToCommand(buttons.buttonElements.link,
                       dialogFormCommand,
@@ -202,7 +204,7 @@ function MarkdownAceEditor(converter, idPostfix, options) {
                       {editor: editor, formOptions: defaultImageFormOptions,
                        postProcess: createMarkdownImageLink,
                        inserter: replaceCurrentRangeEditor});
-  buttons.makeSpacer(2);
+  buttons.makeSpacer(++spacerNum);
   buttons.makeButton('olist', defaultStrings['olist'], '-120px');
   bindButtonToCommand(buttons.buttonElements.olist,
                       toggleIndentEditor,
@@ -222,12 +224,12 @@ function MarkdownAceEditor(converter, idPostfix, options) {
   bindButtonToCommand(buttons.buttonElements.hr,
                       ruleInsertEditor,
                       {editor: editor, rule: '----------'});
-  buttons.makeSpacer(3);
+  buttons.makeSpacer(++spacerNum);
   // for these two buttons bind commands later
   buttons.makeButton('undo', defaultStrings['undo'], '-200px');
   buttons.makeButton('redo', defaultStrings['redo'], '-220px');
   // ACE options
-  buttons.makeSpacer(4);
+  buttons.makeSpacer(++spacerNum);
   buttons.makeButton('settings', defaultStrings['settings'], '-280px');  
   aceSettingsFormOptions.fields.forEach(function(field) { field.checked = aceOptions[field.name]; })
   bindButtonToCommand(buttons.buttonElements.settings,
@@ -245,17 +247,32 @@ function MarkdownAceEditor(converter, idPostfix, options) {
                        },
                        inserter: setEditorOptions});
   buttons.xPosition += 13;
-  buttons.makeDropDown('keybinding', 'Keybinding: ', 180, false, '-15px',
+  buttons.makeDropDown('keybinding', 'Keybinding: ', 165, false, '-15px',
                        keybindings, this.aceOptions.keybinding);
   buttons.buttonElements.keybinding.addEventListener('change',
                                                      changeDropDown.bind(buttons.buttonElements.keybinding,
                                                                          function(d) { editor.setKeyboardHandler(d); }));
 
-  buttons.makeDropDown('mode', 'Mode: ', 180, true, '5px',
+  buttons.makeDropDown('mode', 'Mode: ', 165, true, '5px',
                        modes, this.aceOptions.mode);
   buttons.buttonElements.mode.addEventListener('change',
                                                changeDropDown.bind(buttons.buttonElements.mode,
                                                                    function(d) { editor.getSession().setMode(d); }));
+  // auto-preview
+  buttons.makeSpacer(++spacerNum);
+  buttons.makeCheckBox('autopreview', 'Auto-Preview:', this.aceOptions.autoPreview,
+                       100, false, '-15px');
+  buttons.buttonElements.autopreview.querySelector('input')
+  .addEventListener('change', function(event) {
+    aceOptions.autoPreview = event.srcElement.checked;
+    setSettingsCookie(aceOptions);
+    editor.focus();
+  });  
+  buttons.makeActionButton('preview', 'Preview', function(event) { 
+    panels.preview.innerHTML = converter.makeHtml(editor.getValue());
+    hooks.onPreviewRefresh(self);
+    editor.focus();
+  }, 100, true, '9px');
 
   if (options.helpButton) {
     buttons.makeButton('help', defaultStrings['help'], '-240px');
@@ -270,16 +287,18 @@ function MarkdownAceEditor(converter, idPostfix, options) {
   } 
      
   this.refreshState = function() {
-    panels.preview.innerHTML = converter.makeHtml(editor.getValue());
+    if (aceOptions.autoPreview) {
+      panels.preview.innerHTML = converter.makeHtml(editor.getValue());
+      hooks.onPreviewRefresh(self);
+    }
     refreshButton(buttons.buttonElements.undo, 
                   undoManager.hasUndo.bind(undoManager),
                   undoManager.undo.bind(undoManager));
-    // weird timing issue, i don't understand why i need to put this in a timeout block
+    // weird timing issue, I don't understand why I need to put this in a timeout block
     setTimeout(refreshButton, 0,
                buttons.buttonElements.redo,
                undoManager.hasRedo.bind(undoManager),
                undoManager.redo.bind(undoManager));
-    hooks.onPreviewRefresh(self);    
     function refreshButton(button, stateChecker, command) {
       if (stateChecker()) {
         setupButton(button, true);
@@ -369,9 +388,9 @@ ButtonCollection.prototype.makeDropDown = function(id, title, width, shift, marg
   dropDown.className = 'wmd-select ' + id; 
   var fieldset = dropDown.appendChild(document.createElement('fieldset'));
   var label = fieldset.appendChild(document.createElement('label'));
-  label.textContent = title; label.for = id;
   var select = fieldset.appendChild(document.createElement('select'));
   select.id = 'wmd-' + id + '-select' + this.idPostfix;
+  label.textContent = title; label.htmlFor = select.id;
   for (var key in data) {
     var option = document.createElement('option');
     option.value = data[key];
@@ -382,6 +401,40 @@ ButtonCollection.prototype.makeDropDown = function(id, title, width, shift, marg
   this.buttonRow.appendChild(dropDown);
   this.buttonElements[id] = dropDown;
   return dropDown;
+}
+
+ButtonCollection.prototype.makeCheckBox = function(id, labelText, checked, 
+                                                   width, shift, marginTop) {
+  var checkBox = document.createElement("li");  
+  checkBox.style.left = this.xPosition + 'px';
+  if (shift) this.xPosition += width;
+  checkBox.style.marginTop = marginTop;
+  checkBox.className = 'wmd-checkbox ' + id;
+  var fieldset = checkBox.appendChild(document.createElement('fieldset'));
+  var label = fieldset.appendChild(document.createElement('label'));
+  var input = fieldset.appendChild(document.createElement('input'));
+  input.type = 'checkbox'; input.checked = checked;
+  input.id = 'wmd-' + id + '-checkbox' + this.idPostfix;
+  label.textContent = labelText; label.htmlFor = input.id;
+  this.buttonRow.appendChild(checkBox);
+  this.buttonElements[id] = checkBox;
+  return checkBox;
+}
+
+ButtonCollection.prototype.makeActionButton = function(id, buttonText, action, 
+                                                       width, shift, marginTop) {
+  var buttonLi = document.createElement("li");  
+  buttonLi.style.left = this.xPosition + 'px';
+  if (shift) this.xPosition += width;
+  buttonLi.style.marginTop = marginTop;
+  buttonLi.className = 'wmd-action-button ' + id;
+  var button = buttonLi.appendChild(document.createElement('button'));
+  button.type = 'button';
+  button.textContent = buttonText;
+  button.addEventListener('click', action);
+  this.buttonRow.appendChild(buttonLi);
+  this.buttonElements[id] = buttonLi;;
+  return buttonLi;
 }
 
 function setupButton(button, isEnabled) {  
@@ -742,7 +795,7 @@ function createForm(options) {
     var fieldset = document.createElement('fieldset');
     var label = document.createElement('label');
     label.textContent = field.label + ': ';
-    label.for = field.name;
+    label.htmlFor = field.name;
     var input = document.createElement('input')
     input.name = field.name;
     switch(field.type) {

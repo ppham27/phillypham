@@ -334,6 +334,10 @@ textarea.wmd-input {
   left: 371px;
 }
 
+.wmd-spacer5 {
+  left: 600px;
+}
+
 .wmd-button {
   width: 20px;
   height: 20px;
@@ -345,8 +349,7 @@ textarea.wmd-input {
   cursor: pointer;
 }
 
-
-.wmd-button-bar .wmd-select {
+.wmd-button-bar .wmd-select, .wmd-button-bar .wmd-checkbox, .wmd-button-bar .wmd-action-button {
   text-align: right;
   font-size: 90%;
   height: 20px;

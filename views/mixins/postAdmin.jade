@@ -1,2 +1,3 @@
 mixin postAdmin(post)
-  a(href="/post/" + post.id) Edit
+  if post.id
+    a(href="/post/" + post.id) Edit
