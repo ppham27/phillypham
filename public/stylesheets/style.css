@@ -405,7 +405,7 @@ textarea.wmd-input {
   border-bottom: 1px solid #222;
 }
 
-#registration-form input {
+#registration-form input.text {
   width: 200px;
 }
 

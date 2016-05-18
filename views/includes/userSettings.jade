@@ -2,9 +2,9 @@ mixin descriptiveFieldSet(label, name, value, placeholder, note, secret, autofoc
   fieldset(class=name)
     label(for=name)= label + ':'
     if (secret===true)
-      input(type="password", name=name, value=value, placeholder=placeholder, autofocus=autofocus).encrypt
+      input.text(type="password", name=name, value=value, placeholder=placeholder, autofocus=autofocus).encrypt
     else 
-      input(type="text", name=name, value=value, placeholder=placeholder, autofocus=autofocus)
+      input.text(type="text", name=name, value=value, placeholder=placeholder, autofocus=autofocus)
     span.field-sublabel!= note
 
 if (locals.update)
