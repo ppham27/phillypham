@@ -38,5 +38,6 @@ function makeTagName(name) {
   if (name === 'css') return name;
   if (name === 'meta') return name;
   if (name === 'combinatorics') return name;
+  if (name === 'codeforces') return name;
   return inflection.singularize(name);
 }
