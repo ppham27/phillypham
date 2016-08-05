@@ -5,7 +5,7 @@ block content
   p The quickest way to register is through your existing Facebook or Google account.
   include ./includes/loginButtons.jade
   script
-    include ../public/javascripts/encryptPasswordBundle.js
+    include ../public/javascripts/encryptPasswordBundle-min.js
   form#registration-form(method="POST", action="/register", onsubmit="return encryptPassword(this);")
     h2 Email Registration
     include ./includes/userSettings.jade

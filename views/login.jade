@@ -3,7 +3,7 @@ extends layout
 block content
   h1= title
   script
-    include ../public/javascripts/encryptPasswordBundle.js
+    include ../public/javascripts/encryptPasswordBundle-min.js
   form#login-form(action="/login", method="POST", onsubmit="return encryptPassword(this);")
     input.text(type="text", name="email", placeholder="Email", autofocus=true)
     br
