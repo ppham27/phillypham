@@ -227,7 +227,8 @@ describe('comments', function() {
     describe('unpublished', function() {
       beforeEach(function(done) {
         var browser = this.browser;
-        browser.click('.unposted-comments button.edit[data-comment-id="7"]')
+        browser.pause(1000)
+        .click('.unposted-comments button.edit[data-comment-id="7"]')
         .pause(2000)
         .then(function() {
           done();
@@ -285,7 +286,8 @@ describe('comments', function() {
     describe('published', function() {
       beforeEach(function(done) {
         var browser = this.browser;
-        browser.click('.posted-comments button.edit[data-comment-id="2"]')
+        browser.pause(1000)
+        .click('.posted-comments button.edit[data-comment-id="2"]')
         .pause(2000)
         .then(function() {
           done();
@@ -294,7 +296,8 @@ describe('comments', function() {
 
       it('should update a comment', function(done) { 
         var browser = this.browser;
-        browser.doubleClick('#wmd-editor-comment')
+        browser
+        .click('#wmd-editor-comment')
         .keys('newly updated comment')
         .click('.comment-editor button.submit-button.save')
         .pause(3000)
@@ -308,6 +311,9 @@ describe('comments', function() {
         .then(function(text) {
           expect(text).match(/newly updated comment/);
           done();
+        })
+        .catch(function(err) {
+          done(err);
         });
       });
 
@@ -865,6 +871,9 @@ describe('comment without being logged in at all', function() {
           done();
         });
       });
+    })
+    .catch(function(err) {
+      done(err);
     });
   });
 
@@ -886,7 +895,7 @@ describe('comment without being logged in at all', function() {
     .pause(3000)
     .setValue('#Passwd', testUser.password)
     .click('#signIn')
-    .pause(3000)            
+    .pause(5000)            
     .click('#submit_approve_access') 
     .pause(3000)
     .url() 
@@ -904,6 +913,9 @@ describe('comment without being logged in at all', function() {
           done();
         });
       });
+    })
+    .catch(function(err) {
+      done(err);
     });
   });
 });

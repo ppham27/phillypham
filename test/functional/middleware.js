@@ -332,8 +332,9 @@ describe('middleware', function() {
         .click('#facebook-button')
         .setValue('#email', user.email)
         .setValue('#pass', user.password)
-        .click('button[name="login"]')
         .pause(1000)
+        .click('button[name="login"]')
+        .pause(3000)
         .click('button[name="__CANCEL__"]')
         .pause(2000)
         .url()
@@ -344,6 +345,7 @@ describe('middleware', function() {
         .then(function(text) {
           expect(text).to.match(/Permissions error/);
         })
+        .pause(1000)
         .click('#facebook-button') //try again
         .pause(1000)
         .click('button[name="__CONFIRM__"]')
@@ -361,6 +363,9 @@ describe('middleware', function() {
             expect(user).to.not.be.null;
             done();
           });          
+        })
+        .catch(function(err) {
+          done(err);
         });        
       });
       
