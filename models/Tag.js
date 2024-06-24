@@ -3,21 +3,12 @@ var Promise = require('bluebird');
 var inflection = require('inflection');
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Tag', {
+  model = sequelize.define('Tag', {
     name: {type: DataTypes.STRING, unique: true, allowNull: false,
            validate: {len: {args: [1, 64], msg: 'tag cannot be empty string'}}}
   },
                           {
                             tableName: 'tags',
-                            classMethods: {
-                              associate: function(db) {
-                                db.Tag.belongsToMany(db.Post, {through: db.PostTag});
-                              },
-                              findOrCreateByName: function(name) {
-                                var tagName = makeTagName(name);
-                                return this.findOrCreate({where: {name: tagName}});
-                              }
-                            },
                             hooks: {
                               beforeUpdate: function(tag) {                                
                                 tag.name = makeTagName(tag.name);
@@ -29,6 +20,14 @@ module.exports = function(sequelize, DataTypes) {
                               }
                             }                            
                           });
+  model.associate = function(db) {
+    db.Tag.belongsToMany(db.Post, {through: db.PostTag});
+  }
+  model.findOrCreateByName = function(name) {
+    var tagName = makeTagName(name);
+    return model.findOrCreate({where: {name: tagName}});
+  }
+  return model;
 }
 
 function makeTagName(name) {

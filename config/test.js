@@ -16,7 +16,7 @@ var config = {
   appKeys: {
     facebook: JSON.parse(fs.readFileSync(path.join(__dirname, 'facebookTest.json'), 'utf8')),
     // an object with two keys: clientID and clientSecret
-    google: JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8')).appKey ,
+    google: JSON.parse(fs.readFileSync(path.join(__dirname, 'google.json'), 'utf8')).appKey,
     sweetCaptcha: JSON.parse(fs.readFileSync(path.join(__dirname, 'sweetCaptcha.json'), 'utf8'))
   },
   smtpOptions: JSON.parse(fs.readFileSync(path.join(__dirname, 'smtp.json'), 'utf8')),

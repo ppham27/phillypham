@@ -6,7 +6,7 @@ var random = require('../lib/random');
 
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define("User", {
+  model = sequelize.define("User", {
     displayName: {type: DataTypes.STRING, field: 'display_name', unique: true, allowNull: false, 
                   validate: {len: {args: [1, 64], msg: 'username is too short'}}},
     email: {type: DataTypes.STRING, unique: true, allowNull: true,
@@ -27,8 +27,31 @@ module.exports = function(sequelize, DataTypes) {
     twitterId: {type: DataTypes.STRING, unique: true, allowNull: true, field: 'twitter_id'}    
   },
                           { tableName: 'users',
-                            classMethods: {
-                              associate: function(db) {
+                            hooks: {
+                              beforeValidate: function(user) {
+                                // user already exists, do nothing
+                                if (user.id) return Promise.resolve(user);
+                                var originalDisplayName = user.displayName;
+                                function newNamePromise(displayName) {
+                                  return user.constructor.findOne({where: {displayName: displayName}})
+                                         .then(function(oldUser) {
+                                           if (oldUser === null) return Promise.resolve(user);
+                                           // 1 byte should be enough
+                                           user.displayName = originalDisplayName + random.int(1);
+                                           return newNamePromise(user.displayName);
+                                         });
+                                }
+                                return newNamePromise(originalDisplayName);
+                              },
+                              beforeUpdate: beforeSave,
+                              beforeCreate: beforeSave,
+                              afterValidate: function(user) {
+                                if (user.email) user.email = user.email.toLowerCase();
+                                return user.hashPassword();
+                              }
+                            }});
+
+  model.associate = function(db) {
                                 db.User.belongsTo(db.UserGroup, {foreignKey: {fieldName: 'userGroupId', field: 'user_group_id', allowNull: false}, 
                                                                  constraints: true, onDelete: 'RESTRICT'});
                                 db.User.hasMany(db.Project, {foreignKey: {fieldName: 'userId', field: 'user_id', allowNull: false}, 
@@ -38,10 +61,9 @@ module.exports = function(sequelize, DataTypes) {
                                 db.User.hasMany(db.Comment, {foreignKey: {fieldName: 'userId', field: 'user_id', allowNull: false}, 
                                                              constraints: true, onDelete: 'CASCADE'});
                                 db.User.belongsToMany(db.Role, {through: db.UserRole});
-                              },
-                              authenticate: function(email, password) {
-                                var User = this;
-                                return User.findOne({where: {email: email}})
+                              }
+  model.authenticate = function(email, password) {
+                                return model.findOne({where: {email: email}})
                                        .then(function(user) {
                                          if (!user) {   
                                            return Promise.reject(new Sequelize.ValidationError('user does not exist'));
@@ -56,24 +78,21 @@ module.exports = function(sequelize, DataTypes) {
                                          }
                                        });
                               }
-                          }, 
-                            instanceMethods: {
-                              hasPermission: function(permission) {                                
-                                var db = require('./index');
-                                var user = this;
-                                return db.Role.find({where: {name: permission}})
-                                       .then(function(role) {
-                                         return Promise.all([user.hasRole(role), 
-                                                             user.getUserGroup()
-                                                             .then(function(userGroup) {
-                                                               return userGroup.hasRole(role);
-                                                             })]);
-                                       })
-                                       .then(function(isPermitted) {
-                                         return Promise.resolve(user.emailVerified && isPermitted.some(function(p) { return p; }));
-                                       });
-                              },
-                              hashPassword: function() {
+  model.prototype.hasPermission = function(permission) {
+    var db = require('./index');
+    var user = this;
+    return db.Role.find({where: {name: permission}})
+      .then(function(role) {
+        return Promise.all([user.hasRole(role),
+                            user.getUserGroup()
+                            .then(function(userGroup) {
+                              return userGroup.hasRole(role);
+                            })]);
+      }).then(function(isPermitted) {
+        return Promise.resolve(user.emailVerified && isPermitted.some(function(p) { return p; }));
+      });
+  }
+  model.prototype.hashPassword = function() {
                                 var user = this;
                                 // no password needs to be hashed
                                 if (!user.password || user.salt) return Promise.resolve(user);
@@ -98,31 +117,7 @@ module.exports = function(sequelize, DataTypes) {
                                        }); 
                                 
                               }
-                            },
-                            hooks: {
-                              beforeValidate: function(user) {
-                                // user already exists, do nothing
-                                if (user.id) return Promise.resolve(user);
-                                var originalDisplayName = user.displayName;
-                                function newNamePromise(displayName) {
-                                  return user.Model.findOne({where: {displayName: displayName}})
-                                         .then(function(oldUser) {
-                                           if (oldUser === null) return Promise.resolve(user);
-                                           // 1 byte should be enough
-                                           user.displayName = originalDisplayName + random.int(1);
-                                           return newNamePromise(user.displayName);
-                                         });
-                                }
-                                return newNamePromise(originalDisplayName);
-                              },
-                              beforeUpdate: beforeSave,
-                              beforeCreate: beforeSave,
-                              afterValidate: function(user) {
-                                if (user.email) user.email = user.email.toLowerCase();
-                                return user.hashPassword();
-                              }
-                            }});
-
+  return model;
 }
 
 function beforeSave(user) {

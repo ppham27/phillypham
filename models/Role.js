@@ -1,13 +1,11 @@
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Role', {
+  model = sequelize.define('Role', {
     name: {type: DataTypes.STRING, unique: true, allowNull: false},
     description: {type: DataTypes.TEXT}
-  },
-                          { classMethods: {
-                            associate: function(db) {
+  }, {tableName: 'roles'});
+  model.associate = function(db) {
                               db.Role.belongsToMany(db.User, {through: db.UserRole});
                               db.Role.belongsToMany(db.UserGroup, {through: db.UserGroupRole});
-                            }
-                          },
-                            tableName: 'roles'});
+  }
+  return model;
 };

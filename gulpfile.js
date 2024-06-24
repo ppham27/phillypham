@@ -4,7 +4,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 var gulp = require('gulp');
 var fs = require('fs');
 var browserify = require('browserify');
-var ClosureCompiler = require('closurecompiler');
+var ClosureCompiler = require('google-closure-compiler').compiler;
 var envify = require('envify/custom');
 var child_process = require('child_process');
 var config = require('config')
@@ -18,27 +18,27 @@ gulp.task('markdown-help', function(done) {
   done();
 });
 
-gulp.task('markdown-browserify', ['markdown-help'], function(done) {
+gulp.task('markdown-browserify', gulp.series('markdown-help', function(done) {
   var b = browserify('./public/javascripts/loadMarkdown.js');
-  var bStream = b.transform('uglifyify').bundle();  
+  var bStream = b.transform('uglifyify').bundle();
   bStream.on('end', function() {
     done();
   });
-  bStream.pipe(fs.createWriteStream('./public/javascripts/markdownBundle.js')); 
-});
+  bStream.pipe(fs.createWriteStream('./public/javascripts/markdownBundle.js'));
+}));
 
-gulp.task('markdown-closurecompiler', ['markdown-browserify'], function(done) {
-  var cc = child_process.spawn('ccjs', 
-                               ['./public/javascripts/markdownBundle.js',
-                                '--language_in=ECMASCRIPT5', '--compilation_level=SIMPLE_OPTIMIZATIONS']);
-  cc.stdout.pipe(fs.createWriteStream('./public/javascripts/markdownBundle-min.js'));
-  cc.stderr.pipe(process.stdout);
-  cc.on('exit', function() {
-    done();
+gulp.task('markdown-closurecompiler', gulp.series('markdown-browserify', function(done) {
+  const closureCompiler = new ClosureCompiler({
+      'js': './public/javascripts/markdownBundle.js',
+      'js_output_file': './public/javascripts/markdownBundle-min.js',
+      'language_in': 'ECMASCRIPT5',
+      'language_out': 'ECMASCRIPT5',
+      'compilation_level': 'SIMPLE_OPTIMIZATIONS',
   });
-});
+  closureCompiler.run(function(exitCode, stdOut, stdErr) { done(); });
+}));
 
-gulp.task('markdown', ['markdown-closurecompiler']);
+gulp.task('markdown', gulp.series('markdown-closurecompiler'));
 
 gulp.task('encryptPassword-browserify', function(done) {
   var b = browserify('./public/javascripts/encryptPassword.js');
@@ -51,23 +51,24 @@ gulp.task('encryptPassword-browserify', function(done) {
   bStream.pipe(fs.createWriteStream('./public/javascripts/encryptPasswordBundle.js')); 
 });
 
-gulp.task('encryptPassword-closurecompiler', ['encryptPassword-browserify'], function(done) {
-  // compilation_level: "ADVANCED_OPTIMIZATIONS", possible additional optimization?
-  ClosureCompiler.compile('./public/javascripts/encryptPasswordBundle.js',
-                          {language_in: 'ECMASCRIPT5', compilation_level: "SIMPLE_OPTIMIZATIONS"},
-                          function(err, res) {
-                            if (err) console.info(err);
-                            fs.writeFile('./public/javascripts/encryptPasswordBundle-min.js', res,
-                                         function(err) {
-                                           if (err) throw err;
-                                           done();
-                                         });
-                          });
-});
+gulp.task('encryptPassword-closurecompiler', gulp.series('encryptPassword-browserify', function(done) {
+  const closureCompiler = new ClosureCompiler({
+      'js': './public/javascripts/encryptPasswordBundle.js',
+      'js_output_file': './public/javascripts/encryptPasswordBundle-min.js',
+      'language_in': 'ECMASCRIPT5',
+      'language_out': 'ECMASCRIPT5',
+      'compilation_level': 'SIMPLE_OPTIMIZATIONS',
+  });
+  closureCompiler.run(function(exitCode, stdOut, stdErr) {
+    console.error(stdErr);
+    done();
+  });
+}));
 
-gulp.task('encryptPassword', ['encryptPassword-closurecompiler']);
+gulp.task('encryptPassword', gulp.series('encryptPassword-closurecompiler'));
 
-gulp.task('javascripts', ['encryptPassword']);
+gulp.task('javascripts', gulp.series('encryptPassword'));
+
 
 // sequelize migrations
 
@@ -95,8 +96,9 @@ gulp.task('db:start', function() {
 });
 
 gulp.task('db:migrate', function(done) {  
-  var sequelize = child_process.spawn('sequelize', ['db:migrate'])
-                  .stdout.pipe(process.stdout);
+  const sequelize = child_process.spawn('sequelize', ['db:migrate']);
+  sequelize.stdout.pipe(process.stdout);
+  sequelize.stderr.pipe(process.stderr);
   sequelize.on('exit', function() {
     done();
   });
@@ -132,4 +134,4 @@ gulp.task('test:functional', function(done) {
 });
 
 // necessary tasks to start the app
-gulp.task('default', ['javascripts', 'db:migrate']);
+gulp.task('default', gulp.series('javascripts', 'db:migrate'));

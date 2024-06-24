@@ -10,7 +10,7 @@ Developer Guide
 
 To get this app up and running there are several requirements:
 1. Redis, used for sessions and the Application Settings model
-2. A Postgres SQL database for the rest of the models, installing with homebrew is easiest. Make sure to run `createdb phillypham_development` and `createdb phillypham_test`.
+2. A Postgres SQL database for the rest of the models, installing with homebrew is easiest. Make sure to run `NODE_ENV=development npx sequelize db:create` and `NODE_ENV=test npx sequelize db:create`.
 3. Obviously, [Node.js](https://nodejs.org/).
 
 The easiest way to get these things is [Homebrew](http://brew.sh/). 
@@ -52,8 +52,8 @@ for the public key.
   2. uglifyify
   3. browserify
   4. closurecompiler
-2. `gulp markdown`
-3. `gulp javascripts`
+2. `npx gulp markdown`
+3. `npx gulp javascripts`
 4. `npm start`
 
 Now you can visit the site at [http://localhost:3000](http://localhost:3000).

@@ -3,7 +3,7 @@ var Promise = require('bluebird');
 var converter = require('../lib/markdown').Converter;
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Project', {
+  model = sequelize.define('Project', {
     title: {type: DataTypes.STRING, unique: true, allowNull: false,
             validate: {len: {args: [1, 128], msg: 'title cannot be empty string'}}},
     summary: {type: DataTypes.TEXT, allowNull: false},
@@ -16,14 +16,9 @@ module.exports = function(sequelize, DataTypes) {
     thumbnail: {type: DataTypes.STRING, defaultValue: '/images/GitHub-Mark.png'},
     published: {type: DataTypes.BOOLEAN, defaultValue: false},
     publishedAt: {type: DataTypes.DATE, allowNull: true, field: 'published_at', defaultValue: null}
-  },
-                          { classMethods: {
-                            associate: function(db) {
-                              db.Project.belongsTo(db.User, {foreignKey: {fieldName: 'userId', field: 'user_id', allowNull: false}, 
-                                                             constraints: true, onDelete: 'RESTRICT'});
-                            }
-                          }, tableName: 'projects',
-                            hooks: {
+  }, {
+    tableName: 'projects',
+    hooks: {
                               beforeUpdate: function(project) {
                                 if (project.changed('published')) project.publishedAt = new Date();
                                 if (project.description) project.descriptionHtml = converter.makeHtml(project.description);
@@ -37,6 +32,12 @@ module.exports = function(sequelize, DataTypes) {
                                 return Promise.resolve(project);
                               }
                             }});
+
+  model.associate = function(db) {
+    db.Project.belongsTo(db.User, {foreignKey: {fieldName: 'userId', field: 'user_id', allowNull: false},
+                                   constraints: true, onDelete: 'RESTRICT'});
+  }
+  return model;
 }
 
 

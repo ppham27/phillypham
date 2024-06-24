@@ -24,7 +24,7 @@ describe('Markdown', function() {
 // <a href="">no space</a>\n\
 // <a href="http://www.yahoo.com">phil</a>';
         var html = this.converter.makeHtml(markdown);
-        var expectedHtml = '<p>// <a href="http://www.google.com" target="_blank">phil</a>\n// <a href="http://www.google.com" target="_self">self</a>\n// <a href="#abc">chris</a>\n// <a href="http://www.facebook.com" target="_blank">phil</a>\n// <a target="_blank">improper</a>\n// <a href target="_blank">nothing</a>\n// <a href target="_blank">no space</a>\n// <a href="http://www.yahoo.com" target="_blank">phil</a></p>';
+        var expectedHtml = '<p>// <a href="http://www.google.com" target="_blank">phil</a>\n// <a href="http://www.google.com" target="_self">self</a>\n// <a href="#abc">chris</a>\n// <a href="http://www.facebook.com" target="_blank">phil</a>\n// <a target="_blank">improper</a>\n// <a target="_blank">nothing</a>\n// <a target="_blank">no space</a>\n// <a href="http://www.yahoo.com" target="_blank">phil</a></p>';
         expect(html).to.equal(expectedHtml);
       });
     });
@@ -100,7 +100,7 @@ describe('Markdown', function() {
       });
 
       it('should preserve svg elements and their attributes', function() {
-        var dirtyHtml = '<div><p><svg><circle cx="10" cy="10" r="5" style="fill: red;"></circle></svg></p></div>'
+        var dirtyHtml = '<div><p><svg><circle cx="10" cy="10" r="5" style="fill:red"></circle></svg></p></div>'
         var cleanHtml = this.converter.makeHtml(dirtyHtml);
         expect(cleanHtml).to.equal(dirtyHtml);
       });
