@@ -63,21 +63,21 @@ module.exports = function(sequelize, DataTypes) {
                                 db.User.belongsToMany(db.Role, {through: db.UserRole});
                               }
   model.authenticate = function(email, password) {
-                                return model.findOne({where: {email: email}})
-                                       .then(function(user) {
-                                         if (!user) {   
-                                           return Promise.reject(new Sequelize.ValidationError('user does not exist'));
-                                         } else {                                           
-                                           return new Promise(function(resolve, reject) {
-                                                                bcrypt.compare(password, user.password, function(err, res) {
-                                                                  if (err) reject(err);
-                                                                  if (res) return resolve(user);
-                                                                  return reject(new Sequelize.ValidationError('invalid password'));
-                                                                });
-                                                              });
-                                         }
-                                       });
-                              }
+    return this.findOne({where: {email: email}})
+      .then(function(user) {
+        if (!user) {
+          return Promise.reject(new Sequelize.ValidationError('user does not exist'));
+        } else {
+          return new Promise(function(resolve, reject) {
+            bcrypt.compare(password, user.password, function(err, res) {
+              if (err) reject(err);
+              if (res) return resolve(user);
+              return reject(new Sequelize.ValidationError('invalid password'));
+            });
+          });
+        }
+      });
+  }
   model.prototype.hasPermission = function(permission) {
     var db = require('./index');
     var user = this;
