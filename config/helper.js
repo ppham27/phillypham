@@ -11,6 +11,12 @@ exports.parseSqlUrl = function(url) {
   config.port = match[5];
   config.database = match[6] || null;
   config.url = url;
+  if (config.url.includes("rds.amazonaws.com")) {
+    config.dialectOptions = {}
+    config.dialectOptions.ssl = {}
+    config.dialectOptions.ssl.require = true
+    config.dialectOptions.ssl.rejectUnauthorized = false
+  }
   return config;
 }
 
