@@ -4,7 +4,7 @@ var helper = require(__dirname + '/helper');
 var sequelizeConfig = JSON.parse(fs.readFileSync(__dirname + '/config.json', 'utf8'))[process.env.NODE_ENV];
 
 var config = {  
-  siteUrl: 'http://www.phillypham.com',
+  siteUrl: 'https://www.phillypham.com',
   secret: process.env.SECRET,
   rsaPublicKey: process.env.RSA_PUBLIC_KEY,
   rsaPrivateKey: process.env.RSA_PRIVATE_KEY,

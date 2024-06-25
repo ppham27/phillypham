@@ -3,13 +3,13 @@
   "author": {
     "name": "Philip Pham",
     "email": "phil@phillypham.com",
-    "url": "http://www.phillypham.com"
+    "url": "https://www.phillypham.com"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/ppham27/phillypham.git"
   },
-  "version": "0.8.0",
+  "version": "0.8.1",
   "license": "MIT",
   "private": true,
   "engines": {
