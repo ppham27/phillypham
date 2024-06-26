@@ -16,7 +16,7 @@ router.get('/list', authorize({role: 'poster'}), function(req, res, next) {
   };
   db.Post.findAll({
     where: where,
-    order: 'created_at DESC',
+    order: [['created_at', 'DESC']],
     include: [{model: db.User, attributes: ['id', 'displayName']}]})
   .then(function(posts) {
     res.render('post/list', {title: 'Posts', posts: posts});
