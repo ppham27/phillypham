@@ -106,7 +106,7 @@ router.get('/edit/:title', authorize({role: 'project_manager'}), function(req, r
 
 router.get('/', function(req, res, next) {
   db.Project.findAll({where: {published: true}, 
-                      order: 'published_at DESC',
+                      order: [['published_at', 'DESC']],
                       include: [{model: db.User, attributes: ['id', 'displayName']}]})
   .then(function(projects) {
     res.render('projects/index', {title: 'Projects', projects: projects});
